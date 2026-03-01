@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleep Gift</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Фон с чешуйками -->
+    <canvas id="hex-bg"></canvas>
+    
+    <div class="header">
+        <div class="header-left">
+            <div class="header-avatar">
+                <span class="header-avatar-emoji">🎮</span>
+            </div>
+            <div class="header-user-info">
+                <div class="header-username" id="header-username">PLAYER</div>
+                <div class="header-level-row">
+                    <span class="header-level-badge">1 ▲</span>
+                    <span class="header-xp-dots">1 · · 2</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-coins-block">
+                <div class="header-coin-row">
+                    <span id="header-gold-flip">0</span>
+                    <span class="header-coin-emoji">🟡</span>
+                </div>
+                <div class="header-coin-row">
+                    <span id="header-silver-flip">0</span>
+                    <span class="header-coin-emoji">⚪</span>
+                </div>
+            </div>
+            <button class="header-plus-btn" onclick="openTopUpModal()">+</button>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="welcome-text" id="welcome">
+            <h2>Добро пожаловать!</h2>
+            <p>Используйте нижние кнопки для навигации по приложению. При первом входе вам начислено 1000 серебряных F-коинов. Удачи в игре!</p>
+        </div>
+        
+        <div id="game-section" class="content-section">
+            <h2 class="game-section-title">ИГРЫ</h2>
+
+            <!-- Карточки игр в стиле референса -->
+            <div class="game-cards-list">
+
+                <div class="game-card-new" onclick="selectGame('rocket')">
+                    <div class="game-card-new-bg game-card-bg-rocket"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">РАКЕТКА</div>
+                    </div>
+                    <div class="game-card-image-wrap game-card-img-rocket">
+                        <span class="game-card-emoji-big">🚀</span>
+                    </div>
+                </div>
+
+                <div class="game-card-new" onclick="selectGame('mines')">
+                    <div class="game-card-new-bg game-card-bg-mines"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">МИНЫ</div>
+                    </div>
+                    <div class="game-card-image-wrap game-card-img-mines">
+                        <span class="game-card-emoji-big">💣</span>
+                    </div>
+                </div>
+
+                <div class="game-card-new" onclick="selectGame('roulette')">
+                    <div class="game-card-new-bg game-card-bg-roulette"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">РУЛЕТКА</div>
+                    </div>
+                    <div class="game-card-image-wrap game-card-img-roulette">
+                        <span class="game-card-emoji-big">🎰</span>
+                    </div>
+                </div>
+
+                <div class="game-card-new" onclick="selectGame('cases')">
+                    <div class="game-card-new-bg game-card-bg-cases"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">КЕЙСЫ</div>
+                    </div>
+                    <div class="game-card-image-wrap game-card-img-cases">
+                        <span class="game-card-emoji-big">🎁</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <!-- Игра "Мины" -->
+            <div id="mines-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+
+                <!-- НАСТРОЙКИ (скрываются во время игры) -->
+                <div class="game-settings mines-settings-new" id="mines-settings-panel">
+
+                    <!-- Размер поля -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Поле</span>
+                        <div class="mines-toggle-group">
+                            <button class="mines-toggle active" data-size="3">3×3</button>
+                            <button class="mines-toggle" data-size="5">5×5</button>
+                            <button class="mines-toggle" data-size="10">10×10</button>
+                        </div>
+                    </div>
+
+                    <!-- Мины -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Мины</span>
+                        <div class="mines-mine-counter">
+                            <button class="mines-counter-btn" onclick="mineCountChange(-1)">−</button>
+                            <span id="mines-count-display">1</span>
+                            <button class="mines-counter-btn" onclick="mineCountChange(1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Ставка + выбор валюты -->
+                    <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
+                        <input class="mines-bet-input" id="mines-bet-input" type="number" value="100" min="10"
+                            oninput="minesBetInputChange(this.value)"
+                            style="flex:1;font-size:1.1rem;padding:12px 14px;" />
+                        <!-- Серебро -->
+                        <div id="mines-currency-silver" onclick="setMinesCurrency('silver')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;flex-shrink:0;transition:all 0.18s;">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <circle cx="14" cy="14" r="13" fill="url(#silver_grad)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                                <defs><radialGradient id="silver_grad" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#e8e8f0"/><stop offset="60%" stop-color="#b0b0c8"/><stop offset="100%" stop-color="#7878a0"/></radialGradient></defs>
+                                <text x="14" y="19" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Arial">F</text>
+                            </svg>
+                            <span style="font-size:0.5rem;color:#c084fc;font-weight:800;letter-spacing:0.5px;">СЕР</span>
+                        </div>
+                        <!-- Золото -->
+                        <div id="mines-currency-gold" onclick="setMinesCurrency('gold')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #2a2a3a;background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;flex-shrink:0;transition:all 0.18s;">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <circle cx="14" cy="14" r="13" fill="url(#gold_grad)" stroke="rgba(255,220,0,0.3)" stroke-width="1"/>
+                                <defs><radialGradient id="gold_grad" cx="38%" cy="32%" r="70%"><stop offset="0%" stop-color="#ffe566"/><stop offset="60%" stop-color="#f0a500"/><stop offset="100%" stop-color="#b87000"/></radialGradient></defs>
+                                <text x="14" y="19" text-anchor="middle" font-size="11" font-weight="900" fill="#7a3d00" font-family="Arial">F</text>
+                            </svg>
+                            <span style="font-size:0.5rem;color:#aaa;font-weight:800;letter-spacing:0.5px;">ЗОЛ</span>
+                        </div>
+                        <button class="mines-max-btn" onclick="minesSetMax()" style="height:54px;padding:0 14px;flex-shrink:0;">MAX</button>
+                    </div>
+
+                    <p class="balance-warning" id="balance-warning" style="display:none;">
+                        <i class="fas fa-exclamation-triangle"></i> Недостаточно средств!
+                    </p>
+
+                    <!-- Кнопка ИГРАТЬ -->
+                    <button class="mines-play-btn" onclick="startGame()" id="play-btn">
+                        ИГРАТЬ
+                    </button>
+                </div>
+
+                <!-- ИГРОВОЕ ПОЛЕ (показывается во время игры) -->
+                <div id="game-board" class="mines-board-new hidden">
+
+                    <!-- Статистика во время игры -->
+                    <div class="mines-live-stats">
+                        <div class="mines-live-chip">
+                            <span>💣</span>
+                            <span id="mines-left">1</span>
+                        </div>
+                        <div class="mines-live-chip green-chip">
+                            <span id="current-coef">1.00×</span>
+                        </div>
+                        <div class="mines-live-chip">
+                            <span>+<span id="current-win">0</span> F</span>
+                        </div>
+                    </div>
+
+                    <!-- Сетка мин -->
+                    <div class="mines-grid-new" id="mines-grid"></div>
+
+                    <!-- Кнопка ЗАБРАТЬ -->
+                    <button class="mines-cashout-btn" onclick="cashOut()" id="cashout-btn" disabled>
+                        ЗАБРАТЬ
+                    </button>
+                </div>
+
+                <!-- Скрытые элементы для совместимости -->
+                <span id="game-balance" style="display:none">1000</span>
+                <span id="current-balance" style="display:none">1000</span>
+                <span id="current-bet" style="display:none">100</span>
+                <span id="size-coef" style="display:none"></span>
+                <span id="mine-coef" style="display:none"></span>
+
+                <div class="game-history" style="margin-top:16px;">
+                    <h3><i class="fas fa-history"></i> История игр</h3>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </div>
+
+            <!-- Игра "Ракетка" -->
+            <div id="rocket-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+                <div class="rocket-game-content" style="padding:0;">
+
+                    <!-- ИГРОВОЕ ПОЛЕ -->
+                    <div style="position:relative;background:#080814;border-radius:14px;overflow:hidden;margin:0 0 0 0;">
+
+                        <!-- Canvas -->
+                        <canvas id="rocket-canvas" style="width:100%;height:340px;display:block;"></canvas>
+
+                        <!-- Ракета (gif) -->
+                        <div id="rocket-emoji" style="position:absolute;left:35%;top:55%;width:100px;height:100px;transform:translate(-50%,-50%) rotate(-45deg);pointer-events:none;filter:drop-shadow(0 0 18px rgba(255,150,50,0.9));display:block;">
+                            <img src="1f680.gif" style="width:100%;height:100%;object-fit:contain;" />
+                        </div>
+                        <!-- Пламя (убрано) -->
+
+                        <!-- Коэффициент — большой, сверху слева -->
+                        <div style="position:absolute;top:14px;left:14px;pointer-events:none;">
+                            <span id="rocket-coefficient" style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 16px rgba(138,43,226,0.7);">×1.00</span>
+                        </div>
+
+                        <!-- Таймер раунда — сверху справа -->
+                        <div id="round-status" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:#bbb;display:none;">
+                            ⏳ <span id="round-timer">5</span>с
+                        </div>
+                    </div>
+
+                    <!-- Полоса прошлых раундов -->
+                    <div style="background:#0d0d1c;padding:7px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-top:1px solid rgba(255,255,255,0.04);">
+                        <span style="font-size:0.7rem;color:#555;flex-shrink:0;">Прошлые:</span>
+                        <div id="rocket-prev-rounds" style="display:flex;gap:5px;flex-shrink:0;"></div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div style="padding:10px 12px 14px;background:#0d0d1c;border-radius:0 0 14px 14px;">
+                        <button id="rocket-play-btn" onclick="openRocketBetSheet()" style="width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
+                            СДЕЛАТЬ СТАВКУ
+                        </button>
+                        <button id="rocket-cashout-btn" onclick="cashOutRocket()" style="display:none;width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#00c853,#00e676);color:#111;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,200,80,0.4);"></button>
+                    </div>
+
+                    <!-- Скрытые служебные элементы -->
+                    <div style="display:none;">
+                        <span id="rocket-current-bet">100</span>
+                        <span id="rocket-potential-win"></span>
+                        <span id="rocket-balance-warning"></span>
+                    </div>
+
+                    <div class="game-history" style="padding:0 14px 14px;">
+                        <h3 style="margin:14px 0 8px;"><i class="fas fa-history"></i> История игр</h3>
+                        <div id="rocket-history-list" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ШТОРКА СТАВКИ (bottom sheet) -->
+            <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.65);" onclick="closeRocketBetSheet(event)">
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#13131f;border-radius:22px 22px 0 0;padding:20px 20px 40px;max-width:520px;margin:0 auto;" onclick="event.stopPropagation()">
+                    <!-- Ручка -->
+                    <div style="width:42px;height:4px;background:#333;border-radius:2px;margin:0 auto 18px;"></div>
+                    <h3 style="text-align:center;margin-bottom:16px;font-size:1rem;color:#eee;font-weight:700;">Размер ставки</h3>
+
+                    <!-- Выбор валюты -->
+                    <div style="display:flex;gap:8px;margin-bottom:14px;">
+                        <button id="rocket-currency-silver" onclick="setRocketCurrency('silver')"
+                            style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #7b5cff;background:rgba(123,92,255,0.25);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;">
+                            ⚪ Серебро
+                        </button>
+                        <button id="rocket-currency-gold" onclick="setRocketCurrency('gold')"
+                            style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #2a2a3a;background:#1a1a2a;color:#aaa;font-size:0.85rem;font-weight:700;cursor:pointer;">
+                            🟡 Золото
+                        </button>
+                    </div>
+
+                    <!-- Управление суммой + ручной ввод -->
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+                        <button onclick="changeRocketBet(-10)" style="width:46px;height:46px;border-radius:50%;border:1.5px solid #2a2a3a;background:#1a1a2a;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
+                        <input id="rocket-bet-input" type="number" min="10" value="100"
+                            oninput="setRocketBet(parseInt(this.value)||10)"
+                            style="width:100px;max-width:100px;min-width:60px;text-align:center;font-size:1.5rem;font-weight:900;color:#fff;background:rgba(255,255,255,0.07);border:1.5px solid rgba(123,92,255,0.4);border-radius:12px;padding:10px 8px;outline:none;-moz-appearance:textfield;" />
+                        <button onclick="changeRocketBet(10)" style="width:46px;height:46px;border-radius:50%;border:1.5px solid #2a2a3a;background:#1a1a2a;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
+                    </div>
+                    <!-- Пресеты -->
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+                        <button onclick="setRocketBet(50)"  style="padding:11px 0;background:#1a1a2a;border:1.5px solid #2a2a3a;border-radius:9px;color:#ccc;font-size:0.95rem;cursor:pointer;font-weight:600;">50</button>
+                        <button onclick="setRocketBet(100)" style="padding:11px 0;background:#1a1a2a;border:1.5px solid #2a2a3a;border-radius:9px;color:#ccc;font-size:0.95rem;cursor:pointer;font-weight:600;">100</button>
+                        <button onclick="setRocketBet(200)" style="padding:11px 0;background:#1a1a2a;border:1.5px solid #2a2a3a;border-radius:9px;color:#ccc;font-size:0.95rem;cursor:pointer;font-weight:600;">200</button>
+                        <button onclick="setRocketBet(500)" style="padding:11px 0;background:#1a1a2a;border:1.5px solid #2a2a3a;border-radius:9px;color:#ccc;font-size:0.95rem;cursor:pointer;font-weight:600;">500</button>
+                    </div>
+                    <p style="text-align:center;color:#e74c3c;font-size:0.82rem;margin-bottom:10px;display:none;" id="rocket-balance-warning2">⚠ Недостаточно средств!</p>
+                    <button onclick="confirmRocketBet()" style="width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:1.05rem;font-weight:800;cursor:pointer;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
+                        Поставить
+                    </button>
+                </div>
+            </div>
+
+            <!-- Кейсы -->
+            <div id="cases-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+                <h2 class="section-title">Кейсы</h2>
+                <p class="cases-info">Откройте кейсы и получите ценные призы!</p>
+                <div class="cases-container" id="cases-container">
+                    <div class="case-item" id="case-peace" onclick="selectCase('peace')">
+                        <div class="case-icon"><i class="fas fa-hands-praying"></i></div>
+                        <p class="case-name">Покой в богатстве</p>
+                        <p class="case-price">555 ⚪</p>
+                    </div>
+                    <div class="case-item" id="case-stars67" onclick="selectCase('stars67')">
+                        <div class="case-icon"><i class="fas fa-star"></i><span class="star-count">67</span></div>
+                        <p class="case-name">67 звёзд</p>
+                        <p class="case-price">67 🟡</p>
+                    </div>
+                    <div class="case-item" id="case-daily" onclick="selectCase('daily')">
+                        <div class="case-icon"><i class="fas fa-calendar-day"></i></div>
+                        <p class="case-name">Ежедневный</p>
+                        <p class="case-price case-price-free">Бесплатно</p>
+                    </div>
+                    <div class="case-item" id="case-strike" onclick="selectCase('strike')">
+                        <div class="case-icon"><i class="fas fa-bolt"></i></div>
+                        <p class="case-name">СТРАЙК</p>
+                        <p class="case-price case-price-special">7 дней депозита</p>
+                    </div>
+                    <div class="case-item" id="case-stars15" onclick="selectCase('stars15')">
+                        <div class="case-icon"><i class="fas fa-star"></i><span class="star-count">15</span></div>
+                        <p class="case-name">15 звёзд</p>
+                        <p class="case-price">15 🟡</p>
+                    </div>
+                    <div class="case-item" id="case-stars25" onclick="selectCase('stars25')">
+                        <div class="case-icon"><i class="fas fa-star"></i><span class="star-count">25</span></div>
+                        <p class="case-name">25 звёзд</p>
+                        <p class="case-price">25 🟡</p>
+                    </div>
+                    <div class="case-item" id="case-stars50" onclick="selectCase('stars50')">
+                        <div class="case-icon"><i class="fas fa-star"></i><span class="star-count">50</span></div>
+                        <p class="case-name">50 звёзд</p>
+                        <p class="case-price">50 🟡</p>
+                    </div>
+                    <div class="case-item" id="case-stars100" onclick="selectCase('stars100')">
+                        <div class="case-icon"><i class="fas fa-star"></i><span class="star-count">100</span></div>
+                        <p class="case-name">100 звёзд</p>
+                        <p class="case-price">100 🟡</p>
+                    </div>
+                </div>
+
+                <!-- панель кейса заменена модальным окном -->
+                <div class="cases-history"><h3><i class="fas fa-history"></i> История открытий</h3><div id="cases-history-list" class="history-list"></div></div>
+            </div>
+
+            <!-- Игра "Рулетка" -->
+            <div id="roulette-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+                <div class="roulette-game-content">
+                    <div style="text-align:center;padding:60px 20px;color:#aaa;">
+                        <i class="fas fa-sync-alt" style="font-size:3rem;margin-bottom:16px;display:block;color:#8a2be2;"></i>
+                        <h3 style="color:#fff;margin-bottom:8px;">Рулетка</h3>
+                        <p>Скоро будет доступна</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="profile-section" class="content-section">
+
+    <!-- Шапка профиля -->
+    <div style="position:relative;background:linear-gradient(180deg,#1a1040 0%,#0d0d1a 100%);padding:24px 16px 0;">
+        <!-- Аватар + имя -->
+        <div style="display:flex;flex-direction:column;align-items:center;padding-bottom:16px;">
+            <div style="position:relative;margin-bottom:12px;">
+                <div id="profile-avatar" style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#7b5cff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:3px solid rgba(123,92,255,0.6);overflow:hidden;">
+                    <img id="profile-tg-photo" style="width:100%;height:100%;object-fit:cover;display:none;" />
+                    <span id="profile-avatar-emoji">👤</span>
+                </div>
+                <div style="position:absolute;bottom:0;right:0;background:#7b5cff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900;border:2px solid #0d0d1a;">1</div>
+            </div>
+            <h2 id="profile-username" style="font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:1px;margin:0 0 4px;"></h2>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span style="background:rgba(123,92,255,0.2);border:1px solid rgba(123,92,255,0.4);border-radius:20px;padding:3px 12px;font-size:0.75rem;color:#a78bfa;font-weight:700;">Уровень 1 ▲</span>
+            </div>
+            <!-- Прогресс-бар уровня -->
+            <div style="width:100%;margin-top:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#666;margin-bottom:4px;">
+                    <span>1</span><span>2</span>
+                </div>
+                <div style="background:rgba(255,255,255,0.08);border-radius:4px;height:6px;overflow:hidden;">
+                    <div style="width:20%;height:100%;background:linear-gradient(90deg,#7b5cff,#a855f7);border-radius:4px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладки -->
+        <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08);margin:0 -16px;">
+            <button onclick="switchProfileTab('stats')" id="ptab-stats"
+                style="flex:1;padding:12px 0;border:none;background:none;color:#7b5cff;font-size:0.82rem;font-weight:800;letter-spacing:1px;border-bottom:2px solid #7b5cff;cursor:pointer;text-transform:uppercase;">СТАТИСТИКА</button>
+            <button onclick="switchProfileTab('refs')" id="ptab-refs"
+                style="flex:1;padding:12px 0;border:none;background:none;color:#555;font-size:0.82rem;font-weight:800;letter-spacing:1px;border-bottom:2px solid transparent;cursor:pointer;text-transform:uppercase;">РЕФЕРАЛЫ</button>
+            <button onclick="switchProfileTab('history')" id="ptab-history"
+                style="flex:1;padding:12px 0;border:none;background:none;color:#555;font-size:0.82rem;font-weight:800;letter-spacing:1px;border-bottom:2px solid transparent;cursor:pointer;text-transform:uppercase;">ИСТОРИЯ</button>
+        </div>
+    </div>
+
+    <!-- Контент вкладок -->
+    <div style="padding:16px;">
+
+        <!-- СТАТИСТИКА -->
+        <div id="ptab-stats-content">
+            <!-- Баланс -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+                <div style="background:#13131f;border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:0.7rem;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Золотые</div>
+                    <div style="font-size:1.4rem;font-weight:900;color:#fbbf24;">🟡 <span id="profile-gold-bal">0</span></div>
+                </div>
+                <div style="background:#13131f;border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:0.7rem;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Серебряные</div>
+                    <div style="font-size:1.4rem;font-weight:900;color:#a78bfa;">⚪ <span id="profile-silver-bal">0</span></div>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="background:#13131f;border-radius:16px;padding:14px 16px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:14px;">
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(123,92,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🏆</div>
+                    <div>
+                        <div style="font-size:1.5rem;font-weight:900;color:#fff;"><span id="profile-total-won2">0</span>🪙 | <span id="profile-total-won-gold">0</span>🟡</div>
+                        <div style="font-size:0.72rem;color:#666;text-transform:uppercase;letter-spacing:1px;">СУММА ВЫИГРЫШЕЙ</div>
+                    </div>
+                </div>
+                <div style="background:#13131f;border-radius:16px;padding:14px 16px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:14px;">
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🎮</div>
+                    <div>
+                        <div style="font-size:1.5rem;font-weight:900;color:#fff;"><span id="profile-games-played2">0</span></div>
+                        <div style="font-size:0.72rem;color:#666;text-transform:uppercase;letter-spacing:1px;">ВСЕГО ИГР</div>
+                    </div>
+                </div>
+                <div style="background:#13131f;border-radius:16px;padding:14px 16px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:14px;">
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(34,197,94,0.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🥇</div>
+                    <div>
+                        <div style="font-size:1.5rem;font-weight:900;color:#fff;"><span id="profile-games-won2">0</span></div>
+                        <div style="font-size:0.72rem;color:#666;text-transform:uppercase;letter-spacing:1px;">ВСЕГО ПОБЕД</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Значки -->
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#2a2a3a;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">2</div>
+                <div style="width:40px;height:40px;border-radius:50%;background:#7b5cff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🔥</div>
+                <div style="width:40px;height:40px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">⭐</div>
+                <div style="width:40px;height:40px;border-radius:50%;background:#ec4899;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">💎</div>
+                <div style="width:40px;height:40px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🏆</div>
+                <div style="width:40px;height:40px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🎯</div>
+            </div>
+        </div>
+
+        <!-- РЕФЕРАЛЫ -->
+        <div id="ptab-refs-content" style="display:none;">
+            <div style="background:#13131f;border-radius:16px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:2rem;margin-bottom:8px;">👥</div>
+                <div style="font-weight:800;color:#fff;margin-bottom:6px;">Пригласи друзей</div>
+                <div style="color:#666;font-size:0.85rem;margin-bottom:16px;">За каждого друга — бонусные коины</div>
+                <button onclick="shareRefLink()" style="background:linear-gradient(90deg,#7b5cff,#a855f7);border:none;border-radius:12px;padding:12px 24px;color:#fff;font-weight:800;cursor:pointer;width:100%;">Поделиться ссылкой</button>
+            </div>
+        </div>
+
+        <!-- ИСТОРИЯ -->
+        <div id="ptab-history-content" style="display:none;">
+            <div id="profile-history-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+    </div>
+</div>
+
+
