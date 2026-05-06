@@ -323,7 +323,17 @@ function showSection(section) {
     if (backBtn) backBtn.style.display = 'none';
 
     if (section === 'game') {
-        document.getElementById('game-section').classList.add('active-section');
+        const gs = document.getElementById('game-section');
+        gs.classList.add('active-section');
+        // Всегда восстанавливаем карточки и скрываем активные игры
+        document.querySelectorAll('.game-container').forEach(el => {
+            el.style.display = 'none';
+            el.classList.remove('game-fullscreen');
+        });
+        const cardsList = gs.querySelector('.game-cards-list');
+        const sectionTitle = gs.querySelector('.game-section-title');
+        if (cardsList) cardsList.style.display = '';
+        if (sectionTitle) sectionTitle.style.display = '';
         const n = document.getElementById('nav-game'); if(n) n.classList.add('active-btn');
     } else if (section === 'profile') {
         document.getElementById('profile-section').classList.add('active-section');
@@ -348,14 +358,17 @@ function showSection(section) {
 }
 
 function selectGame(game) {
-    // Скрываем весь game-section
+    // Скрываем список карточек, НО НЕ сам game-section (иначе дочерние элементы тоже скрываются)
     const gameSection = document.getElementById('game-section');
-    if (gameSection) gameSection.style.display = 'none';
+    const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
+    const sectionTitle = gameSection ? gameSection.querySelector('.game-section-title') : null;
+    if (cardsList) cardsList.style.display = 'none';
+    if (sectionTitle) sectionTitle.style.display = 'none';
 
     // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
 
-    // Показываем нужную игру как fullscreen overlay
+    // Показываем нужную игру fullscreen
     const target = document.getElementById(game + '-game');
     if (target) {
         target.style.display = 'block';
@@ -376,9 +389,12 @@ function backToGamesList() {
         el.classList.remove('game-fullscreen');
     });
 
-    // Показываем game-section
+    // Показываем список карточек
     const gameSection = document.getElementById('game-section');
-    if (gameSection) gameSection.style.display = '';
+    const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
+    const sectionTitle = gameSection ? gameSection.querySelector('.game-section-title') : null;
+    if (cardsList) cardsList.style.display = '';
+    if (sectionTitle) sectionTitle.style.display = '';
 
     // Вернуть навигацию
     const nav = document.querySelector('.navigation');
@@ -2340,7 +2356,14 @@ function cancelUsdtInvoice() {
 }
 
 // ═══ ОПЛАТА ЧЕРЕЗ TELEGRAM STARS (нативный WebApp Invoice) ═══
-const BACKEND_URL = 'https://web-production-42c21.up.railway.app';
+// BACKEND_URL — автоматически берём тот же хост что и у фронтенда
+// Если открыто локально (file://) — используем хардкодный Railway адрес
+const BACKEND_URL = (function() {
+    if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        return window.location.origin;
+    }
+    return 'https://web-production-42c21.up.railway.app';
+})();
 async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
