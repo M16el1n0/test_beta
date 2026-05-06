@@ -187,7 +187,6 @@ function simulateOnlineCounts() {
     const counts = {
         'online-rocket': [25, 45],
         'online-mines': [18, 38],
-        'online-roulette': [40, 70],
         'online-cases': [10, 25]
     };
     function update() {
@@ -195,7 +194,7 @@ function simulateOnlineCounts() {
             const el = document.getElementById(id);
             if (el) {
                 const n = Math.floor(Math.random() * (max - min + 1)) + min;
-                el.textContent = n + ' ОНЛАЙН';
+                el.textContent = n + ' онлайн';
             }
         }
     }

@@ -55,54 +55,42 @@
             <!-- Карточки игр -->
             <div class="game-cards-list">
 
-                <!-- РАКЕТКА -->
-                <div class="game-tile" onclick="selectGame('rocket')">
-                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);"></div>
-                    <div class="game-tile-inner">
-                        <div class="game-tile-left">
-                            <div class="game-tile-badge" style="background:rgba(124,58,237,0.25);color:#a78bfa;border-color:rgba(124,58,237,0.4);">МГНОВЕННО</div>
-                            <div class="game-tile-name">РАКЕТКА</div>
-                            <div class="game-tile-sub">Лети выше — забирай больше</div>
-                            <div class="game-tile-online"><span class="online-dot"></span><span id="online-rocket">— ОНЛАЙН</span></div>
-                        </div>
-                        <div class="game-tile-right">
-                            <div class="game-tile-emoji">🚀</div>
-                            <div class="game-tile-coef">до ×50</div>
-                        </div>
+                <div class="game-btn" onclick="selectGame('rocket')">
+                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#0a0820,#1a0a40);"></div>
+                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(123,92,255,0.45),transparent 65%);"></div>
+                    <div class="game-btn-content">
+                        <div class="game-btn-icon">🚀</div>
+                        <div class="game-btn-name">РАКЕТКА</div>
+                    </div>
+                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
+                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#a78bfa;background:rgba(123,92,255,0.18);border:1px solid rgba(123,92,255,0.35);padding:2px 8px;border-radius:6px;text-transform:uppercase;">до ×50</span>
+                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-rocket">· · ·</span>
                     </div>
                 </div>
 
-                <!-- МИНЫ -->
-                <div class="game-tile" onclick="selectGame('mines')">
-                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#065f46,#059669);"></div>
-                    <div class="game-tile-inner">
-                        <div class="game-tile-left">
-                            <div class="game-tile-badge" style="background:rgba(5,150,105,0.2);color:#34d399;border-color:rgba(5,150,105,0.4);">СТРАТЕГИЯ</div>
-                            <div class="game-tile-name">МИНЫ</div>
-                            <div class="game-tile-sub">Найди алмазы — избегай мин</div>
-                            <div class="game-tile-online"><span class="online-dot" style="background:#34d399;box-shadow:0 0 6px #34d399;"></span><span id="online-mines">— ОНЛАЙН</span></div>
-                        </div>
-                        <div class="game-tile-right">
-                            <div class="game-tile-emoji">💣</div>
-                            <div class="game-tile-coef" style="color:#34d399;">до ×8</div>
-                        </div>
+                <div class="game-btn" onclick="selectGame('mines')">
+                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#040f06,#0b2e10);"></div>
+                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(34,197,94,0.38),transparent 65%);"></div>
+                    <div class="game-btn-content">
+                        <div class="game-btn-icon">💣</div>
+                        <div class="game-btn-name">МИНЫ</div>
+                    </div>
+                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
+                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#34d399;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);padding:2px 8px;border-radius:6px;text-transform:uppercase;">до ×8</span>
+                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-mines">· · ·</span>
                     </div>
                 </div>
 
-                <!-- КЕЙСЫ -->
-                <div class="game-tile" onclick="selectGame('cases')">
-                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);"></div>
-                    <div class="game-tile-inner">
-                        <div class="game-tile-left">
-                            <div class="game-tile-badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border-color:rgba(59,130,246,0.4);">УДАЧА</div>
-                            <div class="game-tile-name">КЕЙСЫ</div>
-                            <div class="game-tile-sub">Открывай и получай подарки</div>
-                            <div class="game-tile-online"><span class="online-dot" style="background:#60a5fa;box-shadow:0 0 6px #60a5fa;"></span><span id="online-cases">— ОНЛАЙН</span></div>
-                        </div>
-                        <div class="game-tile-right">
-                            <div class="game-tile-emoji">🎁</div>
-                            <div class="game-tile-coef" style="color:#60a5fa;">+ ПРИЗЫ</div>
-                        </div>
+                <div class="game-btn" onclick="selectGame('cases')">
+                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#04091c,#0c1a40);"></div>
+                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(96,165,250,0.38),transparent 65%);"></div>
+                    <div class="game-btn-content">
+                        <div class="game-btn-icon">🎁</div>
+                        <div class="game-btn-name">КЕЙСЫ</div>
+                    </div>
+                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
+                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#60a5fa;background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);padding:2px 8px;border-radius:6px;text-transform:uppercase;">ПРИЗЫ</span>
+                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-cases">· · ·</span>
                     </div>
                 </div>
 
