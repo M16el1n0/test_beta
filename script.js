@@ -110,25 +110,42 @@ let rocketGameState = {
 
 let currentNewGift = null;
 
-// ===== СИСТЕМА ПОДАРКОВ =====
+// ===== СИСТЕМА ПОДАРКОВ (с редкостью) =====
+// rare: 15-99 монет  |  epic: 100-499  |  legendary: 500+
 const GIFT_SYSTEM = {
     gifts: [
-        { type: 'heart',      name: 'Сердце',           minValue: 15,  maxValue: 50  },
-        { type: 'bear',       name: 'Плюшевый медведь', minValue: 15,  maxValue: 50  },
-        { type: 'gift',       name: 'Подарок',          minValue: 25,  maxValue: 100 },
-        { type: 'rose',       name: 'Роза',             minValue: 25,  maxValue: 100 },
-        { type: 'cake',       name: 'Торт',             minValue: 50,  maxValue: 200 },
-        { type: 'bouquet',    name: 'Букет',            minValue: 50,  maxValue: 200 },
-        { type: 'rocket',     name: 'Ракета',           minValue: 50,  maxValue: 200 },
-        { type: 'cup',        name: 'Кубок',            minValue: 100, maxValue: 500 },
-        { type: 'ring',       name: 'Кольцо',           minValue: 100, maxValue: 500 },
-        { type: 'diamond',    name: 'Алмаз',            minValue: 100, maxValue: 500 },
-        { type: 'champagne',  name: 'Шампанское',       minValue: 100, maxValue: 500 }
+        // ── RARE (15–99 монет) ──
+        { type: 'heart',     name: 'Сердце',           tier: 'rare',      minValue: 15,  maxValue: 50,  weight: 30 },
+        { type: 'bear',      name: 'Плюшевый медведь', tier: 'rare',      minValue: 15,  maxValue: 50,  weight: 30 },
+        { type: 'rose',      name: 'Роза',             tier: 'rare',      minValue: 25,  maxValue: 99,  weight: 25 },
+        { type: 'gift',      name: 'Подарок',          tier: 'rare',      minValue: 25,  maxValue: 99,  weight: 20 },
+        // ── EPIC (100–499 монет) ──
+        { type: 'cake',      name: 'Торт',             tier: 'epic',      minValue: 100, maxValue: 300, weight: 12 },
+        { type: 'bouquet',   name: 'Букет',            tier: 'epic',      minValue: 100, maxValue: 300, weight: 12 },
+        { type: 'rocket',    name: 'Ракета',           tier: 'epic',      minValue: 100, maxValue: 499, weight: 10 },
+        { type: 'champagne', name: 'Шампанское',       tier: 'epic',      minValue: 100, maxValue: 499, weight: 8  },
+        // ── LEGENDARY (500+ монет) ──
+        { type: 'cup',       name: 'Кубок',            tier: 'legendary', minValue: 500, maxValue: 1000, weight: 5  },
+        { type: 'ring',      name: 'Кольцо',           tier: 'legendary', minValue: 500, maxValue: 1000, weight: 4  },
+        { type: 'diamond',   name: 'Алмаз',            tier: 'legendary', minValue: 500, maxValue: 2000, weight: 2  }
     ],
+    getRarity(value) {
+        if (value >= 500) return 'legendary';
+        if (value >= 100) return 'epic';
+        if (value >= 15)  return 'rare';
+        return 'common';
+    },
     getRandomGift(winAmount) {
         const eligible = this.gifts.filter(g => winAmount >= g.minValue);
         if (!eligible.length) return null;
-        return eligible[Math.floor(Math.random() * eligible.length)];
+        // Взвешенный случайный выбор
+        const totalWeight = eligible.reduce((s, g) => s + g.weight, 0);
+        let rnd = Math.random() * totalWeight;
+        for (const g of eligible) {
+            rnd -= g.weight;
+            if (rnd <= 0) return g;
+        }
+        return eligible[eligible.length - 1];
     }
 };
 
@@ -1420,7 +1437,7 @@ function claimTaskReward(id) {
 
 // ===== КЕЙСЫ — КОНФИГ =====
 const CASE_CONFIG = {
-    peace:    { name: 'Покой в богатстве', currency: 'silver', cost: 555,  allowGold: false },
+    peace:    { name: 'Покой в богатстве', currency: 'silver', cost: 555,  goldCost: 555, allowGold: true },
     stars67:  { name: '67 звёзд',          currency: 'gold',   cost: 67,   allowGold: true  },
     daily:    { name: 'Ежедневный',         currency: null,     cost: 0,    free: true       },
     strike:   { name: 'СТРАЙК',            currency: null,     cost: 0,    strike: true     },
@@ -1431,14 +1448,28 @@ const CASE_CONFIG = {
 };
 
 // ===== КЕЙСЫ - ПОДАРКИ С ЦЕНАМИ =====
+// CASE_GIFTS — используются в спин-анимации кейса
+// tier: rare(15-99) | epic(100-499) | legendary(500+)
 const CASE_GIFTS = [
-    { type: 'rocket',     name: 'Ракета',          emoji: '🚀', value: 50  },
-    { type: 'heart',      name: 'Сердце',           emoji: '❤️', value: 15  },
-    { type: 'bear',       name: 'Мишка',            emoji: '🐻', value: 15  },
-    { type: 'diamond',    name: 'Алмаз',            emoji: '💎', value: 50  },
-    { type: 'champagne',  name: 'Шампанское',       emoji: '🍾', value: 50  },
-    { type: 'cup',        name: 'Кубок',            emoji: '🏆', value: 100 }
+    { type: 'heart',     name: 'Сердце',           emoji: '❤️',  value: 15,  tier: 'rare',      weight: 28 },
+    { type: 'bear',      name: 'Мишка',            emoji: '🐻',  value: 15,  tier: 'rare',      weight: 25 },
+    { type: 'rose',      name: 'Роза',             emoji: '🌹',  value: 25,  tier: 'rare',      weight: 22 },
+    { type: 'gift',      name: 'Подарок',          emoji: '🎁',  value: 25,  tier: 'rare',      weight: 18 },
+    { type: 'cake',      name: 'Торт',             emoji: '🎂',  value: 100, tier: 'epic',      weight: 12 },
+    { type: 'rocket',    name: 'Ракета',           emoji: '🚀',  value: 100, tier: 'epic',      weight: 10 },
+    { type: 'champagne', name: 'Шампанское',       emoji: '🍾',  value: 100, tier: 'epic',      weight: 9  },
+    { type: 'bouquet',   name: 'Букет',            emoji: '💐',  value: 200, tier: 'epic',      weight: 6  },
+    { type: 'cup',       name: 'Кубок',            emoji: '🏆',  value: 500, tier: 'legendary', weight: 3  },
+    { type: 'ring',      name: 'Кольцо',           emoji: '💍',  value: 500, tier: 'legendary', weight: 2  },
+    { type: 'diamond',   name: 'Алмаз',            emoji: '💎',  value: 1000,tier: 'legendary', weight: 1  }
 ];
+
+function pickWeightedCaseGift() {
+    const total = CASE_GIFTS.reduce((s,g) => s + g.weight, 0);
+    let rnd = Math.random() * total;
+    for (const g of CASE_GIFTS) { rnd -= g.weight; if (rnd <= 0) return g; }
+    return CASE_GIFTS[CASE_GIFTS.length - 1];
+}
 
 let pendingCasePrize = null;
 let pendingCaseType  = null;
@@ -1478,7 +1509,7 @@ function selectCase(type) {
         selectedCaseCurrency = null;
     } else if (cfg.goldCost) {
         // peace — и серебро и золото
-        if (currDiv) currDiv.style.display = 'flex';
+        if (currDiv) { currDiv.style.display = 'flex'; currDiv.style.flexDirection = 'row'; currDiv.style.gap = '10px'; }
         selectedCaseCurrency = 'silver';
         setCaseCurrency('silver');
     } else if (cfg.allowGold) {
@@ -1493,21 +1524,24 @@ function selectCase(type) {
     // Подарки из CASE_GIFTS с процентами
     const oddsList = $id('case-odds-list');
     if (oddsList) {
-        const weights = [2, 3, 3, 2, 2, 1];
+        const weights = CASE_GIFTS.map(g => g.weight);
         const total = weights.reduce((a,b)=>a+b,0);
-        const colors = ['#a78bfa','#f87171','#fbbf24','#38bdf8','#34d399','#fcd34d'];
+        const colors = CASE_GIFTS.map(g => ({'rare':'#60a5fa','epic':'#c084fc','legendary':'#fcd34d'}[g.tier]||'#888'));
         oddsList.innerHTML = '';
         CASE_GIFTS.forEach((g, i) => {
             const pct = Math.round(weights[i]/total*100);
             const el = document.createElement('div');
             el.className = 'case-odds-item';
+            const tierColor = {'rare':'#60a5fa','epic':'#c084fc','legendary':'#fcd34d'}[g.tier] || '#888';
+            const tierLabel = {'rare':'Редкий','epic':'Эпический','legendary':'Легендарный'}[g.tier] || 'Обычный';
             el.innerHTML =
                 '<div class="case-odds-left">'
                 + '<span class="case-odds-emoji">' + g.emoji + '</span>'
-                + '<div><div class="case-odds-name">' + g.name + '</div>'
+                + '<div><div class="case-odds-name">' + g.name
+                + ' <span style="font-size:0.55rem;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,0.07);color:' + tierColor + ';font-weight:800;">' + tierLabel + '</span></div>'
                 + '<div class="case-odds-val">' + g.value + ' F</div></div>'
                 + '</div>'
-                + '<span class="case-odds-pct" style="color:' + colors[i] + ';">' + pct + '%</span>';
+                + '<span class="case-odds-pct" style="color:' + tierColor + ';">' + pct + '%</span>';
             oddsList.appendChild(el);
         });
     }
@@ -1676,7 +1710,7 @@ function claimCasePrize() {
 
     // Добавляем подарок в инвентарь
     if (!userData.inventory) userData.inventory = [];
-    const tier = val >= 2000 ? 'legendary' : val >= 500 ? 'rare' : val >= 100 ? 'epic' : 'common';
+    const tier = (pendingCasePrize && pendingCasePrize.tier) || (val >= 500 ? 'legendary' : val >= 100 ? 'epic' : val >= 15 ? 'rare' : 'common');
     userData.inventory.push({
         id: Date.now(),
         type: pendingCasePrize.type,
@@ -2312,17 +2346,22 @@ async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
         if (!userId) return;
-        const resp = await fetch(BACKEND_URL + '/balance?user_id=' + userId + '&init_data=' + encodeURIComponent(tg?.initData||''));
+        const resp = await fetch(BACKEND_URL + '/balance?user_id=' + userId);
         if (!resp.ok) return;
         const data = await resp.json();
         const serverGold = parseInt(data.gold_coins) || 0;
-        // Обновляем только если сервер вернул больше (никогда не обнуляем локальный баланс)
-        if (serverGold > (userData.balance.gold || 0)) {
-            userData.balance.gold = serverGold;
+        const serverSilver = parseInt(data.silver_coins) || 0;
+        let changed = false;
+        // Золото — берём максимум из сервера и локального (сервер авторитетен для gold)
+        if (serverGold > 0 || userData.balance.gold === 0) {
+            if (serverGold !== userData.balance.gold) {
+                userData.balance.gold = Math.max(serverGold, userData.balance.gold);
+                changed = true;
+            }
+        }
+        if (changed) {
             saveUserData();
             updateBalance();
-            const el = document.getElementById('cases-gold-val');
-            if (el) el.textContent = serverGold;
         }
     } catch(e) { /* сервер недоступен — используем локальный баланс */ }
 }
@@ -2369,30 +2408,29 @@ async function buyStarPackage(stars, coins) {
         }
         tg.openInvoice(data.invoice_url, async (status) => {
             if (status === 'paid') {
-                // Сервер начислил через successful_payment — синхронизируем с сервера
-                showNotif('⭐ Оплата прошла! Обновляем баланс…', '#a78bfa');
-                try {
-                    let synced = false;
-                    for (let attempt = 0; attempt < 8; attempt++) {
-                        await new Promise(r => setTimeout(r, 1500));
+                showNotif('⭐ Оплата прошла! Синхронизируем баланс…', '#a78bfa');
+                closeTopUpModal();
+                let synced = false;
+                for (let attempt = 0; attempt < 10; attempt++) {
+                    await new Promise(r => setTimeout(r, 1800));
+                    try {
                         const br = await fetch(BACKEND_URL + '/balance?user_id=' + userId);
+                        if (!br.ok) continue;
                         const bd = await br.json();
-                        const serverGold = bd.gold_coins ?? 0;
-                        if (serverGold > userData.balance.gold) {
-                            const gained = serverGold - userData.balance.gold;
+                        const serverGold = parseInt(bd.gold_coins) || 0;
+                        if (serverGold > (userData.balance.gold || 0)) {
+                            const gained = serverGold - (userData.balance.gold || 0);
                             userData.balance.gold = serverGold;
-                            saveUserData(); updateBalance(); closeTopUpModal();
+                            saveUserData(); updateBalance();
                             trackDeposit(gained);
                             showTopUpSuccess(gained, stars, 'stars');
                             synced = true;
                             break;
                         }
-                    }
-                    if (!synced) {
-                        // Fallback: зачисляем локально
-                        creditCoins(coins, stars);
-                    }
-                } catch(e) {
+                    } catch(e) {}
+                }
+                if (!synced) {
+                    // Fallback: зачисляем локально если сервер не ответил
                     creditCoins(coins, stars);
                 }
             } else if (status === 'cancelled') {
