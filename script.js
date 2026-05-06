@@ -186,18 +186,17 @@ function simulateOnlineCounts() {
     setInterval(update, 8000);
 }
 
-async function loadUserData() {
+function loadUserData() {
     const saved = DB.get('userData');
     if (saved) userData = Object.assign(getDefaultUserData(), saved);
     userData.lastVisit = new Date().toISOString();
+    saveUserData();
     updateBalance();
     updateStats();
     updateTasks();
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
-    // Сразу синхронизируем баланс с сервером
-    await syncGoldFromServer();
     // Синхронизируем золото из Telegram CloudStorage (начисляется ботом после оплаты)
     syncGoldFromServer();
 }
@@ -391,7 +390,13 @@ function checkBetValidity() {
     const warning = $id('balance-warning');
     const playBtn = $id('play-btn');
     if (!warning || !playBtn) return;
-    if (bet > balance) {
+    if (bet < 10) {
+        warning.textContent = '⚠ Минимальная ставка: 10';
+        warning.style.display = 'flex';
+        playBtn.disabled = true;
+        playBtn.style.opacity = '0.5';
+    } else if (bet > balance) {
+        warning.textContent = '⚠ Недостаточно средств';
         warning.style.display = 'flex';
         playBtn.disabled = true;
         playBtn.style.opacity = '0.5';
@@ -414,18 +419,18 @@ function updateBetDisplay() {
 }
 
 function changeBet(amount) {
-    gameState.currentBet = Math.max(1, gameState.currentBet + amount);
+    gameState.currentBet = Math.max(10, gameState.currentBet + amount);
     updateBetDisplay();
 }
 
 function setBet(amount) {
-    gameState.currentBet = Math.max(1, amount);
+    gameState.currentBet = Math.max(10, amount);
     updateBetDisplay();
 }
 
 // Новые функции управления для нового дизайна
 function minesBetInputChange(val) {
-    gameState.currentBet = Math.max(1, parseInt(val) || 1);
+    gameState.currentBet = Math.max(10, parseInt(val) || 10);
     updateBetDisplay();
 }
 
@@ -2301,23 +2306,17 @@ async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
         if (!userId) return;
-        const resp = await fetch(
-            BACKEND_URL + '/balance?user_id=' + userId +
-            '&init_data=' + encodeURIComponent(tg?.initData || '')
-        );
+        const resp = await fetch(BACKEND_URL + '/balance?user_id=' + userId + '&init_data=' + encodeURIComponent(tg?.initData||''));
         if (!resp.ok) return;
         const data = await resp.json();
-        const serverGold   = parseInt(data.gold_coins)   || 0;
-        const serverSilver = parseInt(data.silver_coins) || 0;
-        // Сервер ВСЕГДА приоритет для gold (начисляется только ботом)
-        // Silver: берём максимум (может быть заработано в игре)
-        const changed = (serverGold !== (userData.balance.gold || 0)) ||
-                        (serverSilver > (userData.balance.silver || 0));
-        userData.balance.gold   = serverGold;
-        userData.balance.silver = Math.max(serverSilver, userData.balance.silver || 0);
-        if (changed) {
+        const serverGold = parseInt(data.gold_coins) || 0;
+        // Обновляем только если сервер вернул больше (никогда не обнуляем локальный баланс)
+        if (serverGold > (userData.balance.gold || 0)) {
+            userData.balance.gold = serverGold;
             saveUserData();
             updateBalance();
+            const el = document.getElementById('cases-gold-val');
+            if (el) el.textContent = serverGold;
         }
     } catch(e) { /* сервер недоступен — используем локальный баланс */ }
 }
