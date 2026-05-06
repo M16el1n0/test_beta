@@ -2361,14 +2361,7 @@ function cancelUsdtInvoice() {
 }
 
 // ═══ ОПЛАТА ЧЕРЕЗ TELEGRAM STARS (нативный WebApp Invoice) ═══
-// BACKEND_URL — автоматически берём тот же хост что и у фронтенда
-// Если открыто локально (file://) — используем хардкодный Railway адрес
-const BACKEND_URL = (function() {
-    if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        return window.location.origin;
-    }
-    return 'https://web-production-42c21.up.railway.app';
-})();
+const BACKEND_URL = 'https://fleep-bot-production.up.railway.app';
 async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
@@ -2423,6 +2416,12 @@ async function buyStarPackage(stars, coins) {
             })
         });
 
+        // Проверяем что ответ JSON, а не HTML страница ошибки
+        const contentType = resp.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await resp.text();
+            throw new Error(`Сервер вернул не JSON (${resp.status}): ${text.slice(0, 100)}`);
+        }
         const data = await resp.json();
         if (!data.invoice_url) throw new Error(data.error || 'no invoice_url');
 
