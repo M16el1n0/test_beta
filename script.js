@@ -186,17 +186,18 @@ function simulateOnlineCounts() {
     setInterval(update, 8000);
 }
 
-function loadUserData() {
+async function loadUserData() {
     const saved = DB.get('userData');
     if (saved) userData = Object.assign(getDefaultUserData(), saved);
     userData.lastVisit = new Date().toISOString();
-    saveUserData();
     updateBalance();
     updateStats();
     updateTasks();
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
+    // Сразу синхронизируем баланс с сервером
+    await syncGoldFromServer();
     // Синхронизируем золото из Telegram CloudStorage (начисляется ботом после оплаты)
     syncGoldFromServer();
 }
@@ -1307,110 +1308,6 @@ function updateProfileGifts() {
     });
 }
 
-
-// ═══ TON WALLET PAYMENT ═══
-let _tonInvoice = null;
-
-async function openTonPayment(tons) {
-    const userId = tg?.initDataUnsafe?.user?.id;
-    if (!userId) { showNotif('⚠️ Откройте через Telegram', '#f87171'); return; }
-
-    showNotif('💎 Создаём счёт TON…', '#8b5cf6');
-    try {
-        const resp = await fetch(BACKEND_URL + '/create_ton_invoice', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: userId, tons: tons })
-        });
-        const data = await resp.json();
-        if (!data.ok) { showNotif('❌ ' + (data.error || 'Ошибка'), '#f87171'); return; }
-
-        _tonInvoice = data;
-        showTonPayScreen(data);
-    } catch(e) {
-        showNotif('❌ Нет связи с сервером', '#f87171');
-    }
-}
-
-function showTonPayScreen(inv) {
-    const modal = document.getElementById('topup-modal');
-    if (!modal) return;
-
-    // Создаём экран оплаты TON
-    let screen = document.getElementById('ton-pay-screen');
-    if (!screen) {
-        screen = document.createElement('div');
-        screen.id = 'ton-pay-screen';
-        modal.appendChild(screen);
-    }
-    screen.style.cssText = 'position:absolute;inset:0;background:#13131f;border-radius:24px;z-index:10;padding:24px 20px;display:flex;flex-direction:column;';
-    screen.innerHTML = `
-        <button onclick="document.getElementById('ton-pay-screen').remove()" 
-            style="background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer;align-self:flex-start;margin-bottom:16px;">←</button>
-        <div style="text-align:center;margin-bottom:24px;">
-            <div style="font-size:3rem;margin-bottom:8px;">💎</div>
-            <div style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:4px;">${inv.tons} TON → 🟡 ${inv.coins}</div>
-            <div style="font-size:0.75rem;color:#666;">Курс: 1 TON = ${TON_COINS_PER_TON || 1000} золота</div>
-        </div>
-        <div style="background:#1a1a2e;border:1px solid rgba(123,92,255,0.3);border-radius:14px;padding:14px;margin-bottom:16px;">
-            <div style="font-size:0.7rem;color:#666;margin-bottom:6px;">Адрес кошелька</div>
-            <div style="font-size:0.75rem;color:#c4b5fd;word-break:break-all;font-family:monospace;">${inv.wallet}</div>
-        </div>
-        <div style="background:#1a1a2e;border:1px solid rgba(123,92,255,0.3);border-radius:14px;padding:14px;margin-bottom:20px;">
-            <div style="font-size:0.7rem;color:#666;margin-bottom:6px;">Комментарий (обязательно!)</div>
-            <div style="font-size:1rem;font-weight:900;color:#fcd34d;letter-spacing:2px;">${inv.comment}</div>
-        </div>
-        <a href="${inv.deeplink}" style="display:block;width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#0088cc,#00aaff);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:10px;">
-            💎 Открыть Telegram Wallet
-        </a>
-        <button onclick="verifyTonPayment()" 
-            style="width:100%;padding:13px;border:1.5px solid rgba(123,92,255,0.5);border-radius:14px;background:transparent;color:#c4b5fd;font-size:0.9rem;font-weight:700;cursor:pointer;">
-            ✅ Я оплатил — проверить
-        </button>
-        <div id="ton-verify-status" style="text-align:center;margin-top:12px;font-size:0.8rem;color:#666;"></div>
-    `;
-}
-
-async function verifyTonPayment() {
-    if (!_tonInvoice) return;
-    const userId = tg?.initDataUnsafe?.user?.id;
-    const statusEl = document.getElementById('ton-verify-status');
-    if (statusEl) statusEl.textContent = '⏳ Проверяем…';
-
-    try {
-        const resp = await fetch(BACKEND_URL + '/verify_ton', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                user_id: userId,
-                tons: _tonInvoice.tons,
-                comment: _tonInvoice.comment
-            })
-        });
-        const data = await resp.json();
-        if (data.ok) {
-            userData.balance.gold = (userData.balance.gold || 0) + data.coins;
-            saveUserData(); updateBalance();
-            document.getElementById('ton-pay-screen')?.remove();
-            closeTopUpModal();
-            showNotif('✅ +' + data.coins + ' 🟡 получено!', '#22c55e');
-            _tonInvoice = null;
-        } else {
-            if (statusEl) statusEl.textContent = '❌ Платёж не найден. Подожди пару минут и попробуй снова.';
-        }
-    } catch(e) {
-        if (statusEl) statusEl.textContent = '❌ Ошибка проверки';
-    }
-}
-
-const TON_COINS_PER_TON = 1000;
-const TON_PACKAGES = [
-    { tons: 1,   coins: 1000,  label: '1 TON'   },
-    { tons: 5,   coins: 5000,  label: '5 TON'   },
-    { tons: 10,  coins: 10000, label: '10 TON'  },
-    { tons: 50,  coins: 55000, label: '50 TON 🔥' },
-];
-
 function copyRefLink() {
     const tgUser = getTgUser();
     const botUsername = 'fleep_gift_bot';
@@ -2241,13 +2138,23 @@ function updatePromoDisplay() {
 // ─── USDT ОПЛАТА ──────────────────────────────────────────────────────────────
 function switchTopUpTab(tab) {
     topUpTab = tab;
-    ['stars','usdt','ton'].forEach(t => {
-        const btn  = document.getElementById('tab-' + t);
-        const body = document.getElementById('topup-' + t + '-body') ||
-                     document.getElementById('topup-' + t + '-panel');
-        if (btn)  btn.classList.toggle('topup-tab-active', t === tab);
-        if (body) body.style.display = (t === tab) ? 'block' : 'none';
-    });
+    const starsTab  = document.getElementById('tab-stars');
+    const usdtTab   = document.getElementById('tab-usdt');
+    const starsBody = document.getElementById('topup-stars-body');
+    const usdtBody  = document.getElementById('topup-usdt-body');
+    if (!starsTab) return;
+
+    if (tab === 'stars') {
+        starsTab.classList.add('topup-tab-active');
+        usdtTab.classList.remove('topup-tab-active');
+        starsBody.style.display = 'block';
+        usdtBody.style.display  = 'none';
+    } else {
+        usdtTab.classList.add('topup-tab-active');
+        starsTab.classList.remove('topup-tab-active');
+        starsBody.style.display = 'none';
+        usdtBody.style.display  = 'block';
+    }
 }
 
 function renderUsdtTab() {
@@ -2394,17 +2301,23 @@ async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
         if (!userId) return;
-        const resp = await fetch(BACKEND_URL + '/balance?user_id=' + userId + '&init_data=' + encodeURIComponent(tg?.initData||''));
+        const resp = await fetch(
+            BACKEND_URL + '/balance?user_id=' + userId +
+            '&init_data=' + encodeURIComponent(tg?.initData || '')
+        );
         if (!resp.ok) return;
         const data = await resp.json();
-        const serverGold = parseInt(data.gold_coins) || 0;
-        // Обновляем только если сервер вернул больше (никогда не обнуляем локальный баланс)
-        if (serverGold > (userData.balance.gold || 0)) {
-            userData.balance.gold = serverGold;
+        const serverGold   = parseInt(data.gold_coins)   || 0;
+        const serverSilver = parseInt(data.silver_coins) || 0;
+        // Сервер ВСЕГДА приоритет для gold (начисляется только ботом)
+        // Silver: берём максимум (может быть заработано в игре)
+        const changed = (serverGold !== (userData.balance.gold || 0)) ||
+                        (serverSilver > (userData.balance.silver || 0));
+        userData.balance.gold   = serverGold;
+        userData.balance.silver = Math.max(serverSilver, userData.balance.silver || 0);
+        if (changed) {
             saveUserData();
             updateBalance();
-            const el = document.getElementById('cases-gold-val');
-            if (el) el.textContent = serverGold;
         }
     } catch(e) { /* сервер недоступен — используем локальный баланс */ }
 }
