@@ -15,7 +15,7 @@
     </style>
     <title>Fleep Gift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=32">
+    <link rel="stylesheet" href="style.css?v=23">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -830,6 +830,7 @@
             <div class="topup-tabs">
                 <button id="tab-stars" class="topup-tab topup-tab-active" onclick="switchTopUpTab('stars')">⭐ Stars</button>
                 <button id="tab-usdt"  class="topup-tab" onclick="switchTopUpTab('usdt')">💵 USDT</button>
+                <button id="tab-ton"   class="topup-tab" onclick="switchTopUpTab('ton')">💎 TON</button>
             </div>
 
             <!-- === ВКЛАДКА STARS === -->
@@ -855,13 +856,44 @@
             <div id="topup-usdt-body" style="display:none">
                 <p class="topup-subtitle">100 коинов = 1.50 USDT TRC20. Зачисление автоматически.</p>
                 <div id="usdt-packages"></div>
+
+                <div id="topup-ton-panel" class="topup-tab-panel" style="display:none;">
+                    <div style="text-align:center;margin-bottom:20px;">
+                        <div style="font-size:2.5rem;margin-bottom:8px;">💎</div>
+                        <div style="font-size:0.85rem;color:#888;">Оплата в TON через Telegram Wallet</div>
+                        <div style="font-size:0.75rem;color:#666;margin-top:4px;">1 TON = 1000 🟡 золота</div>
+                    </div>
+                    <div class="star-pkg-grid" style="margin-bottom:16px;">
+                        <div class="star-pkg-card" onclick="openTonPayment(1)">
+                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
+                            <div style="font-size:1rem;font-weight:900;color:#fff;">1 TON</div>
+                            <div style="font-size:0.75rem;color:#888;">→ 🟡 1 000</div>
+                        </div>
+                        <div class="star-pkg-card" onclick="openTonPayment(5)">
+                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
+                            <div style="font-size:1rem;font-weight:900;color:#fff;">5 TON</div>
+                            <div style="font-size:0.75rem;color:#888;">→ 🟡 5 000</div>
+                        </div>
+                        <div class="star-pkg-card" onclick="openTonPayment(10)">
+                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
+                            <div style="font-size:1rem;font-weight:900;color:#fff;">10 TON</div>
+                            <div style="font-size:0.75rem;color:#888;">→ 🟡 10 000</div>
+                        </div>
+                        <div class="star-pkg-card" onclick="openTonPayment(50)" style="border-color:rgba(252,211,77,0.4);">
+                            <div style="font-size:1.5rem;margin-bottom:4px;">🔥</div>
+                            <div style="font-size:1rem;font-weight:900;color:#fcd34d;">50 TON</div>
+                            <div style="font-size:0.75rem;color:#888;">→ 🟡 55 000</div>
+                            <div style="font-size:0.65rem;color:#fcd34d;margin-top:2px;">+10% бонус</div>
+                        </div>
+                    </div>
+                </div>
                 <p class="topup-footer-note">Сеть: TRON TRC20 · Зачисление в течение 1 мин после оплаты.</p>
             </div>
 
         </div>
     </div>
 
-    <script src="script.js?v=32"></script>
+    <script src="script.js?v=23"></script>
 
 </body>
 </html>

@@ -197,7 +197,6 @@ body[style*="background"] {
 }
 .header-plus-btn:active { transform: scale(0.92); }
 
-
 /* ===== НОВЫЕ КАРТОЧКИ ИГР ===== */
 .game-section-title {
     font-size: 1.5rem !important;
@@ -2977,7 +2976,6 @@ body[style*="background"] {
 #mines-currency-silver:hover, #mines-currency-gold:hover {
     filter: brightness(1.15);
 }
-
 
 /* ═══════════════════════════════════════════
    НОВЫЙ ПРОФИЛЬ — дизайн по скриншоту
