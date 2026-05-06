@@ -310,6 +310,14 @@ function showSection(section) {
         const s = document.getElementById(id);
         if (s) s.classList.remove('active-section');
     });
+    // Всегда восстанавливаем header при переключении секций
+    const hdr = document.querySelector('.header');
+    if (hdr) hdr.style.display = '';
+    // Скрываем все игры
+    document.querySelectorAll('.game-container').forEach(el => {
+        el.style.display = 'none';
+        el.classList.remove('game-fullscreen');
+    });
     // Форсируем тёмный фон на body и html (Telegram может перебивать)
     document.body.style.setProperty('background','#000','important');
     document.body.style.setProperty('background-color','#000','important');
@@ -364,11 +372,9 @@ function selectGame(game) {
         if (el) { el.style.display = 'none'; el.classList.remove('active-section'); }
     });
 
-    // Скрываем header и контент-враппер
+    // Скрываем header
     const header = document.querySelector('.header');
     if (header) header.style.display = 'none';
-    const contentWrap = document.querySelector('.content');
-    if (contentWrap) contentWrap.style.display = 'none';
 
     // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => {
@@ -383,9 +389,9 @@ function selectGame(game) {
         target.classList.add('game-fullscreen');
     }
 
-    // Скрыть навигацию, показать кнопку назад
+    // Скрыть навигацию (сдвигом), показать кнопку назад
     const nav = document.querySelector('.navigation');
-    if (nav) nav.style.display = 'none';
+    if (nav) nav.style.bottom = '-120px';
     const backBtn = document.getElementById('global-back-btn');
     if (backBtn) backBtn.style.display = 'flex';
 }
@@ -397,19 +403,17 @@ function backToGamesList() {
         el.classList.remove('game-fullscreen');
     });
 
-    // Восстанавливаем header и контент
+    // Восстанавливаем header
     const header = document.querySelector('.header');
     if (header) header.style.display = '';
-    const contentWrap = document.querySelector('.content');
-    if (contentWrap) contentWrap.style.display = '';
 
     // Показываем game-section
     const gs = document.getElementById('game-section');
     if (gs) { gs.style.display = 'block'; gs.classList.add('active-section'); }
 
-    // Навигацию обратно
+    // Возвращаем навигацию
     const nav = document.querySelector('.navigation');
-    if (nav) nav.style.display = '';
+    if (nav) nav.style.bottom = '';
     const backBtn = document.getElementById('global-back-btn');
     if (backBtn) backBtn.style.display = 'none';
 
