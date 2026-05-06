@@ -425,7 +425,7 @@
 
             <!-- Ставка + выбор валюты -->
             <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
-                <input class="mines-bet-input" id="mines-bet-input" type="number" value="100" min="10"
+                <input class="mines-bet-input" id="mines-bet-input" type="number" value="10" min="10"
                     oninput="minesBetInputChange(this.value)"
                     style="flex:1;font-size:1.1rem;padding:12px 14px;" />
                 <!-- Серебро -->
@@ -571,7 +571,7 @@
                     <span class="mines-label">Сумма</span>
                     <div class="mines-bet-row" style="flex:1;justify-content:flex-end;">
                         <button onclick="changeRocketBet(-10)" class="mines-counter-btn" style="font-size:1.3rem;">−</button>
-                        <input id="rocket-bet-input" type="number" min="10" value="100"
+                        <input id="rocket-bet-input" type="number" min="10" value="10"
                             oninput="setRocketBet(parseInt(this.value)||10)"
                             class="mines-bet-input" style="width:90px;" />
                         <button onclick="changeRocketBet(10)" class="mines-counter-btn" style="font-size:1.3rem;">+</button>

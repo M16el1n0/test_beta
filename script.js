@@ -83,7 +83,7 @@ const gameConfig = { size: 3, mines: 1 };
 
 let gameState = {
     isPlaying: false,
-    currentBet: 100,
+    currentBet: 10,
     betType: 'silver',
     currentCoefficient: 1.0,
     totalCells: 9,
@@ -99,7 +99,7 @@ let rocketGameState = {
     isPlaying: false,
     isRoundActive: false,
     currentCoefficient: 1.0,
-    currentBet: 100,
+    currentBet: 10,
     betType: 'silver',
     rocketPosition: 0,
     roundCountdown: 5,
@@ -358,11 +358,17 @@ function showSection(section) {
 }
 
 function selectGame(game) {
-    // Скрываем все секции навигации
+    // Скрываем все секции
     ['game-section','profile-section','tasks-section','inventory-section'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.style.display = 'none'; el.classList.remove('active-section'); }
     });
+
+    // Скрываем header и контент-враппер
+    const header = document.querySelector('.header');
+    if (header) header.style.display = 'none';
+    const contentWrap = document.querySelector('.content');
+    if (contentWrap) contentWrap.style.display = 'none';
 
     // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => {
@@ -373,14 +379,13 @@ function selectGame(game) {
     // Показываем нужную игру fullscreen
     const target = document.getElementById(game + '-game');
     if (target) {
-        target.style.removeProperty('display');
         target.style.display = 'block';
         target.classList.add('game-fullscreen');
     }
 
     // Скрыть навигацию, показать кнопку назад
     const nav = document.querySelector('.navigation');
-    if (nav) nav.style.bottom = '-120px';
+    if (nav) nav.style.display = 'none';
     const backBtn = document.getElementById('global-back-btn');
     if (backBtn) backBtn.style.display = 'flex';
 }
@@ -392,20 +397,26 @@ function backToGamesList() {
         el.classList.remove('game-fullscreen');
     });
 
+    // Восстанавливаем header и контент
+    const header = document.querySelector('.header');
+    if (header) header.style.display = '';
+    const contentWrap = document.querySelector('.content');
+    if (contentWrap) contentWrap.style.display = '';
+
     // Показываем game-section
     const gs = document.getElementById('game-section');
     if (gs) { gs.style.display = 'block'; gs.classList.add('active-section'); }
 
-    // Обновляем nav-кнопку
+    // Навигацию обратно
+    const nav = document.querySelector('.navigation');
+    if (nav) nav.style.display = '';
+    const backBtn = document.getElementById('global-back-btn');
+    if (backBtn) backBtn.style.display = 'none';
+
+    // Обновляем активную кнопку навигации
     document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active-btn'));
     const ng = document.getElementById('nav-game');
     if (ng) ng.classList.add('active-btn');
-
-    // Вернуть навигацию
-    const nav = document.querySelector('.navigation');
-    if (nav) nav.style.bottom = '';
-    const backBtn = document.getElementById('global-back-btn');
-    if (backBtn) backBtn.style.display = 'none';
 }
 
 // ===== БЕЗОПАСНЫЕ ХЕЛПЕРЫ =====
@@ -462,18 +473,18 @@ function updateBetDisplay() {
 }
 
 function changeBet(amount) {
-    gameState.currentBet = Math.max(1, gameState.currentBet + amount);
+    gameState.currentBet = Math.max(10, gameState.currentBet + amount);
     updateBetDisplay();
 }
 
 function setBet(amount) {
-    gameState.currentBet = Math.max(1, amount);
+    gameState.currentBet = Math.max(10, amount);
     updateBetDisplay();
 }
 
 // Новые функции управления для нового дизайна
 function minesBetInputChange(val) {
-    gameState.currentBet = Math.max(1, parseInt(val) || 1);
+    gameState.currentBet = Math.max(10, parseInt(val) || 10);
     updateBetDisplay();
 }
 
@@ -2401,26 +2412,22 @@ async function buyStarPackage(stars, coins) {
     showNotif('⭐ Создаём счёт…', '#8b5cf6');
 
     try {
-        // Создаём инвойс напрямую через Telegram Bot API
-        const tgResp = await fetch(
-            `https://api.telegram.org/bot${BOT_TOKEN_PUBLIC}/createInvoiceLink`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: `⭐ ${stars} → 🟡 ${finalCoins} коинов`,
-                    description: 'Пополнение баланса FLEEP GIFT',
-                    payload: `stars_${stars}_${finalCoins}_${userId}`,
-                    provider_token: '',
-                    currency: 'XTR',
-                    prices: [{ label: 'Звёзды Telegram', amount: stars }]
-                })
-            }
-        );
-        const tgData = await tgResp.json();
-        if (!tgData.ok) throw new Error(tgData.description || 'Telegram API error');
+        const resp = await fetch(`${BACKEND_URL}/create_invoice`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, stars, promo })
+        });
 
-        const invoiceUrl = tgData.result;
+        let invoiceUrl;
+        const ct = resp.headers.get('content-type') || '';
+        if (ct.includes('application/json')) {
+            const data = await resp.json();
+            if (!data.invoice_url) throw new Error(data.error || 'no invoice_url');
+            invoiceUrl = data.invoice_url;
+        } else {
+            const txt = await resp.text();
+            throw new Error('Сервер: ' + txt.replace(/<[^>]+>/g,'').trim().slice(0,80));
+        }
 
         if (typeof tg.openInvoice !== 'function') {
             tg.openLink ? tg.openLink(invoiceUrl) : window.open(invoiceUrl, '_blank');
@@ -2429,9 +2436,8 @@ async function buyStarPackage(stars, coins) {
 
         tg.openInvoice(invoiceUrl, async (status) => {
             if (status === 'paid') {
-                showNotif('✅ Оплата прошла! Обновляем баланс…', '#a78bfa');
+                showNotif('✅ Оплата прошла!', '#a78bfa');
                 closeTopUpModal();
-                // Пробуем синхронизировать с сервером
                 let synced = false;
                 for (let i = 0; i < 10; i++) {
                     await new Promise(r => setTimeout(r, 1800));
@@ -2460,7 +2466,7 @@ async function buyStarPackage(stars, coins) {
 
     } catch (e) {
         console.error('buyStarPackage error:', e);
-        showNotif('❌ ' + (e.message || 'Ошибка, попробуй позже'), '#f87171');
+        showNotif('❌ ' + (e.message || 'Ошибка'), '#f87171');
     }
 }
 
