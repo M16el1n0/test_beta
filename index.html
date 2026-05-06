@@ -55,37 +55,55 @@
             <!-- Карточки игр -->
             <div class="game-cards-list">
 
-                <div class="game-btn" onclick="selectGame('rocket')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#0d0d2e,#2d1060);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 80% 50%,rgba(123,92,255,0.4),transparent 70%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">🚀</div>
-                        <div class="game-btn-name">РАКЕТКА</div>
-                        <div class="game-btn-desc">Лети выше — забирай больше</div>
+                <!-- РАКЕТКА -->
+                <div class="game-tile" onclick="selectGame('rocket')">
+                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);"></div>
+                    <div class="game-tile-inner">
+                        <div class="game-tile-left">
+                            <div class="game-tile-badge" style="background:rgba(124,58,237,0.25);color:#a78bfa;border-color:rgba(124,58,237,0.4);">МГНОВЕННО</div>
+                            <div class="game-tile-name">РАКЕТКА</div>
+                            <div class="game-tile-sub">Лети выше — забирай больше</div>
+                            <div class="game-tile-online"><span class="online-dot"></span><span id="online-rocket">— ОНЛАЙН</span></div>
+                        </div>
+                        <div class="game-tile-right">
+                            <div class="game-tile-emoji">🚀</div>
+                            <div class="game-tile-coef">до ×50</div>
+                        </div>
                     </div>
-                    <div class="game-btn-arrow">→</div>
                 </div>
 
-                <div class="game-btn" onclick="selectGame('mines')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#0a1a06,#1a4a0a);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 80% 50%,rgba(34,197,94,0.35),transparent 70%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">💣</div>
-                        <div class="game-btn-name">МИНЫ</div>
-                        <div class="game-btn-desc">Найди алмазы — избегай мин</div>
+                <!-- МИНЫ -->
+                <div class="game-tile" onclick="selectGame('mines')">
+                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#065f46,#059669);"></div>
+                    <div class="game-tile-inner">
+                        <div class="game-tile-left">
+                            <div class="game-tile-badge" style="background:rgba(5,150,105,0.2);color:#34d399;border-color:rgba(5,150,105,0.4);">СТРАТЕГИЯ</div>
+                            <div class="game-tile-name">МИНЫ</div>
+                            <div class="game-tile-sub">Найди алмазы — избегай мин</div>
+                            <div class="game-tile-online"><span class="online-dot" style="background:#34d399;box-shadow:0 0 6px #34d399;"></span><span id="online-mines">— ОНЛАЙН</span></div>
+                        </div>
+                        <div class="game-tile-right">
+                            <div class="game-tile-emoji">💣</div>
+                            <div class="game-tile-coef" style="color:#34d399;">до ×8</div>
+                        </div>
                     </div>
-                    <div class="game-btn-arrow">→</div>
                 </div>
 
-                <div class="game-btn" onclick="selectGame('cases')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#080c28,#1a2060);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 80% 50%,rgba(96,165,250,0.35),transparent 70%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">🎁</div>
-                        <div class="game-btn-name">КЕЙСЫ</div>
-                        <div class="game-btn-desc">Открывай и получай подарки</div>
+                <!-- КЕЙСЫ -->
+                <div class="game-tile" onclick="selectGame('cases')">
+                    <div class="game-tile-accent" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);"></div>
+                    <div class="game-tile-inner">
+                        <div class="game-tile-left">
+                            <div class="game-tile-badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border-color:rgba(59,130,246,0.4);">УДАЧА</div>
+                            <div class="game-tile-name">КЕЙСЫ</div>
+                            <div class="game-tile-sub">Открывай и получай подарки</div>
+                            <div class="game-tile-online"><span class="online-dot" style="background:#60a5fa;box-shadow:0 0 6px #60a5fa;"></span><span id="online-cases">— ОНЛАЙН</span></div>
+                        </div>
+                        <div class="game-tile-right">
+                            <div class="game-tile-emoji">🎁</div>
+                            <div class="game-tile-coef" style="color:#60a5fa;">+ ПРИЗЫ</div>
+                        </div>
                     </div>
-                    <div class="game-btn-arrow">→</div>
                 </div>
 
             </div>
@@ -788,6 +806,40 @@
             <div class="gift-info" id="manage-gift-info"></div>
             
             <div class="gift-actions" id="manage-gift-actions"></div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно выбора кейса (появляется при клике на кейс) -->
+    <div id="case-select-modal" style="display:none;position:fixed;inset:0;z-index:450;background:rgba(0,0,0,0.8);" onclick="closeCaseSelectModal()">
+        <div style="position:absolute;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 40px;" onclick="event.stopPropagation()">
+            <!-- Handle -->
+            <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
+
+            <div style="padding:20px 20px 0;">
+                <!-- Название кейса -->
+                <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;" id="case-modal-name">КЕЙС</div>
+                <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:16px;" id="case-modal-price"></div>
+
+                <!-- Выбор валюты (показывается только для peace) -->
+                <div id="case-modal-currency" style="display:none;gap:10px;margin-bottom:14px;">
+                    <button id="case-currency-silver" onclick="setCaseCurrency('silver')" style="flex:1;padding:12px;border-radius:12px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);color:#fff;font-weight:700;cursor:pointer;font-size:0.85rem;">⚪ Серебро</button>
+                    <button id="case-currency-gold" onclick="setCaseCurrency('gold')" style="flex:1;padding:12px;border-radius:12px;border:2px solid #2a2a3a;background:#1a1a2a;color:#aaa;font-weight:700;cursor:pointer;font-size:0.85rem;">🟡 Золото</button>
+                </div>
+
+                <!-- Список призов -->
+                <div style="font-size:0.6rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Возможные призы</div>
+                <div id="case-odds-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:16px;"></div>
+
+                <!-- Предупреждение баланса -->
+                <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:0 0 10px;display:none;">⚠ Недостаточно средств!</p>
+
+                <!-- Кнопка открыть -->
+                <button id="case-open-btn" onclick="confirmOpenCase()" style="width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#7b5cff,#a855f7);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;letter-spacing:1px;margin-bottom:10px;">ОТКРЫТЬ</button>
+
+                <!-- Отмена -->
+                <button onclick="closeCaseSelectModal()" style="width:100%;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">Отмена</button>
+            </div>
         </div>
     </div>
 
