@@ -15,7 +15,7 @@
     </style>
     <title>Fleep Gift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=99">
+    <link rel="stylesheet" href="style.css?v=32">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -52,45 +52,37 @@
         <div id="game-section" class="content-section">
             <h2 class="game-section-title">ИГРЫ</h2>
 
-            <!-- Карточки игр -->
+            <!-- Карточки игр в стиле референса -->
             <div class="game-cards-list">
 
-                <div class="game-btn" onclick="selectGame('rocket')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#0a0820,#1a0a40);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(123,92,255,0.45),transparent 65%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">🚀</div>
-                        <div class="game-btn-name">РАКЕТКА</div>
+                <div class="game-card-new" onclick="selectGame('rocket')">
+                    <div class="game-card-new-bg game-card-bg-rocket"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">РАКЕТКА</div>
                     </div>
-                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
-                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#a78bfa;background:rgba(123,92,255,0.18);border:1px solid rgba(123,92,255,0.35);padding:2px 8px;border-radius:6px;text-transform:uppercase;">до ×50</span>
-                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-rocket">· · ·</span>
+                    <div class="game-card-image-wrap game-card-img-rocket">
+                        <span class="game-card-emoji-big">🚀</span>
                     </div>
                 </div>
 
-                <div class="game-btn" onclick="selectGame('mines')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#040f06,#0b2e10);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(34,197,94,0.38),transparent 65%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">💣</div>
-                        <div class="game-btn-name">МИНЫ</div>
+                <div class="game-card-new" onclick="selectGame('mines')">
+                    <div class="game-card-new-bg game-card-bg-mines"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">МИНЫ</div>
                     </div>
-                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
-                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#34d399;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);padding:2px 8px;border-radius:6px;text-transform:uppercase;">до ×8</span>
-                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-mines">· · ·</span>
+                    <div class="game-card-image-wrap game-card-img-mines">
+                        <span class="game-card-emoji-big">💣</span>
+                        
                     </div>
                 </div>
 
-                <div class="game-btn" onclick="selectGame('cases')">
-                    <div class="game-btn-bg" style="background:linear-gradient(135deg,#04091c,#0c1a40);"></div>
-                    <div class="game-btn-glow" style="background:radial-gradient(ellipse at 75% 50%,rgba(96,165,250,0.38),transparent 65%);"></div>
-                    <div class="game-btn-content">
-                        <div class="game-btn-icon">🎁</div>
-                        <div class="game-btn-name">КЕЙСЫ</div>
+                <div class="game-card-new" onclick="selectGame('cases')">
+                    <div class="game-card-new-bg game-card-bg-cases"></div>
+                    <div class="game-card-new-info">
+                        <div class="game-card-new-name">КЕЙСЫ</div>
                     </div>
-                    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:18px;">
-                        <span style="font-size:0.55rem;font-weight:800;letter-spacing:1.5px;color:#60a5fa;background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);padding:2px 8px;border-radius:6px;text-transform:uppercase;">ПРИЗЫ</span>
-                        <span style="font-size:0.58rem;color:#444;font-weight:700;letter-spacing:0.5px;" id="online-cases">· · ·</span>
+                    <div class="game-card-image-wrap game-card-img-cases">
+                        <span class="game-card-emoji-big">🎁</span>
                     </div>
                 </div>
 
@@ -98,6 +90,338 @@
 
 
 
+            <!-- Игра "Мины" -->
+            <div id="mines-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+
+                <!-- НАСТРОЙКИ (скрываются во время игры) -->
+                <div class="game-settings mines-settings-new" id="mines-settings-panel">
+
+                    <!-- Размер поля -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Поле</span>
+                        <div class="mines-toggle-group">
+                            <button class="mines-toggle active" data-size="3">3×3</button>
+                            <button class="mines-toggle" data-size="5">5×5</button>
+                        </div>
+                    </div>
+
+                    <!-- Мины -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Мины</span>
+                        <div class="mines-mine-counter">
+                            <button class="mines-counter-btn" onclick="mineCountChange(-1)">−</button>
+                            <span id="mines-count-display">1</span>
+                            <button class="mines-counter-btn" onclick="mineCountChange(1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Ставка + выбор валюты -->
+                    <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
+                        <input class="mines-bet-input" id="mines-bet-input" type="number" value="100" min="10"
+                            oninput="minesBetInputChange(this.value)"
+                            style="flex:1;font-size:1.1rem;padding:12px 14px;" />
+                        <!-- Серебро -->
+                        <div id="mines-currency-silver" onclick="setMinesCurrency('silver')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
+                            <span style="font-size:1.4rem;font-weight:900;color:#c084fc;text-shadow:0 0 12px rgba(192,132,252,0.8);line-height:1;">F</span>
+                            <span style="font-size:0.5rem;color:#c084fc;font-weight:800;letter-spacing:0.5px;">СЕР</span>
+                        </div>
+                        <!-- Золото -->
+                        <div id="mines-currency-gold" onclick="setMinesCurrency('gold')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #2a2a3a;background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
+                            <span style="font-size:1.4rem;font-weight:900;color:#f0a500;text-shadow:0 0 12px rgba(240,165,0,0.5);line-height:1;">F</span>
+                            <span style="font-size:0.5rem;color:#aaa;font-weight:800;letter-spacing:0.5px;">ЗОЛ</span>
+                        </div>
+                        <button class="mines-max-btn" onclick="minesSetMax()" style="height:54px;padding:0 14px;flex-shrink:0;">MAX</button>
+                    </div>
+
+                    <p class="balance-warning" id="balance-warning" style="display:none;">
+                        <i class="fas fa-exclamation-triangle"></i> Недостаточно средств!
+                    </p>
+
+                    <!-- Кнопка ИГРАТЬ -->
+                    <button class="mines-play-btn" onclick="startGame()" id="play-btn">
+                        ИГРАТЬ
+                    </button>
+                </div>
+
+                <!-- ИГРОВОЕ ПОЛЕ (показывается во время игры) -->
+                <div id="game-board" class="mines-board-new hidden">
+
+                    <!-- Статистика во время игры -->
+                    <div class="mines-live-stats">
+                        <div class="mines-live-chip">
+                            <span>💣</span>
+                            <span id="mines-left">1</span>
+                        </div>
+                        <div class="mines-live-chip green-chip">
+                            <span id="current-coef">1.00×</span>
+                        </div>
+                        <div class="mines-live-chip">
+                            <span>+<span id="current-win">0</span> F</span>
+                        </div>
+                    </div>
+
+                    <!-- Сетка мин -->
+                    <div class="mines-grid-new" id="mines-grid"></div>
+
+                    <!-- Кнопка ЗАБРАТЬ -->
+                    <button class="mines-cashout-btn" onclick="cashOut()" id="cashout-btn" disabled>
+                        ЗАБРАТЬ
+                    </button>
+                </div>
+
+                <!-- Скрытые элементы для совместимости -->
+                <span id="game-balance" style="display:none">1000</span>
+                <span id="current-balance" style="display:none">1000</span>
+                <span id="current-bet" style="display:none">100</span>
+                <span id="size-coef" style="display:none"></span>
+                <span id="mine-coef" style="display:none"></span>
+
+                <div class="game-history" style="margin-top:16px;">
+                    <h3><i class="fas fa-history"></i> История игр</h3>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </div>
+
+            <!-- Игра "Ракетка" -->
+            <div id="rocket-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+                <div class="rocket-game-content" style="padding:0;">
+
+                    <!-- ИГРОВОЕ ПОЛЕ -->
+                    <div style="position:relative;background:#080814;border-radius:14px;overflow:hidden;margin:0 0 0 0;">
+
+                        <!-- Canvas -->
+                        <canvas id="rocket-canvas" style="width:100%;height:340px;display:block;"></canvas>
+
+                        <!-- Ракета (gif) -->
+                        <div id="rocket-emoji" style="display:none;position:absolute;pointer-events:none;"></div>
+                        <!-- Пламя (убрано) -->
+
+                        <!-- Коэффициент — большой, сверху слева -->
+                        <div style="position:absolute;top:14px;left:14px;pointer-events:none;">
+                            <span id="rocket-coefficient" style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 16px rgba(138,43,226,0.7);">×1.00</span>
+                        </div>
+
+                        <!-- Таймер раунда — сверху справа -->
+                        <div id="round-status" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:#bbb;display:none;">
+                            ⏳ <span id="round-timer">5</span>с
+                        </div>
+                    </div>
+
+                    <!-- Полоса прошлых раундов -->
+                    <div style="background:#0d0d1c;padding:7px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-top:1px solid rgba(255,255,255,0.04);">
+                        <span style="font-size:0.7rem;color:#555;flex-shrink:0;">Прошлые:</span>
+                        <div id="rocket-prev-rounds" style="display:flex;gap:5px;flex-shrink:0;"></div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div style="padding:10px 12px 14px;background:#0d0d1c;border-radius:0 0 14px 14px;">
+                        <button id="rocket-play-btn" onclick="openRocketBetSheet()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:0.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
+                            СДЕЛАТЬ СТАВКУ
+                        </button>
+                        <button id="rocket-cashout-btn" onclick="cashOutRocket()" style="display:none;width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#00c853,#00e676);color:#111;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,200,80,0.4);"></button>
+                    </div>
+
+                    <!-- Скрытые служебные элементы -->
+                    <div style="display:none;">
+                        <span id="rocket-current-bet">100</span>
+                        <span id="rocket-potential-win"></span>
+                        <span id="rocket-balance-warning"></span>
+                    </div>
+
+                    <div class="game-history" style="padding:0 14px 14px;">
+                        <h3 style="margin:14px 0 8px;"><i class="fas fa-history"></i> История игр</h3>
+                        <div id="rocket-history-list" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ШТОРКА СТАВКИ — стиль мин -->
+            <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="closeRocketBetSheet(event)">
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 36px;max-width:520px;margin:0 auto;" onclick="event.stopPropagation()">
+                    <!-- Ручка -->
+                    <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
+
+                    <div class="mines-settings-new">
+                        <!-- Заголовок -->
+                        <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">СТАВКА</div>
+                        <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Ракетка</div>
+
+                        <!-- Валюта -->
+                        <div class="mines-control-row">
+                            <span class="mines-label">Валюта</span>
+                            <div class="mines-toggle-group">
+                                <button class="mines-toggle active" id="rocket-currency-silver" onclick="setRocketCurrency('silver')">⚪ F</button>
+                                <button class="mines-toggle" id="rocket-currency-gold" onclick="setRocketCurrency('gold')">🟡 G</button>
+                            </div>
+                        </div>
+
+                        <!-- Ставка -->
+                        <div class="mines-control-row">
+                            <span class="mines-label">Сумма</span>
+                            <div class="mines-bet-row" style="flex:1;justify-content:flex-end;">
+                                <button onclick="changeRocketBet(-10)" class="mines-counter-btn" style="font-size:1.3rem;">−</button>
+                                <input id="rocket-bet-input" type="number" min="10" value="100"
+                                    oninput="setRocketBet(parseInt(this.value)||10)"
+                                    class="mines-bet-input" style="width:90px;" />
+                                <button onclick="changeRocketBet(10)" class="mines-counter-btn" style="font-size:1.3rem;">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Пресеты -->
+                        <div class="mines-control-row" style="gap:6px;">
+                            <button onclick="setRocketBet(50)"  class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">50</button>
+                            <button onclick="setRocketBet(100)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">100</button>
+                            <button onclick="setRocketBet(200)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">200</button>
+                            <button onclick="setRocketBet(500)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">500</button>
+                        </div>
+
+                        <!-- Потенциальный выигрыш -->
+                        <div class="mines-info-row">
+                            <div class="mines-info-chip">
+                                <span class="mines-info-label">Ставка</span>
+                                <span class="mines-info-value" id="rocket-bet-display">100 F</span>
+                            </div>
+                            <div class="mines-info-chip">
+                                <span class="mines-info-label">×2.00</span>
+                                <span class="mines-info-value green" id="rocket-win-display">200 F</span>
+                            </div>
+                        </div>
+
+                        <p style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;" id="rocket-balance-warning2">⚠ Недостаточно средств!</p>
+
+                        <!-- Кнопка ПОСТАВИТЬ -->
+                        <button onclick="confirmRocketBet()" class="mines-play-btn" style="background:linear-gradient(135deg,#3d7ef5,#7c3aed);box-shadow:0 4px 24px rgba(61,126,245,0.4);">
+                            ПОСТАВИТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кейсы -->
+            <div id="cases-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+
+                <!-- Баланс и заголовок — стиль мин -->
+                <div class="mines-top-bar">
+                    <div class="mines-balance-chip">
+                        <span class="mines-balance-icon">⚪</span>
+                        <span class="mines-coin-label" id="cases-balance-val">0</span>
+                        <span style="font-size:0.7rem;color:#666;margin-left:2px;">F</span>
+                    </div>
+                    <div class="mines-balance-chip">
+                        <span class="mines-balance-icon">🟡</span>
+                        <span class="mines-coin-label" id="cases-gold-val">0</span>
+                    </div>
+                </div>
+
+                <!-- Список кейсов -->
+                <div class="mines-settings-new" id="cases-list-panel">
+                    <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">КЕЙСЫ</div>
+                    <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Открой и получи подарок</div>
+
+                    <div class="cases-new-grid">
+                        <div class="case-new-card case-card-free" onclick="selectCase('daily')">
+                            <div class="case-new-top case-top-free">
+                                <span class="case-new-emoji">📅</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">Ежедневный</div>
+                                <div class="case-new-price free">Бесплатно</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars15')">
+                            <div class="case-new-top case-top-silver">
+                                <span class="case-new-emoji">⭐</span>
+                                <span class="case-stars-num">15</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">15 звёзд</div>
+                                <div class="case-new-price">15 🟡</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars25')">
+                            <div class="case-new-top case-top-silver">
+                                <span class="case-new-emoji">⭐</span>
+                                <span class="case-stars-num">25</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">25 звёзд</div>
+                                <div class="case-new-price">25 🟡</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-gold" onclick="selectCase('stars50')">
+                            <div class="case-new-top case-top-gold">
+                                <span class="case-new-emoji">⭐</span>
+                                <span class="case-stars-num">50</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">50 звёзд</div>
+                                <div class="case-new-price">50 🟡</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-gold" onclick="selectCase('stars100')">
+                            <div class="case-new-top case-top-gold">
+                                <span class="case-new-emoji">⭐</span>
+                                <span class="case-stars-num">100</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">100 звёзд</div>
+                                <div class="case-new-price">100 🟡</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-peace" onclick="selectCase('peace')">
+                            <div class="case-new-top case-top-peace">
+                                <span class="case-new-emoji">🕊️</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">Покой в богатстве</div>
+                                <div class="case-new-price peace">555 ⚪ / 555 🟡</div>
+                            </div>
+                        </div>
+                        <div class="case-new-card case-card-epic" onclick="selectCase('strike')">
+                            <div class="case-new-top case-top-epic">
+                                <span class="case-new-emoji">⚡</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">СТРАЙК</div>
+                                <div class="case-new-price special">7д депозит</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Панель выбранного кейса -->
+                <div id="case-open-panel" class="mines-settings-new" style="display:none;">
+                    <div id="case-panel-name" style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;"></div>
+
+                    <!-- Валюта -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Валюта</span>
+                        <div class="mines-toggle-group">
+                            <button class="mines-toggle active" id="case-currency-silver" onclick="setCaseCurrency('silver')">⚪ F</button>
+                            <button class="mines-toggle" id="case-currency-gold" onclick="setCaseCurrency('gold')">🟡 G</button>
+                        </div>
+                    </div>
+
+                    <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;">⚠ Недостаточно средств!</p>
+
+                    <!-- Кнопка -->
+                    <button id="case-open-btn" class="mines-play-btn" onclick="confirmOpenCase()">ОТКРЫТЬ</button>
+
+                    <!-- Назад к списку -->
+                    <button onclick="showCasesList()" style="width:100%;margin-top:8px;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">← Все кейсы</button>
+                </div>
+
+                <!-- История -->
+                <div style="padding:0 14px 14px;">
+                    <div style="font-size:0.65rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">ИСТОРИЯ</div>
+                    <div id="cases-history-list" class="history-list"></div>
+                </div>
+            </div>
 
             
         </div>
@@ -397,339 +721,6 @@
     <!-- Глобальная кнопка "Назад" (фиксирована сверху, появляется в играх) -->
     <button id="global-back-btn" onclick="backToGamesList()" style="display:none;position:fixed;top:12px;left:12px;z-index:500;width:40px;height:40px;border-radius:50%;border:none;background:rgba(20,20,35,0.9);color:#fff;font-size:1.2rem;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.5);backdrop-filter:blur(8px);">←</button>
 
-    <!-- Игра "Мины" -->
-    <div id="mines-game" class="game-container" style="display:none;">
-        <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-
-        <!-- НАСТРОЙКИ (скрываются во время игры) -->
-        <div class="game-settings mines-settings-new" id="mines-settings-panel">
-
-            <!-- Размер поля -->
-            <div class="mines-control-row">
-                <span class="mines-label">Поле</span>
-                <div class="mines-toggle-group">
-                    <button class="mines-toggle active" data-size="3">3×3</button>
-                    <button class="mines-toggle" data-size="5">5×5</button>
-                </div>
-            </div>
-
-            <!-- Мины -->
-            <div class="mines-control-row">
-                <span class="mines-label">Мины</span>
-                <div class="mines-mine-counter">
-                    <button class="mines-counter-btn" onclick="mineCountChange(-1)">−</button>
-                    <span id="mines-count-display">1</span>
-                    <button class="mines-counter-btn" onclick="mineCountChange(1)">+</button>
-                </div>
-            </div>
-
-            <!-- Ставка + выбор валюты -->
-            <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
-                <input class="mines-bet-input" id="mines-bet-input" type="number" value="10" min="10"
-                    oninput="minesBetInputChange(this.value)"
-                    style="flex:1;font-size:1.1rem;padding:12px 14px;" />
-                <!-- Серебро -->
-                <div id="mines-currency-silver" onclick="setMinesCurrency('silver')"
-                    style="width:54px;height:54px;border-radius:14px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
-                    <span style="font-size:1.4rem;font-weight:900;color:#c084fc;text-shadow:0 0 12px rgba(192,132,252,0.8);line-height:1;">F</span>
-                    <span style="font-size:0.5rem;color:#c084fc;font-weight:800;letter-spacing:0.5px;">СЕР</span>
-                </div>
-                <!-- Золото -->
-                <div id="mines-currency-gold" onclick="setMinesCurrency('gold')"
-                    style="width:54px;height:54px;border-radius:14px;border:2px solid #2a2a3a;background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
-                    <span style="font-size:1.4rem;font-weight:900;color:#f0a500;text-shadow:0 0 12px rgba(240,165,0,0.5);line-height:1;">F</span>
-                    <span style="font-size:0.5rem;color:#aaa;font-weight:800;letter-spacing:0.5px;">ЗОЛ</span>
-                </div>
-                <button class="mines-max-btn" onclick="minesSetMax()" style="height:54px;padding:0 14px;flex-shrink:0;">MAX</button>
-            </div>
-
-            <p class="balance-warning" id="balance-warning" style="display:none;">
-                <i class="fas fa-exclamation-triangle"></i> Недостаточно средств!
-            </p>
-
-            <!-- Кнопка ИГРАТЬ -->
-            <button class="mines-play-btn" onclick="startGame()" id="play-btn">
-                ИГРАТЬ
-            </button>
-        </div>
-
-        <!-- ИГРОВОЕ ПОЛЕ (показывается во время игры) -->
-        <div id="game-board" class="mines-board-new hidden">
-
-            <!-- Статистика во время игры -->
-            <div class="mines-live-stats">
-                <div class="mines-live-chip">
-                    <span>💣</span>
-                    <span id="mines-left">1</span>
-                </div>
-                <div class="mines-live-chip green-chip">
-                    <span id="current-coef">1.00×</span>
-                </div>
-                <div class="mines-live-chip">
-                    <span>+<span id="current-win">0</span> F</span>
-                </div>
-            </div>
-
-            <!-- Сетка мин -->
-            <div class="mines-grid-new" id="mines-grid"></div>
-
-            <!-- Кнопка ЗАБРАТЬ -->
-            <button class="mines-cashout-btn" onclick="cashOut()" id="cashout-btn" disabled>
-                ЗАБРАТЬ
-            </button>
-        </div>
-
-        <!-- Скрытые элементы для совместимости -->
-        <span id="game-balance" style="display:none">1000</span>
-        <span id="current-balance" style="display:none">1000</span>
-        <span id="current-bet" style="display:none">100</span>
-        <span id="size-coef" style="display:none"></span>
-        <span id="mine-coef" style="display:none"></span>
-
-        <div class="game-history" style="margin-top:16px;">
-            <h3><i class="fas fa-history"></i> История игр</h3>
-            <div id="history-list" class="history-list"></div>
-        </div>
-    </div>
-
-    <!-- Игра "Ракетка" -->
-    <div id="rocket-game" class="game-container" style="display:none;">
-        <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-        <div class="rocket-game-content" style="padding:0;">
-
-            <!-- ИГРОВОЕ ПОЛЕ -->
-            <div style="position:relative;background:#080814;border-radius:14px;overflow:hidden;margin:0 0 0 0;">
-
-                <!-- Canvas -->
-                <canvas id="rocket-canvas" style="width:100%;height:340px;display:block;"></canvas>
-
-                <!-- Ракета (gif) -->
-                <div id="rocket-emoji" style="display:none;position:absolute;pointer-events:none;"></div>
-                <!-- Пламя (убрано) -->
-
-                <!-- Коэффициент — большой, сверху слева -->
-                <div style="position:absolute;top:14px;left:14px;pointer-events:none;">
-                    <span id="rocket-coefficient" style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 16px rgba(138,43,226,0.7);">×1.00</span>
-                </div>
-
-                <!-- Таймер раунда — сверху справа -->
-                <div id="round-status" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:#bbb;display:none;">
-                    ⏳ <span id="round-timer">5</span>с
-                </div>
-            </div>
-
-            <!-- Полоса прошлых раундов -->
-            <div style="background:#0d0d1c;padding:7px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-top:1px solid rgba(255,255,255,0.04);">
-                <span style="font-size:0.7rem;color:#555;flex-shrink:0;">Прошлые:</span>
-                <div id="rocket-prev-rounds" style="display:flex;gap:5px;flex-shrink:0;"></div>
-            </div>
-
-            <!-- Кнопки действий -->
-            <div style="padding:10px 12px 14px;background:#0d0d1c;border-radius:0 0 14px 14px;">
-                <button id="rocket-play-btn" onclick="openRocketBetSheet()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:0.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
-                    СДЕЛАТЬ СТАВКУ
-                </button>
-                <button id="rocket-cashout-btn" onclick="cashOutRocket()" style="display:none;width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#00c853,#00e676);color:#111;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,200,80,0.4);"></button>
-            </div>
-
-            <!-- Скрытые служебные элементы -->
-            <div style="display:none;">
-                <span id="rocket-current-bet">100</span>
-                <span id="rocket-potential-win"></span>
-                <span id="rocket-balance-warning"></span>
-            </div>
-
-            <div class="game-history" style="padding:0 14px 14px;">
-                <h3 style="margin:14px 0 8px;"><i class="fas fa-history"></i> История игр</h3>
-                <div id="rocket-history-list" class="history-list"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ШТОРКА СТАВКИ — стиль мин -->
-    <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="closeRocketBetSheet(event)">
-        <div style="position:absolute;bottom:0;left:0;right:0;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 36px;max-width:520px;margin:0 auto;" onclick="event.stopPropagation()">
-            <!-- Ручка -->
-            <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
-
-            <div class="mines-settings-new">
-                <!-- Заголовок -->
-                <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">СТАВКА</div>
-                <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Ракетка</div>
-
-                <!-- Валюта -->
-                <div class="mines-control-row">
-                    <span class="mines-label">Валюта</span>
-                    <div class="mines-toggle-group">
-                        <button class="mines-toggle active" id="rocket-currency-silver" onclick="setRocketCurrency('silver')">⚪ F</button>
-                        <button class="mines-toggle" id="rocket-currency-gold" onclick="setRocketCurrency('gold')">🟡 G</button>
-                    </div>
-                </div>
-
-                <!-- Ставка -->
-                <div class="mines-control-row">
-                    <span class="mines-label">Сумма</span>
-                    <div class="mines-bet-row" style="flex:1;justify-content:flex-end;">
-                        <button onclick="changeRocketBet(-10)" class="mines-counter-btn" style="font-size:1.3rem;">−</button>
-                        <input id="rocket-bet-input" type="number" min="10" value="10"
-                            oninput="setRocketBet(parseInt(this.value)||10)"
-                            class="mines-bet-input" style="width:90px;" />
-                        <button onclick="changeRocketBet(10)" class="mines-counter-btn" style="font-size:1.3rem;">+</button>
-                    </div>
-                </div>
-
-                <!-- Пресеты -->
-                <div class="mines-control-row" style="gap:6px;">
-                    <button onclick="setRocketBet(50)"  class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">50</button>
-                    <button onclick="setRocketBet(100)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">100</button>
-                    <button onclick="setRocketBet(200)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">200</button>
-                    <button onclick="setRocketBet(500)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">500</button>
-                </div>
-
-                <!-- Потенциальный выигрыш -->
-                <div class="mines-info-row">
-                    <div class="mines-info-chip">
-                        <span class="mines-info-label">Ставка</span>
-                        <span class="mines-info-value" id="rocket-bet-display">100 F</span>
-                    </div>
-                    <div class="mines-info-chip">
-                        <span class="mines-info-label">×2.00</span>
-                        <span class="mines-info-value green" id="rocket-win-display">200 F</span>
-                    </div>
-                </div>
-
-                <p style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;" id="rocket-balance-warning2">⚠ Недостаточно средств!</p>
-
-                <!-- Кнопка ПОСТАВИТЬ -->
-                <button onclick="confirmRocketBet()" class="mines-play-btn" style="background:linear-gradient(135deg,#3d7ef5,#7c3aed);box-shadow:0 4px 24px rgba(61,126,245,0.4);">
-                    ПОСТАВИТЬ
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Кейсы -->
-    <div id="cases-game" class="game-container" style="display:none;">
-        <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-
-        <!-- Баланс и заголовок — стиль мин -->
-        <div class="mines-top-bar">
-            <div class="mines-balance-chip">
-                <span class="mines-balance-icon">⚪</span>
-                <span class="mines-coin-label" id="cases-balance-val">0</span>
-                <span style="font-size:0.7rem;color:#666;margin-left:2px;">F</span>
-            </div>
-            <div class="mines-balance-chip">
-                <span class="mines-balance-icon">🟡</span>
-                <span class="mines-coin-label" id="cases-gold-val">0</span>
-            </div>
-        </div>
-
-        <!-- Список кейсов -->
-        <div class="mines-settings-new" id="cases-list-panel">
-            <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">КЕЙСЫ</div>
-            <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Открой и получи подарок</div>
-
-            <div class="cases-new-grid">
-                <div class="case-new-card case-card-free" onclick="selectCase('daily')">
-                    <div class="case-new-top case-top-free">
-                        <span class="case-new-emoji">📅</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">Ежедневный</div>
-                        <div class="case-new-price free">Бесплатно</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-silver" onclick="selectCase('stars15')">
-                    <div class="case-new-top case-top-silver">
-                        <span class="case-new-emoji">⭐</span>
-                        <span class="case-stars-num">15</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">15 звёзд</div>
-                        <div class="case-new-price">15 🟡</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-silver" onclick="selectCase('stars25')">
-                    <div class="case-new-top case-top-silver">
-                        <span class="case-new-emoji">⭐</span>
-                        <span class="case-stars-num">25</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">25 звёзд</div>
-                        <div class="case-new-price">25 🟡</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-gold" onclick="selectCase('stars50')">
-                    <div class="case-new-top case-top-gold">
-                        <span class="case-new-emoji">⭐</span>
-                        <span class="case-stars-num">50</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">50 звёзд</div>
-                        <div class="case-new-price">50 🟡</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-gold" onclick="selectCase('stars100')">
-                    <div class="case-new-top case-top-gold">
-                        <span class="case-new-emoji">⭐</span>
-                        <span class="case-stars-num">100</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">100 звёзд</div>
-                        <div class="case-new-price">100 🟡</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-peace" onclick="selectCase('peace')">
-                    <div class="case-new-top case-top-peace">
-                        <span class="case-new-emoji">🕊️</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">Покой в богатстве</div>
-                        <div class="case-new-price peace">555 ⚪ / 555 🟡</div>
-                    </div>
-                </div>
-                <div class="case-new-card case-card-epic" onclick="selectCase('strike')">
-                    <div class="case-new-top case-top-epic">
-                        <span class="case-new-emoji">⚡</span>
-                    </div>
-                    <div class="case-new-info">
-                        <div class="case-new-name">СТРАЙК</div>
-                        <div class="case-new-price special">7д депозит</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Панель выбранного кейса -->
-        <div id="case-open-panel" class="mines-settings-new" style="display:none;">
-            <div id="case-panel-name" style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;"></div>
-
-            <!-- Валюта -->
-            <div class="mines-control-row">
-                <span class="mines-label">Валюта</span>
-                <div class="mines-toggle-group">
-                    <button class="mines-toggle active" id="case-currency-silver" onclick="setCaseCurrency('silver')">⚪ F</button>
-                    <button class="mines-toggle" id="case-currency-gold" onclick="setCaseCurrency('gold')">🟡 G</button>
-                </div>
-            </div>
-
-            <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;">⚠ Недостаточно средств!</p>
-
-            <!-- Кнопка -->
-            <button id="case-open-btn" class="mines-play-btn" onclick="confirmOpenCase()">ОТКРЫТЬ</button>
-
-            <!-- Назад к списку -->
-            <button onclick="showCasesList()" style="width:100%;margin-top:8px;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">← Все кейсы</button>
-        </div>
-
-        <!-- История -->
-        <div style="padding:0 14px 14px;">
-            <div style="font-size:0.65rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">ИСТОРИЯ</div>
-            <div id="cases-history-list" class="history-list"></div>
-        </div>
-    </div>
-
     <div class="navigation" style="transition:transform 0.3s ease;">
         <button class="nav-button" onclick="showSection('game')" id="nav-game">
             <img class="nav-icon" src="data:image/jpeg;base64,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" alt="">
@@ -795,40 +786,6 @@
             <div class="gift-info" id="manage-gift-info"></div>
             
             <div class="gift-actions" id="manage-gift-actions"></div>
-        </div>
-    </div>
-
-
-    <!-- Модальное окно выбора кейса (появляется при клике на кейс) -->
-    <div id="case-select-modal" style="display:none;position:fixed;inset:0;z-index:450;background:rgba(0,0,0,0.8);" onclick="closeCaseSelectModal()">
-        <div style="position:absolute;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 40px;" onclick="event.stopPropagation()">
-            <!-- Handle -->
-            <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
-
-            <div style="padding:20px 20px 0;">
-                <!-- Название кейса -->
-                <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;" id="case-modal-name">КЕЙС</div>
-                <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:16px;" id="case-modal-price"></div>
-
-                <!-- Выбор валюты (показывается только для peace) -->
-                <div id="case-modal-currency" style="display:none;gap:10px;margin-bottom:14px;">
-                    <button id="case-currency-silver" onclick="setCaseCurrency('silver')" style="flex:1;padding:12px;border-radius:12px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);color:#fff;font-weight:700;cursor:pointer;font-size:0.85rem;">⚪ Серебро</button>
-                    <button id="case-currency-gold" onclick="setCaseCurrency('gold')" style="flex:1;padding:12px;border-radius:12px;border:2px solid #2a2a3a;background:#1a1a2a;color:#aaa;font-weight:700;cursor:pointer;font-size:0.85rem;">🟡 Золото</button>
-                </div>
-
-                <!-- Список призов -->
-                <div style="font-size:0.6rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Возможные призы</div>
-                <div id="case-odds-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-bottom:16px;"></div>
-
-                <!-- Предупреждение баланса -->
-                <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:0 0 10px;display:none;">⚠ Недостаточно средств!</p>
-
-                <!-- Кнопка открыть -->
-                <button id="case-open-btn" onclick="confirmOpenCase()" style="width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#7b5cff,#a855f7);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;letter-spacing:1px;margin-bottom:10px;">ОТКРЫТЬ</button>
-
-                <!-- Отмена -->
-                <button onclick="closeCaseSelectModal()" style="width:100%;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">Отмена</button>
-            </div>
         </div>
     </div>
 
@@ -904,7 +861,7 @@
         </div>
     </div>
 
-    <script src="script.js?v=99"></script>
+    <script src="script.js?v=32"></script>
 
 </body>
 </html>

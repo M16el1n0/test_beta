@@ -197,6 +197,7 @@ body[style*="background"] {
 }
 .header-plus-btn:active { transform: scale(0.92); }
 
+
 /* ===== НОВЫЕ КАРТОЧКИ ИГР ===== */
 .game-section-title {
     font-size: 1.5rem !important;
@@ -2977,6 +2978,7 @@ body[style*="background"] {
     filter: brightness(1.15);
 }
 
+
 /* ═══════════════════════════════════════════
    НОВЫЙ ПРОФИЛЬ — дизайн по скриншоту
 ═══════════════════════════════════════════ */
@@ -4239,92 +4241,3 @@ body[style*="background"] {
     color: #ef4444;
     text-shadow: 0 0 12px rgba(239,68,68,0.7), 0 0 4px rgba(239,68,68,0.5);
 }
-
-/* ═══ GAME FULLSCREEN OVERLAY ═══ */
-.game-fullscreen {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 500 !important;
-    background: #0d0d1a !important;
-    overflow-y: auto !important;
-    display: block !important;
-    padding-bottom: 20px !important;
-}
-
-/* Кнопка назад поверх игры */
-#global-back-btn {
-    z-index: 600 !important;
-}
-
-/* Новые кнопки игр */
-.game-cards-list {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    padding: 4px 0 110px !important;
-}
-.game-btn {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    min-height: 86px;
-    display: flex;
-    align-items: center;
-    border: 1.5px solid rgba(123,92,255,0.2);
-    transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-}
-.game-btn:active { transform: scale(0.97); }
-.game-btn:hover  { box-shadow: 0 6px 28px rgba(123,92,255,0.3); border-color: rgba(123,92,255,0.55); }
-.game-btn-bg   { position: absolute; inset: 0; z-index: 0; }
-.game-btn-glow { position: absolute; inset: 0; z-index: 1; }
-.game-btn-content {
-    position: relative; z-index: 2;
-    padding: 16px 18px; flex: 1;
-    display: flex; flex-direction: column; gap: 3px;
-}
-.game-btn-icon {
-    font-size: 2.2rem; line-height: 1; margin-bottom: 5px;
-    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.6));
-}
-.game-btn-name {
-    font-size: 1.15rem; font-weight: 900; color: #fff;
-    letter-spacing: 2.5px; text-transform: uppercase;
-    text-shadow: 0 2px 14px rgba(0,0,0,0.9);
-}
-.game-btn-desc { font-size: 0.68rem; color: rgba(255,255,255,0.45); font-weight: 500; }
-.game-btn-arrow {
-    position: relative; z-index: 2;
-    padding-right: 20px; font-size: 1.3rem;
-    color: rgba(255,255,255,0.25);
-}
-/* Скрываем старые стили */
-.game-card-new { display: none !important; }
-
-/* ─── case-odds-item ─────────────────────────────────────────────────────── */
-.case-odds-item {
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 10px;
-    padding: 8px 12px;
-}
-.case-odds-left { display: flex; align-items: center; gap: 10px; }
-.case-odds-emoji { font-size: 1.4rem; }
-.case-odds-name  { font-size: 0.78rem; font-weight: 700; color: #e0d8ff; }
-.case-odds-val   { font-size: 0.65rem; color: #555; }
-.case-odds-pct   { font-size: 0.78rem; font-weight: 800; }
-
-/* ─── tier badge colours ─────────────────────────────────────────────────── */
-.tier-rare      { border-color: rgba(59,130,246,0.45) !important; }
-.tier-rare .inv-gift-tier-badge { background: rgba(59,130,246,0.2); color: #60a5fa; }
-.tier-epic      { border-color: rgba(168,85,247,0.5) !important; }
-.tier-epic .inv-gift-tier-badge { background: rgba(168,85,247,0.2); color: #c084fc; }
-.tier-legendary { border-color: rgba(251,191,36,0.55) !important; box-shadow: 0 0 16px rgba(251,191,36,0.15); }
-.tier-legendary .inv-gift-tier-badge { background: rgba(251,191,36,0.2); color: #fcd34d; }
