@@ -350,14 +350,17 @@ function showSection(section) {
 }
 
 function selectGame(game) {
-    // Скрываем весь game-section
+    // Скрываем список игр и заголовок внутри game-section (не всю секцию!)
     const gameSection = document.getElementById('game-section');
-    if (gameSection) gameSection.style.display = 'none';
+    const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
+    const title = gameSection ? gameSection.querySelector('.game-section-title') : null;
+    if (cardsList) cardsList.style.display = 'none';
+    if (title) title.style.display = 'none';
 
     // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
 
-    // Показываем нужную игру как fullscreen overlay
+    // Показываем нужную игру
     const target = document.getElementById(game + '-game');
     if (target) {
         target.style.display = 'block';
@@ -378,9 +381,12 @@ function backToGamesList() {
         el.classList.remove('game-fullscreen');
     });
 
-    // Показываем game-section
+    // Показываем список игр и заголовок
     const gameSection = document.getElementById('game-section');
-    if (gameSection) gameSection.style.display = '';
+    const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
+    const title = gameSection ? gameSection.querySelector('.game-section-title') : null;
+    if (cardsList) cardsList.style.display = '';
+    if (title) title.style.display = '';
 
     // Вернуть навигацию
     const nav = document.querySelector('.navigation');
