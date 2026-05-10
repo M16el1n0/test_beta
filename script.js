@@ -367,7 +367,8 @@ function selectGame(game) {
         target.classList.add('game-fullscreen');
     }
 
-    // Скрыть навигацию, показать кнопку назад
+    // Блокируем скролл body, скрываем навигацию, показываем кнопку назад
+    document.body.classList.add('game-open');
     const nav = document.querySelector('.navigation');
     if (nav) nav.style.bottom = '-120px';
     const backBtn = document.getElementById('global-back-btn');
@@ -388,7 +389,8 @@ function backToGamesList() {
     if (cardsList) cardsList.style.display = '';
     if (title) title.style.display = '';
 
-    // Вернуть навигацию
+    // Разблокируем скролл body, возвращаем навигацию
+    document.body.classList.remove('game-open');
     const nav = document.querySelector('.navigation');
     if (nav) nav.style.bottom = '';
     const backBtn = document.getElementById('global-back-btn');
