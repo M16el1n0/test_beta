@@ -134,153 +134,8 @@
 
 
             <!-- Игра "Мины" -->
-            <div id="mines-game" class="game-container" style="display:none;">
-                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-
-                <!-- НАСТРОЙКИ (скрываются во время игры) -->
-                <div class="game-settings mines-settings-new" id="mines-settings-panel">
-
-                    <!-- Размер поля -->
-                    <div class="mines-control-row">
-                        <span class="mines-label">Поле</span>
-                        <div class="mines-toggle-group">
-                            <button class="mines-toggle active" data-size="3">3×3</button>
-                            <button class="mines-toggle" data-size="5">5×5</button>
-                        </div>
-                    </div>
-
-                    <!-- Мины -->
-                    <div class="mines-control-row">
-                        <span class="mines-label">Мины</span>
-                        <div class="mines-mine-counter">
-                            <button class="mines-counter-btn" onclick="mineCountChange(-1)">−</button>
-                            <span id="mines-count-display">1</span>
-                            <button class="mines-counter-btn" onclick="mineCountChange(1)">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Ставка + выбор валюты -->
-                    <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
-                        <input class="mines-bet-input" id="mines-bet-input" type="number" value="100" min="10"
-                            oninput="minesBetInputChange(this.value)"
-                            style="flex:1;font-size:1.1rem;padding:12px 14px;" />
-                        <!-- Серебро -->
-                        <div id="mines-currency-silver" onclick="setMinesCurrency('silver')"
-                            style="width:54px;height:54px;border-radius:14px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
-                            <span style="font-size:1.4rem;font-weight:900;color:#c084fc;text-shadow:0 0 12px rgba(192,132,252,0.8);line-height:1;">F</span>
-                            <span style="font-size:0.5rem;color:#c084fc;font-weight:800;letter-spacing:0.5px;">СЕР</span>
-                        </div>
-                        <!-- Золото -->
-                        <div id="mines-currency-gold" onclick="setMinesCurrency('gold')"
-                            style="width:54px;height:54px;border-radius:14px;border:2px solid #2a2a3a;background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
-                            <span style="font-size:1.4rem;font-weight:900;color:#f0a500;text-shadow:0 0 12px rgba(240,165,0,0.5);line-height:1;">F</span>
-                            <span style="font-size:0.5rem;color:#aaa;font-weight:800;letter-spacing:0.5px;">ЗОЛ</span>
-                        </div>
-                        <button class="mines-max-btn" onclick="minesSetMax()" style="height:54px;padding:0 14px;flex-shrink:0;">MAX</button>
-                    </div>
-
-                    <p class="balance-warning" id="balance-warning" style="display:none;">
-                        <i class="fas fa-exclamation-triangle"></i> Недостаточно средств!
-                    </p>
-
-                    <!-- Кнопка ИГРАТЬ -->
-                    <button class="mines-play-btn" onclick="startGame()" id="play-btn">
-                        ИГРАТЬ
-                    </button>
-                </div>
-
-                <!-- ИГРОВОЕ ПОЛЕ (показывается во время игры) -->
-                <div id="game-board" class="mines-board-new hidden">
-
-                    <!-- Статистика во время игры -->
-                    <div class="mines-live-stats">
-                        <div class="mines-live-chip">
-                            <span>💣</span>
-                            <span id="mines-left">1</span>
-                        </div>
-                        <div class="mines-live-chip green-chip">
-                            <span id="current-coef">1.00×</span>
-                        </div>
-                        <div class="mines-live-chip">
-                            <span>+<span id="current-win">0</span> F</span>
-                        </div>
-                    </div>
-
-                    <!-- Сетка мин -->
-                    <div class="mines-grid-new" id="mines-grid"></div>
-
-                    <!-- Кнопка ЗАБРАТЬ -->
-                    <button class="mines-cashout-btn" onclick="cashOut()" id="cashout-btn" disabled>
-                        ЗАБРАТЬ
-                    </button>
-                </div>
-
-                <!-- Скрытые элементы для совместимости -->
-                <span id="game-balance" style="display:none">1000</span>
-                <span id="current-balance" style="display:none">1000</span>
-                <span id="current-bet" style="display:none">100</span>
-                <span id="size-coef" style="display:none"></span>
-                <span id="mine-coef" style="display:none"></span>
-
-                <div class="game-history" style="margin-top:16px;">
-                    <h3><i class="fas fa-history"></i> История игр</h3>
-                    <div id="history-list" class="history-list"></div>
-                </div>
-            </div>
 
             <!-- Игра "Ракетка" -->
-            <div id="rocket-game" class="game-container" style="display:none;">
-                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-                <div class="rocket-game-content" style="padding:0;">
-
-                    <!-- ИГРОВОЕ ПОЛЕ -->
-                    <div style="position:relative;background:#080814;border-radius:14px;overflow:hidden;margin:0 0 0 0;">
-
-                        <!-- Canvas -->
-                        <canvas id="rocket-canvas" style="width:100%;height:340px;display:block;"></canvas>
-
-                        <!-- Ракета (gif) -->
-                        <div id="rocket-emoji" style="display:none;position:absolute;pointer-events:none;"></div>
-                        <!-- Пламя (убрано) -->
-
-                        <!-- Коэффициент — большой, сверху слева -->
-                        <div style="position:absolute;top:14px;left:14px;pointer-events:none;">
-                            <span id="rocket-coefficient" style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 16px rgba(138,43,226,0.7);">×1.00</span>
-                        </div>
-
-                        <!-- Таймер раунда — сверху справа -->
-                        <div id="round-status" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:#bbb;display:none;">
-                            ⏳ <span id="round-timer">5</span>с
-                        </div>
-                    </div>
-
-                    <!-- Полоса прошлых раундов -->
-                    <div style="background:#0d0d1c;padding:7px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-top:1px solid rgba(255,255,255,0.04);">
-                        <span style="font-size:0.7rem;color:#555;flex-shrink:0;">Прошлые:</span>
-                        <div id="rocket-prev-rounds" style="display:flex;gap:5px;flex-shrink:0;"></div>
-                    </div>
-
-                    <!-- Кнопки действий -->
-                    <div style="padding:10px 12px 14px;background:#0d0d1c;border-radius:0 0 14px 14px;">
-                        <button id="rocket-play-btn" onclick="openRocketBetSheet()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:0.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
-                            СДЕЛАТЬ СТАВКУ
-                        </button>
-                        <button id="rocket-cashout-btn" onclick="cashOutRocket()" style="display:none;width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#00c853,#00e676);color:#111;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,200,80,0.4);"></button>
-                    </div>
-
-                    <!-- Скрытые служебные элементы -->
-                    <div style="display:none;">
-                        <span id="rocket-current-bet">100</span>
-                        <span id="rocket-potential-win"></span>
-                        <span id="rocket-balance-warning"></span>
-                    </div>
-
-                    <div class="game-history" style="padding:0 14px 14px;">
-                        <h3 style="margin:14px 0 8px;"><i class="fas fa-history"></i> История игр</h3>
-                        <div id="rocket-history-list" class="history-list"></div>
-                    </div>
-                </div>
-            </div>
 
             <!-- ШТОРКА СТАВКИ — стиль мин -->
             <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="closeRocketBetSheet(event)">
@@ -345,223 +200,6 @@
             </div>
 
             <!-- Кейсы -->
-            <div id="cases-game" class="game-container" style="display:none;">
-                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
-
-                <!-- Баланс и заголовок — стиль мин -->
-                <div class="mines-top-bar">
-                    <div class="mines-balance-chip">
-                        <span class="mines-balance-icon">⚪</span>
-                        <span class="mines-coin-label" id="cases-balance-val">0</span>
-                        <span style="font-size:0.7rem;color:#666;margin-left:2px;">F</span>
-                    </div>
-                    <div class="mines-balance-chip">
-                        <span class="mines-balance-icon">🟡</span>
-                        <span class="mines-coin-label" id="cases-gold-val">0</span>
-                    </div>
-                </div>
-
-                <!-- Список кейсов -->
-                <div class="mines-settings-new" id="cases-list-panel">
-                    <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">КЕЙСЫ</div>
-                    <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Открой и получи подарок</div>
-
-                    <div class="cases-new-grid">
-
-                        <!-- Ежедневный -->
-                        <div class="case-new-card case-card-free" onclick="selectCase('daily')">
-                            <div class="case-new-top case-top-free">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(74,222,128,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#22aa44"/><rect x="4" y="2" width="1" height="2" fill="#22aa44"/><rect x="11" y="2" width="1" height="2" fill="#22aa44"/><rect x="5" y="2" width="6" height="1" fill="#0a1a0a"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#33cc55"/><rect x="2" y="4" width="1" height="3" fill="#1a7730"/><rect x="13" y="4" width="1" height="3" fill="#1a7730"/><rect x="3" y="4" width="4" height="1" fill="#66ee88"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#155522"/><rect x="7" y="6" width="2" height="2" fill="#55ff77"/><rect x="7" y="7" width="2" height="1" fill="#22cc44"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#29a843"/><rect x="2" y="8" width="1" height="4" fill="#1a7730"/><rect x="13" y="8" width="1" height="4" fill="#1a7730"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#155522"/><rect x="2" y="13" width="12" height="1" fill="#0f3d18"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#88ffaa"/><rect x="12" y="4" width="1" height="1" fill="#88ffaa"/><rect x="3" y="12" width="1" height="1" fill="#88ffaa"/><rect x="12" y="12" width="1" height="1" fill="#88ffaa"/>
-                                    <rect x="6" y="9" width="4" height="1" fill="#ccffdd"/><rect x="6" y="10" width="3" height="1" fill="#ccffdd"/><rect x="6" y="11" width="1" height="1" fill="#ccffdd"/><rect x="6" y="12" width="1" height="1" fill="#ccffdd"/>
-                                </svg>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">Ежедневный</div>
-                                <div class="case-new-price free">Бесплатно</div>
-                            </div>
-                        </div>
-
-                        <!-- 15 звёзд -->
-                        <div class="case-new-card case-card-silver" onclick="selectCase('stars15')">
-                            <div class="case-new-top case-top-silver">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#3388cc"/><rect x="4" y="2" width="1" height="2" fill="#3388cc"/><rect x="11" y="2" width="1" height="2" fill="#3388cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#44aadd"/><rect x="2" y="4" width="1" height="3" fill="#225588"/><rect x="13" y="4" width="1" height="3" fill="#225588"/><rect x="3" y="4" width="4" height="1" fill="#99ddff"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#113366"/><rect x="7" y="6" width="2" height="2" fill="#88ccff"/><rect x="7" y="7" width="2" height="1" fill="#3377bb"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#3399cc"/><rect x="2" y="8" width="1" height="4" fill="#225588"/><rect x="13" y="8" width="1" height="4" fill="#225588"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#113366"/><rect x="2" y="13" width="12" height="1" fill="#0a2244"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#bbeeff"/><rect x="12" y="4" width="1" height="1" fill="#bbeeff"/><rect x="3" y="12" width="1" height="1" fill="#bbeeff"/><rect x="12" y="12" width="1" height="1" fill="#bbeeff"/>
-                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
-                                </svg>
-                                <span class="case-stars-num">15</span>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">15 звёзд</div>
-                                <div class="case-new-price">15 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- 25 звёзд -->
-                        <div class="case-new-card case-card-silver" onclick="selectCase('stars25')">
-                            <div class="case-new-top case-top-silver">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#2299cc"/><rect x="4" y="2" width="1" height="2" fill="#2299cc"/><rect x="11" y="2" width="1" height="2" fill="#2299cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#33bbdd"/><rect x="2" y="4" width="1" height="3" fill="#116688"/><rect x="13" y="4" width="1" height="3" fill="#116688"/><rect x="3" y="4" width="4" height="1" fill="#88eeff"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#0a4455"/><rect x="7" y="6" width="2" height="2" fill="#77ddff"/><rect x="7" y="7" width="2" height="1" fill="#2288aa"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#22aacc"/><rect x="2" y="8" width="1" height="4" fill="#116688"/><rect x="13" y="8" width="1" height="4" fill="#116688"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#0a4455"/><rect x="2" y="13" width="12" height="1" fill="#062233"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#aaffff"/><rect x="12" y="4" width="1" height="1" fill="#aaffff"/><rect x="3" y="12" width="1" height="1" fill="#aaffff"/><rect x="12" y="12" width="1" height="1" fill="#aaffff"/>
-                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
-                                    <rect x="6" y="9" width="1" height="1" fill="#ffffff" opacity="0.5"/><rect x="9" y="11" width="1" height="1" fill="#ffffff" opacity="0.5"/>
-                                </svg>
-                                <span class="case-stars-num">25</span>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">25 звёзд</div>
-                                <div class="case-new-price">25 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- 50 звёзд -->
-                        <div class="case-new-card case-card-silver" onclick="selectCase('stars50')">
-                            <div class="case-new-top case-top-silver">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#7799bb"/><rect x="4" y="2" width="1" height="2" fill="#7799bb"/><rect x="11" y="2" width="1" height="2" fill="#7799bb"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#99bbcc"/><rect x="2" y="4" width="1" height="3" fill="#556677"/><rect x="13" y="4" width="1" height="3" fill="#556677"/><rect x="3" y="4" width="4" height="1" fill="#cceeff"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#334455"/><rect x="7" y="6" width="2" height="2" fill="#bbddee"/><rect x="7" y="7" width="2" height="1" fill="#778899"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#889aaa"/><rect x="2" y="8" width="1" height="4" fill="#556677"/><rect x="13" y="8" width="1" height="4" fill="#556677"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#334455"/><rect x="2" y="13" width="12" height="1" fill="#223344"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#ddeeff"/><rect x="12" y="4" width="1" height="1" fill="#ddeeff"/><rect x="3" y="12" width="1" height="1" fill="#ddeeff"/><rect x="12" y="12" width="1" height="1" fill="#ddeeff"/>
-                                    <rect x="7" y="9" width="2" height="1" fill="#eef4ff"/><rect x="6" y="10" width="4" height="1" fill="#eef4ff"/><rect x="7" y="11" width="2" height="1" fill="#eef4ff"/><rect x="7" y="9" width="2" height="3" fill="#eef4ff"/>
-                                </svg>
-                                <span class="case-stars-num">50</span>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">50 звёзд</div>
-                                <div class="case-new-price">50 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- 67 звёзд (новый!) -->
-                        <div class="case-new-card case-card-epic" onclick="selectCase('stars67')">
-                            <div class="case-new-top case-top-epic">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#cc2222"/><rect x="4" y="2" width="1" height="2" fill="#cc2222"/><rect x="11" y="2" width="1" height="2" fill="#cc2222"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#dd3333"/><rect x="2" y="4" width="1" height="3" fill="#881111"/><rect x="13" y="4" width="1" height="3" fill="#881111"/><rect x="3" y="4" width="4" height="1" fill="#ff8888"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#660000"/><rect x="7" y="6" width="2" height="2" fill="#ff7777"/><rect x="7" y="7" width="2" height="1" fill="#bb2222"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#cc2222"/><rect x="2" y="8" width="1" height="4" fill="#881111"/><rect x="13" y="8" width="1" height="4" fill="#881111"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#660000"/><rect x="2" y="13" width="12" height="1" fill="#440000"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="3" y="12" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="12" width="1" height="1" fill="#ffaaaa"/>
-                                    <rect x="7" y="9" width="2" height="1" fill="#ffeeee"/><rect x="6" y="9" width="1" height="1" fill="#ffeeee"/><rect x="9" y="9" width="1" height="1" fill="#ffeeee"/>
-                                    <rect x="6" y="10" width="4" height="1" fill="#ffeeee"/><rect x="7" y="10" width="1" height="1" fill="#cc2222"/><rect x="9" y="10" width="1" height="1" fill="#cc2222"/>
-                                    <rect x="7" y="11" width="1" height="1" fill="#ffeeee"/><rect x="9" y="11" width="1" height="1" fill="#ffeeee"/>
-                                    <rect x="7" y="12" width="1" height="1" fill="#ffeeee"/><rect x="8" y="12" width="1" height="1" fill="#ffeeee"/><rect x="9" y="12" width="1" height="1" fill="#ffeeee"/>
-                                </svg>
-                                <span class="case-stars-num">67</span>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">67 звёзд</div>
-                                <div class="case-new-price special">67 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- 100 звёзд -->
-                        <div class="case-new-card case-card-epic" onclick="selectCase('stars100')">
-                            <div class="case-new-top case-top-epic">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#aa4400"/><rect x="4" y="2" width="1" height="2" fill="#aa4400"/><rect x="11" y="2" width="1" height="2" fill="#aa4400"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#cc5500"/><rect x="2" y="4" width="1" height="3" fill="#773300"/><rect x="13" y="4" width="1" height="3" fill="#773300"/><rect x="3" y="4" width="4" height="1" fill="#ff9955"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#552200"/><rect x="7" y="6" width="2" height="2" fill="#ff8844"/><rect x="7" y="7" width="2" height="1" fill="#993300"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#bb4400"/><rect x="2" y="8" width="1" height="4" fill="#773300"/><rect x="13" y="8" width="1" height="4" fill="#773300"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#552200"/><rect x="2" y="13" width="12" height="1" fill="#331100"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#ffcc99"/><rect x="12" y="4" width="1" height="1" fill="#ffcc99"/><rect x="3" y="12" width="1" height="1" fill="#ffcc99"/><rect x="12" y="12" width="1" height="1" fill="#ffcc99"/>
-                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/>
-                                    <rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
-                                    <rect x="7" y="9" width="1" height="1" fill="#ffee44"/><rect x="9" y="9" width="1" height="1" fill="#ffee44"/>
-                                </svg>
-                                <span class="case-stars-num">100</span>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">100 звёзд</div>
-                                <div class="case-new-price special">100 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- Покой в богатстве -->
-                        <div class="case-new-card case-card-peace" onclick="selectCase('peace')">
-                            <div class="case-new-top case-top-peace">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(139,92,246,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#8855dd"/><rect x="4" y="2" width="1" height="2" fill="#8855dd"/><rect x="11" y="2" width="1" height="2" fill="#8855dd"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#9966ee"/><rect x="2" y="4" width="1" height="3" fill="#4422aa"/><rect x="13" y="4" width="1" height="3" fill="#4422aa"/><rect x="3" y="4" width="4" height="1" fill="#ccaaff"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#331188"/><rect x="7" y="6" width="2" height="2" fill="#bb99ff"/><rect x="7" y="7" width="2" height="1" fill="#7744cc"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#8855cc"/><rect x="2" y="8" width="1" height="4" fill="#4422aa"/><rect x="13" y="8" width="1" height="4" fill="#4422aa"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#331188"/><rect x="2" y="13" width="12" height="1" fill="#220066"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#eeddff"/><rect x="12" y="4" width="1" height="1" fill="#eeddff"/><rect x="3" y="12" width="1" height="1" fill="#eeddff"/><rect x="12" y="12" width="1" height="1" fill="#eeddff"/>
-                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/><rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
-                                </svg>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">Покой в богатстве</div>
-                                <div class="case-new-price peace">555 ⚪ / 555 🟡</div>
-                            </div>
-                        </div>
-
-                        <!-- СТРАЙК -->
-                        <div class="case-new-card case-card-gold" onclick="selectCase('strike')">
-                            <div class="case-new-top case-top-gold">
-                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(252,211,77,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="1" width="6" height="1" fill="#dd9900"/><rect x="4" y="2" width="1" height="2" fill="#dd9900"/><rect x="11" y="2" width="1" height="2" fill="#dd9900"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="4" width="12" height="3" fill="#ffcc00"/><rect x="2" y="4" width="1" height="3" fill="#996600"/><rect x="13" y="4" width="1" height="3" fill="#996600"/><rect x="3" y="4" width="4" height="1" fill="#ffee88"/>
-                                    <rect x="2" y="7" width="12" height="1" fill="#774400"/><rect x="7" y="6" width="2" height="2" fill="#ffee44"/><rect x="7" y="7" width="2" height="1" fill="#cc8800"/>
-                                    <rect x="2" y="8" width="12" height="4" fill="#e8a800"/><rect x="2" y="8" width="1" height="4" fill="#996600"/><rect x="13" y="8" width="1" height="4" fill="#996600"/>
-                                    <rect x="2" y="12" width="12" height="1" fill="#774400"/><rect x="2" y="13" width="12" height="1" fill="#553300"/>
-                                    <rect x="3" y="4" width="1" height="1" fill="#ffff99"/><rect x="12" y="4" width="1" height="1" fill="#ffff99"/><rect x="3" y="12" width="1" height="1" fill="#ffff99"/><rect x="12" y="12" width="1" height="1" fill="#ffff99"/>
-                                    <rect x="9" y="9" width="2" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="7" y="10" width="3" height="1" fill="#fff5aa"/><rect x="6" y="11" width="2" height="1" fill="#fff5aa"/><rect x="7" y="12" width="2" height="1" fill="#fff5aa"/>
-                                </svg>
-                            </div>
-                            <div class="case-new-info">
-                                <div class="case-new-name">СТРАЙК</div>
-                                <div class="case-new-price special">7д депозит</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Панель выбранного кейса -->
-                <div id="case-open-panel" class="mines-settings-new" style="display:none;">
-                    <div id="case-panel-name" style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;"></div>
-
-                    <!-- Валюта -->
-                    <div class="mines-control-row">
-                        <span class="mines-label">Валюта</span>
-                        <div class="mines-toggle-group">
-                            <button class="mines-toggle active" id="case-currency-silver" onclick="setCaseCurrency('silver')">⚪ F</button>
-                            <button class="mines-toggle" id="case-currency-gold" onclick="setCaseCurrency('gold')">🟡 G</button>
-                        </div>
-                    </div>
-
-                    <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;">⚠ Недостаточно средств!</p>
-
-                    <!-- Кнопка -->
-                    <button id="case-open-btn" class="mines-play-btn" onclick="confirmOpenCase()">ОТКРЫТЬ</button>
-
-                    <!-- Назад к списку -->
-                    <button onclick="showCasesList()" style="width:100%;margin-top:8px;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">← Все кейсы</button>
-                </div>
-
-                <!-- История -->
-                <div style="padding:0 14px 14px;">
-                    <div style="font-size:0.65rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">ИСТОРИЯ</div>
-                    <div id="cases-history-list" class="history-list"></div>
-                </div>
-            </div>
 
             
         </div>
@@ -1002,6 +640,372 @@
     </div>
 
     <script src="script.js?v=33"></script>
+
+    <!-- GAME CONTAINERS (moved outside .content for proper fixed positioning) -->
+            <div id="mines-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+
+                <!-- НАСТРОЙКИ (скрываются во время игры) -->
+                <div class="game-settings mines-settings-new" id="mines-settings-panel">
+
+                    <!-- Размер поля -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Поле</span>
+                        <div class="mines-toggle-group">
+                            <button class="mines-toggle active" data-size="3">3×3</button>
+                            <button class="mines-toggle" data-size="5">5×5</button>
+                        </div>
+                    </div>
+
+                    <!-- Мины -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Мины</span>
+                        <div class="mines-mine-counter">
+                            <button class="mines-counter-btn" onclick="mineCountChange(-1)">−</button>
+                            <span id="mines-count-display">1</span>
+                            <button class="mines-counter-btn" onclick="mineCountChange(1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Ставка + выбор валюты -->
+                    <div style="display:flex;gap:10px;align-items:center;margin-bottom:2px;">
+                        <input class="mines-bet-input" id="mines-bet-input" type="number" value="100" min="10"
+                            oninput="minesBetInputChange(this.value)"
+                            style="flex:1;font-size:1.1rem;padding:12px 14px;" />
+                        <!-- Серебро -->
+                        <div id="mines-currency-silver" onclick="setMinesCurrency('silver')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #7b5cff;background:rgba(123,92,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
+                            <span style="font-size:1.4rem;font-weight:900;color:#c084fc;text-shadow:0 0 12px rgba(192,132,252,0.8);line-height:1;">F</span>
+                            <span style="font-size:0.5rem;color:#c084fc;font-weight:800;letter-spacing:0.5px;">СЕР</span>
+                        </div>
+                        <!-- Золото -->
+                        <div id="mines-currency-gold" onclick="setMinesCurrency('gold')"
+                            style="width:54px;height:54px;border-radius:14px;border:2px solid #2a2a3a;background:rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;flex-shrink:0;transition:all 0.18s;">
+                            <span style="font-size:1.4rem;font-weight:900;color:#f0a500;text-shadow:0 0 12px rgba(240,165,0,0.5);line-height:1;">F</span>
+                            <span style="font-size:0.5rem;color:#aaa;font-weight:800;letter-spacing:0.5px;">ЗОЛ</span>
+                        </div>
+                        <button class="mines-max-btn" onclick="minesSetMax()" style="height:54px;padding:0 14px;flex-shrink:0;">MAX</button>
+                    </div>
+
+                    <p class="balance-warning" id="balance-warning" style="display:none;">
+                        <i class="fas fa-exclamation-triangle"></i> Недостаточно средств!
+                    </p>
+
+                    <!-- Кнопка ИГРАТЬ -->
+                    <button class="mines-play-btn" onclick="startGame()" id="play-btn">
+                        ИГРАТЬ
+                    </button>
+                </div>
+
+                <!-- ИГРОВОЕ ПОЛЕ (показывается во время игры) -->
+                <div id="game-board" class="mines-board-new hidden">
+
+                    <!-- Статистика во время игры -->
+                    <div class="mines-live-stats">
+                        <div class="mines-live-chip">
+                            <span>💣</span>
+                            <span id="mines-left">1</span>
+                        </div>
+                        <div class="mines-live-chip green-chip">
+                            <span id="current-coef">1.00×</span>
+                        </div>
+                        <div class="mines-live-chip">
+                            <span>+<span id="current-win">0</span> F</span>
+                        </div>
+                    </div>
+
+                    <!-- Сетка мин -->
+                    <div class="mines-grid-new" id="mines-grid"></div>
+
+                    <!-- Кнопка ЗАБРАТЬ -->
+                    <button class="mines-cashout-btn" onclick="cashOut()" id="cashout-btn" disabled>
+                        ЗАБРАТЬ
+                    </button>
+                </div>
+
+                <!-- Скрытые элементы для совместимости -->
+                <span id="game-balance" style="display:none">1000</span>
+                <span id="current-balance" style="display:none">1000</span>
+                <span id="current-bet" style="display:none">100</span>
+                <span id="size-coef" style="display:none"></span>
+                <span id="mine-coef" style="display:none"></span>
+
+                <div class="game-history" style="margin-top:16px;">
+                    <h3><i class="fas fa-history"></i> История игр</h3>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </div>
+
+            <div id="rocket-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+                <div class="rocket-game-content" style="padding:0;">
+
+                    <!-- ИГРОВОЕ ПОЛЕ -->
+                    <div style="position:relative;background:#080814;border-radius:14px;overflow:hidden;margin:0 0 0 0;">
+
+                        <!-- Canvas -->
+                        <canvas id="rocket-canvas" style="width:100%;height:340px;display:block;"></canvas>
+
+                        <!-- Ракета (gif) -->
+                        <div id="rocket-emoji" style="display:none;position:absolute;pointer-events:none;"></div>
+                        <!-- Пламя (убрано) -->
+
+                        <!-- Коэффициент — большой, сверху слева -->
+                        <div style="position:absolute;top:14px;left:14px;pointer-events:none;">
+                            <span id="rocket-coefficient" style="font-size:2.2rem;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 2px 16px rgba(138,43,226,0.7);">×1.00</span>
+                        </div>
+
+                        <!-- Таймер раунда — сверху справа -->
+                        <div id="round-status" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.55);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:#bbb;display:none;">
+                            ⏳ <span id="round-timer">5</span>с
+                        </div>
+                    </div>
+
+                    <!-- Полоса прошлых раундов -->
+                    <div style="background:#0d0d1c;padding:7px 10px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-top:1px solid rgba(255,255,255,0.04);">
+                        <span style="font-size:0.7rem;color:#555;flex-shrink:0;">Прошлые:</span>
+                        <div id="rocket-prev-rounds" style="display:flex;gap:5px;flex-shrink:0;"></div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div style="padding:10px 12px 14px;background:#0d0d1c;border-radius:0 0 14px 14px;">
+                        <button id="rocket-play-btn" onclick="openRocketBetSheet()" style="width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#3d7ef5,#7c3aed);color:#fff;font-size:0.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(100,60,220,0.4);">
+                            СДЕЛАТЬ СТАВКУ
+                        </button>
+                        <button id="rocket-cashout-btn" onclick="cashOutRocket()" style="display:none;width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(90deg,#00c853,#00e676);color:#111;font-size:1.05rem;font-weight:800;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,200,80,0.4);"></button>
+                    </div>
+
+                    <!-- Скрытые служебные элементы -->
+                    <div style="display:none;">
+                        <span id="rocket-current-bet">100</span>
+                        <span id="rocket-potential-win"></span>
+                        <span id="rocket-balance-warning"></span>
+                    </div>
+
+                    <div class="game-history" style="padding:0 14px 14px;">
+                        <h3 style="margin:14px 0 8px;"><i class="fas fa-history"></i> История игр</h3>
+                        <div id="rocket-history-list" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cases-game" class="game-container" style="display:none;">
+                <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
+
+                <!-- Баланс и заголовок — стиль мин -->
+                <div class="mines-top-bar">
+                    <div class="mines-balance-chip">
+                        <span class="mines-balance-icon">⚪</span>
+                        <span class="mines-coin-label" id="cases-balance-val">0</span>
+                        <span style="font-size:0.7rem;color:#666;margin-left:2px;">F</span>
+                    </div>
+                    <div class="mines-balance-chip">
+                        <span class="mines-balance-icon">🟡</span>
+                        <span class="mines-coin-label" id="cases-gold-val">0</span>
+                    </div>
+                </div>
+
+                <!-- Список кейсов -->
+                <div class="mines-settings-new" id="cases-list-panel">
+                    <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">КЕЙСЫ</div>
+                    <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Открой и получи подарок</div>
+
+                    <div class="cases-new-grid">
+
+                        <!-- Ежедневный -->
+                        <div class="case-new-card case-card-free" onclick="selectCase('daily')">
+                            <div class="case-new-top case-top-free">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(74,222,128,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#22aa44"/><rect x="4" y="2" width="1" height="2" fill="#22aa44"/><rect x="11" y="2" width="1" height="2" fill="#22aa44"/><rect x="5" y="2" width="6" height="1" fill="#0a1a0a"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#33cc55"/><rect x="2" y="4" width="1" height="3" fill="#1a7730"/><rect x="13" y="4" width="1" height="3" fill="#1a7730"/><rect x="3" y="4" width="4" height="1" fill="#66ee88"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#155522"/><rect x="7" y="6" width="2" height="2" fill="#55ff77"/><rect x="7" y="7" width="2" height="1" fill="#22cc44"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#29a843"/><rect x="2" y="8" width="1" height="4" fill="#1a7730"/><rect x="13" y="8" width="1" height="4" fill="#1a7730"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#155522"/><rect x="2" y="13" width="12" height="1" fill="#0f3d18"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#88ffaa"/><rect x="12" y="4" width="1" height="1" fill="#88ffaa"/><rect x="3" y="12" width="1" height="1" fill="#88ffaa"/><rect x="12" y="12" width="1" height="1" fill="#88ffaa"/>
+                                    <rect x="6" y="9" width="4" height="1" fill="#ccffdd"/><rect x="6" y="10" width="3" height="1" fill="#ccffdd"/><rect x="6" y="11" width="1" height="1" fill="#ccffdd"/><rect x="6" y="12" width="1" height="1" fill="#ccffdd"/>
+                                </svg>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">Ежедневный</div>
+                                <div class="case-new-price free">Бесплатно</div>
+                            </div>
+                        </div>
+
+                        <!-- 15 звёзд -->
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars15')">
+                            <div class="case-new-top case-top-silver">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#3388cc"/><rect x="4" y="2" width="1" height="2" fill="#3388cc"/><rect x="11" y="2" width="1" height="2" fill="#3388cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#44aadd"/><rect x="2" y="4" width="1" height="3" fill="#225588"/><rect x="13" y="4" width="1" height="3" fill="#225588"/><rect x="3" y="4" width="4" height="1" fill="#99ddff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#113366"/><rect x="7" y="6" width="2" height="2" fill="#88ccff"/><rect x="7" y="7" width="2" height="1" fill="#3377bb"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#3399cc"/><rect x="2" y="8" width="1" height="4" fill="#225588"/><rect x="13" y="8" width="1" height="4" fill="#225588"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#113366"/><rect x="2" y="13" width="12" height="1" fill="#0a2244"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#bbeeff"/><rect x="12" y="4" width="1" height="1" fill="#bbeeff"/><rect x="3" y="12" width="1" height="1" fill="#bbeeff"/><rect x="12" y="12" width="1" height="1" fill="#bbeeff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
+                                </svg>
+                                <span class="case-stars-num">15</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">15 звёзд</div>
+                                <div class="case-new-price">15 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- 25 звёзд -->
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars25')">
+                            <div class="case-new-top case-top-silver">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#2299cc"/><rect x="4" y="2" width="1" height="2" fill="#2299cc"/><rect x="11" y="2" width="1" height="2" fill="#2299cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#33bbdd"/><rect x="2" y="4" width="1" height="3" fill="#116688"/><rect x="13" y="4" width="1" height="3" fill="#116688"/><rect x="3" y="4" width="4" height="1" fill="#88eeff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#0a4455"/><rect x="7" y="6" width="2" height="2" fill="#77ddff"/><rect x="7" y="7" width="2" height="1" fill="#2288aa"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#22aacc"/><rect x="2" y="8" width="1" height="4" fill="#116688"/><rect x="13" y="8" width="1" height="4" fill="#116688"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#0a4455"/><rect x="2" y="13" width="12" height="1" fill="#062233"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#aaffff"/><rect x="12" y="4" width="1" height="1" fill="#aaffff"/><rect x="3" y="12" width="1" height="1" fill="#aaffff"/><rect x="12" y="12" width="1" height="1" fill="#aaffff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#ffffff" opacity="0.5"/><rect x="9" y="11" width="1" height="1" fill="#ffffff" opacity="0.5"/>
+                                </svg>
+                                <span class="case-stars-num">25</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">25 звёзд</div>
+                                <div class="case-new-price">25 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- 50 звёзд -->
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars50')">
+                            <div class="case-new-top case-top-silver">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#7799bb"/><rect x="4" y="2" width="1" height="2" fill="#7799bb"/><rect x="11" y="2" width="1" height="2" fill="#7799bb"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#99bbcc"/><rect x="2" y="4" width="1" height="3" fill="#556677"/><rect x="13" y="4" width="1" height="3" fill="#556677"/><rect x="3" y="4" width="4" height="1" fill="#cceeff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#334455"/><rect x="7" y="6" width="2" height="2" fill="#bbddee"/><rect x="7" y="7" width="2" height="1" fill="#778899"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#889aaa"/><rect x="2" y="8" width="1" height="4" fill="#556677"/><rect x="13" y="8" width="1" height="4" fill="#556677"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#334455"/><rect x="2" y="13" width="12" height="1" fill="#223344"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ddeeff"/><rect x="12" y="4" width="1" height="1" fill="#ddeeff"/><rect x="3" y="12" width="1" height="1" fill="#ddeeff"/><rect x="12" y="12" width="1" height="1" fill="#ddeeff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#eef4ff"/><rect x="6" y="10" width="4" height="1" fill="#eef4ff"/><rect x="7" y="11" width="2" height="1" fill="#eef4ff"/><rect x="7" y="9" width="2" height="3" fill="#eef4ff"/>
+                                </svg>
+                                <span class="case-stars-num">50</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">50 звёзд</div>
+                                <div class="case-new-price">50 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- 67 звёзд (новый!) -->
+                        <div class="case-new-card case-card-epic" onclick="selectCase('stars67')">
+                            <div class="case-new-top case-top-epic">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#cc2222"/><rect x="4" y="2" width="1" height="2" fill="#cc2222"/><rect x="11" y="2" width="1" height="2" fill="#cc2222"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#dd3333"/><rect x="2" y="4" width="1" height="3" fill="#881111"/><rect x="13" y="4" width="1" height="3" fill="#881111"/><rect x="3" y="4" width="4" height="1" fill="#ff8888"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#660000"/><rect x="7" y="6" width="2" height="2" fill="#ff7777"/><rect x="7" y="7" width="2" height="1" fill="#bb2222"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#cc2222"/><rect x="2" y="8" width="1" height="4" fill="#881111"/><rect x="13" y="8" width="1" height="4" fill="#881111"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#660000"/><rect x="2" y="13" width="12" height="1" fill="#440000"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="3" y="12" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="12" width="1" height="1" fill="#ffaaaa"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffeeee"/><rect x="6" y="9" width="1" height="1" fill="#ffeeee"/><rect x="9" y="9" width="1" height="1" fill="#ffeeee"/>
+                                    <rect x="6" y="10" width="4" height="1" fill="#ffeeee"/><rect x="7" y="10" width="1" height="1" fill="#cc2222"/><rect x="9" y="10" width="1" height="1" fill="#cc2222"/>
+                                    <rect x="7" y="11" width="1" height="1" fill="#ffeeee"/><rect x="9" y="11" width="1" height="1" fill="#ffeeee"/>
+                                    <rect x="7" y="12" width="1" height="1" fill="#ffeeee"/><rect x="8" y="12" width="1" height="1" fill="#ffeeee"/><rect x="9" y="12" width="1" height="1" fill="#ffeeee"/>
+                                </svg>
+                                <span class="case-stars-num">67</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">67 звёзд</div>
+                                <div class="case-new-price special">67 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- 100 звёзд -->
+                        <div class="case-new-card case-card-epic" onclick="selectCase('stars100')">
+                            <div class="case-new-top case-top-epic">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#aa4400"/><rect x="4" y="2" width="1" height="2" fill="#aa4400"/><rect x="11" y="2" width="1" height="2" fill="#aa4400"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#cc5500"/><rect x="2" y="4" width="1" height="3" fill="#773300"/><rect x="13" y="4" width="1" height="3" fill="#773300"/><rect x="3" y="4" width="4" height="1" fill="#ff9955"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#552200"/><rect x="7" y="6" width="2" height="2" fill="#ff8844"/><rect x="7" y="7" width="2" height="1" fill="#993300"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#bb4400"/><rect x="2" y="8" width="1" height="4" fill="#773300"/><rect x="13" y="8" width="1" height="4" fill="#773300"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#552200"/><rect x="2" y="13" width="12" height="1" fill="#331100"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffcc99"/><rect x="12" y="4" width="1" height="1" fill="#ffcc99"/><rect x="3" y="12" width="1" height="1" fill="#ffcc99"/><rect x="12" y="12" width="1" height="1" fill="#ffcc99"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/>
+                                    <rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
+                                    <rect x="7" y="9" width="1" height="1" fill="#ffee44"/><rect x="9" y="9" width="1" height="1" fill="#ffee44"/>
+                                </svg>
+                                <span class="case-stars-num">100</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">100 звёзд</div>
+                                <div class="case-new-price special">100 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- Покой в богатстве -->
+                        <div class="case-new-card case-card-peace" onclick="selectCase('peace')">
+                            <div class="case-new-top case-top-peace">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(139,92,246,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#8855dd"/><rect x="4" y="2" width="1" height="2" fill="#8855dd"/><rect x="11" y="2" width="1" height="2" fill="#8855dd"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#9966ee"/><rect x="2" y="4" width="1" height="3" fill="#4422aa"/><rect x="13" y="4" width="1" height="3" fill="#4422aa"/><rect x="3" y="4" width="4" height="1" fill="#ccaaff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#331188"/><rect x="7" y="6" width="2" height="2" fill="#bb99ff"/><rect x="7" y="7" width="2" height="1" fill="#7744cc"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#8855cc"/><rect x="2" y="8" width="1" height="4" fill="#4422aa"/><rect x="13" y="8" width="1" height="4" fill="#4422aa"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#331188"/><rect x="2" y="13" width="12" height="1" fill="#220066"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#eeddff"/><rect x="12" y="4" width="1" height="1" fill="#eeddff"/><rect x="3" y="12" width="1" height="1" fill="#eeddff"/><rect x="12" y="12" width="1" height="1" fill="#eeddff"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/><rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
+                                </svg>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">Покой в богатстве</div>
+                                <div class="case-new-price peace">555 ⚪ / 555 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- СТРАЙК -->
+                        <div class="case-new-card case-card-gold" onclick="selectCase('strike')">
+                            <div class="case-new-top case-top-gold">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(252,211,77,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#dd9900"/><rect x="4" y="2" width="1" height="2" fill="#dd9900"/><rect x="11" y="2" width="1" height="2" fill="#dd9900"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#ffcc00"/><rect x="2" y="4" width="1" height="3" fill="#996600"/><rect x="13" y="4" width="1" height="3" fill="#996600"/><rect x="3" y="4" width="4" height="1" fill="#ffee88"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#774400"/><rect x="7" y="6" width="2" height="2" fill="#ffee44"/><rect x="7" y="7" width="2" height="1" fill="#cc8800"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#e8a800"/><rect x="2" y="8" width="1" height="4" fill="#996600"/><rect x="13" y="8" width="1" height="4" fill="#996600"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#774400"/><rect x="2" y="13" width="12" height="1" fill="#553300"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffff99"/><rect x="12" y="4" width="1" height="1" fill="#ffff99"/><rect x="3" y="12" width="1" height="1" fill="#ffff99"/><rect x="12" y="12" width="1" height="1" fill="#ffff99"/>
+                                    <rect x="9" y="9" width="2" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="7" y="10" width="3" height="1" fill="#fff5aa"/><rect x="6" y="11" width="2" height="1" fill="#fff5aa"/><rect x="7" y="12" width="2" height="1" fill="#fff5aa"/>
+                                </svg>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">СТРАЙК</div>
+                                <div class="case-new-price special">7д депозит</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Панель выбранного кейса -->
+                <div id="case-open-panel" class="mines-settings-new" style="display:none;">
+                    <div id="case-panel-name" style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;"></div>
+
+                    <!-- Валюта -->
+                    <div class="mines-control-row">
+                        <span class="mines-label">Валюта</span>
+                        <div class="mines-toggle-group">
+                            <button class="mines-toggle active" id="case-currency-silver" onclick="setCaseCurrency('silver')">⚪ F</button>
+                            <button class="mines-toggle" id="case-currency-gold" onclick="setCaseCurrency('gold')">🟡 G</button>
+                        </div>
+                    </div>
+
+                    <p id="case-balance-warning" style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;">⚠ Недостаточно средств!</p>
+
+                    <!-- Кнопка -->
+                    <button id="case-open-btn" class="mines-play-btn" onclick="confirmOpenCase()">ОТКРЫТЬ</button>
+
+                    <!-- Назад к списку -->
+                    <button onclick="showCasesList()" style="width:100%;margin-top:8px;padding:10px;border:1px solid #2a2a3a;border-radius:12px;background:#1a1a2a;color:#666;font-size:0.82rem;cursor:pointer;">← Все кейсы</button>
+                </div>
+
+                <!-- История -->
+                <div style="padding:0 14px 14px;">
+                    <div style="font-size:0.65rem;font-weight:800;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">ИСТОРИЯ</div>
+                    <div id="cases-history-list" class="history-list"></div>
+                </div>
+            </div>
 
 </body>
 </html>
