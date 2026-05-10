@@ -15,7 +15,7 @@
     </style>
     <title>Fleep Gift</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=23">
+    <link rel="stylesheet" href="style.css?v=33">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -52,38 +52,81 @@
         <div id="game-section" class="content-section">
             <h2 class="game-section-title">ИГРЫ</h2>
 
-            <!-- Карточки игр в стиле референса -->
+            <!-- Карточки игр -->
             <div class="game-cards-list">
 
-                <div class="game-card-new" onclick="selectGame('rocket')">
-                    <div class="game-card-new-bg game-card-bg-rocket"></div>
-                    <div class="game-card-new-info">
-                        <div class="game-card-new-name">РАКЕТКА</div>
+                <div class="game-select-card" onclick="selectGame('rocket')">
+                    <div class="game-select-card-left">
+                        <div class="game-select-icon" style="background:rgba(123,92,255,0.15);border-color:rgba(123,92,255,0.4);display:flex;align-items:center;justify-content:center;">
+                            <svg style="image-rendering:pixelated;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(255,120,40,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7" y="0" width="2" height="1" fill="#ff4444"/><rect x="6" y="1" width="4" height="1" fill="#ff6666"/><rect x="5" y="2" width="6" height="1" fill="#ff8888"/>
+                                <rect x="5" y="3" width="6" height="1" fill="#eeeeee"/><rect x="5" y="4" width="6" height="1" fill="#dddddd"/>
+                                <rect x="5" y="5" width="1" height="2" fill="#cccccc"/><rect x="6" y="5" width="4" height="2" fill="#f5f5f5"/><rect x="10" y="5" width="1" height="2" fill="#cccccc"/>
+                                <rect x="7" y="5" width="2" height="2" fill="#33aaff"/><rect x="7" y="5" width="1" height="1" fill="#88ddff"/>
+                                <rect x="5" y="7" width="6" height="1" fill="#dddddd"/><rect x="5" y="8" width="6" height="1" fill="#cccccc"/>
+                                <rect x="3" y="7" width="2" height="3" fill="#ff8844"/><rect x="2" y="9" width="1" height="1" fill="#ff6622"/>
+                                <rect x="11" y="7" width="2" height="3" fill="#ff8844"/><rect x="13" y="9" width="1" height="1" fill="#ff6622"/>
+                                <rect x="5" y="9" width="6" height="1" fill="#bbbbbb"/><rect x="5" y="10" width="6" height="1" fill="#aaaaaa"/>
+                                <rect x="6" y="11" width="4" height="1" fill="#888888"/><rect x="7" y="12" width="2" height="1" fill="#666666"/>
+                                <rect x="5" y="13" width="6" height="1" fill="#ffbb00"/><rect x="6" y="14" width="4" height="1" fill="#ff7700"/>
+                                <rect x="5" y="14" width="1" height="1" fill="#ffdd00"/><rect x="10" y="14" width="1" height="1" fill="#ffdd00"/>
+                                <rect x="6" y="15" width="4" height="1" fill="#ff4400"/>
+                            </svg>
+                        </div>
+                        <div class="game-select-info">
+                            <div class="game-select-name">Ракетка</div>
+                            <div class="game-select-desc">Лети выше — забирай больше</div>
+                        </div>
                     </div>
-                    <div class="game-card-image-wrap game-card-img-rocket">
-                        <span class="game-card-emoji-big">🚀</span>
-                    </div>
+                    <div class="game-select-arrow">→</div>
                 </div>
 
-                <div class="game-card-new" onclick="selectGame('mines')">
-                    <div class="game-card-new-bg game-card-bg-mines"></div>
-                    <div class="game-card-new-info">
-                        <div class="game-card-new-name">МИНЫ</div>
+                <div class="game-select-card" onclick="selectGame('mines')">
+                    <div class="game-select-card-left">
+                        <div class="game-select-icon" style="background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.35);display:flex;align-items:center;justify-content:center;">
+                            <svg style="image-rendering:pixelated;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(60,210,60,0.75))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="0" width="1" height="1" fill="#ffee00"/><rect x="7" y="0" width="1" height="1" fill="#ff8800" opacity="0.9"/><rect x="9" y="0" width="1" height="1" fill="#ffcc00" opacity="0.7"/>
+                                <rect x="8" y="1" width="1" height="1" fill="#eecc00"/><rect x="7" y="2" width="2" height="1" fill="#cc9900"/><rect x="7" y="3" width="2" height="1" fill="#886600"/>
+                                <rect x="6" y="4" width="4" height="1" fill="#33aa33"/>
+                                <rect x="5" y="5" width="6" height="1" fill="#33bb33"/><rect x="4" y="6" width="8" height="1" fill="#44cc44"/>
+                                <rect x="4" y="7" width="8" height="1" fill="#55dd55"/><rect x="4" y="8" width="8" height="1" fill="#44cc44"/>
+                                <rect x="4" y="9" width="8" height="1" fill="#33bb33"/><rect x="5" y="10" width="6" height="1" fill="#229922"/>
+                                <rect x="6" y="11" width="4" height="1" fill="#187018"/>
+                                <rect x="5" y="6" width="2" height="1" fill="#88ff88"/><rect x="5" y="7" width="1" height="1" fill="#77ee77"/>
+                                <rect x="9" y="8" width="2" height="1" fill="#1a8818"/><rect x="9" y="9" width="2" height="1" fill="#116611"/>
+                                <rect x="7" y="7" width="2" height="3" fill="#115511"/><rect x="6" y="8" width="4" height="1" fill="#115511"/>
+                            </svg>
+                        </div>
+                        <div class="game-select-info">
+                            <div class="game-select-name">Мины</div>
+                            <div class="game-select-desc">Найди алмазы — избегай мин</div>
+                        </div>
                     </div>
-                    <div class="game-card-image-wrap game-card-img-mines">
-                        <span class="game-card-emoji-big">💣</span>
-                        
-                    </div>
+                    <div class="game-select-arrow">→</div>
                 </div>
 
-                <div class="game-card-new" onclick="selectGame('cases')">
-                    <div class="game-card-new-bg game-card-bg-cases"></div>
-                    <div class="game-card-new-info">
-                        <div class="game-card-new-name">КЕЙСЫ</div>
+                <div class="game-select-card" onclick="selectGame('cases')">
+                    <div class="game-select-card-left">
+                        <div class="game-select-icon" style="background:rgba(96,165,250,0.12);border-color:rgba(96,165,250,0.35);display:flex;align-items:center;justify-content:center;">
+                            <svg style="image-rendering:pixelated;width:36px;height:36px;filter:drop-shadow(0 0 6px rgba(255,200,40,0.75))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="5" y="2" width="6" height="1" fill="#cc8800"/><rect x="4" y="3" width="1" height="2" fill="#cc8800"/><rect x="11" y="3" width="1" height="2" fill="#cc8800"/><rect x="5" y="3" width="6" height="1" fill="#111111"/>
+                                <rect x="2" y="5" width="12" height="3" fill="#ffcc44"/><rect x="2" y="5" width="1" height="3" fill="#bb8800"/><rect x="13" y="5" width="1" height="3" fill="#bb8800"/>
+                                <rect x="3" y="5" width="5" height="1" fill="#ffee99"/><rect x="2" y="8" width="12" height="1" fill="#996600"/>
+                                <rect x="7" y="7" width="2" height="2" fill="#ffdd44"/><rect x="7" y="8" width="2" height="1" fill="#ffaa00"/>
+                                <rect x="2" y="9" width="12" height="4" fill="#e8a820"/><rect x="2" y="9" width="1" height="4" fill="#aa7700"/><rect x="13" y="9" width="1" height="4" fill="#aa7700"/>
+                                <rect x="2" y="13" width="12" height="1" fill="#996600"/><rect x="2" y="14" width="12" height="1" fill="#774400"/>
+                                <rect x="3" y="5" width="1" height="1" fill="#ffff99"/><rect x="12" y="5" width="1" height="1" fill="#ffff99"/>
+                                <rect x="3" y="13" width="1" height="1" fill="#ffff99"/><rect x="12" y="13" width="1" height="1" fill="#ffff99"/>
+                                <rect x="7" y="10" width="2" height="1" fill="#fff8cc"/><rect x="9" y="10" width="1" height="1" fill="#fff8cc"/>
+                                <rect x="9" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="12" width="1" height="1" fill="#fff8cc"/>
+                            </svg>
+                        </div>
+                        <div class="game-select-info">
+                            <div class="game-select-name">Кейсы</div>
+                            <div class="game-select-desc">Открывай и получай подарки</div>
+                        </div>
                     </div>
-                    <div class="game-card-image-wrap game-card-img-cases">
-                        <span class="game-card-emoji-big">🎁</span>
-                    </div>
+                    <div class="game-select-arrow">→</div>
                 </div>
 
             </div>
@@ -324,18 +367,38 @@
                     <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Открой и получи подарок</div>
 
                     <div class="cases-new-grid">
+
+                        <!-- Ежедневный -->
                         <div class="case-new-card case-card-free" onclick="selectCase('daily')">
                             <div class="case-new-top case-top-free">
-                                <span class="case-new-emoji">📅</span>
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(74,222,128,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#22aa44"/><rect x="4" y="2" width="1" height="2" fill="#22aa44"/><rect x="11" y="2" width="1" height="2" fill="#22aa44"/><rect x="5" y="2" width="6" height="1" fill="#0a1a0a"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#33cc55"/><rect x="2" y="4" width="1" height="3" fill="#1a7730"/><rect x="13" y="4" width="1" height="3" fill="#1a7730"/><rect x="3" y="4" width="4" height="1" fill="#66ee88"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#155522"/><rect x="7" y="6" width="2" height="2" fill="#55ff77"/><rect x="7" y="7" width="2" height="1" fill="#22cc44"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#29a843"/><rect x="2" y="8" width="1" height="4" fill="#1a7730"/><rect x="13" y="8" width="1" height="4" fill="#1a7730"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#155522"/><rect x="2" y="13" width="12" height="1" fill="#0f3d18"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#88ffaa"/><rect x="12" y="4" width="1" height="1" fill="#88ffaa"/><rect x="3" y="12" width="1" height="1" fill="#88ffaa"/><rect x="12" y="12" width="1" height="1" fill="#88ffaa"/>
+                                    <rect x="6" y="9" width="4" height="1" fill="#ccffdd"/><rect x="6" y="10" width="3" height="1" fill="#ccffdd"/><rect x="6" y="11" width="1" height="1" fill="#ccffdd"/><rect x="6" y="12" width="1" height="1" fill="#ccffdd"/>
+                                </svg>
                             </div>
                             <div class="case-new-info">
                                 <div class="case-new-name">Ежедневный</div>
                                 <div class="case-new-price free">Бесплатно</div>
                             </div>
                         </div>
+
+                        <!-- 15 звёзд -->
                         <div class="case-new-card case-card-silver" onclick="selectCase('stars15')">
                             <div class="case-new-top case-top-silver">
-                                <span class="case-new-emoji">⭐</span>
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#3388cc"/><rect x="4" y="2" width="1" height="2" fill="#3388cc"/><rect x="11" y="2" width="1" height="2" fill="#3388cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#44aadd"/><rect x="2" y="4" width="1" height="3" fill="#225588"/><rect x="13" y="4" width="1" height="3" fill="#225588"/><rect x="3" y="4" width="4" height="1" fill="#99ddff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#113366"/><rect x="7" y="6" width="2" height="2" fill="#88ccff"/><rect x="7" y="7" width="2" height="1" fill="#3377bb"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#3399cc"/><rect x="2" y="8" width="1" height="4" fill="#225588"/><rect x="13" y="8" width="1" height="4" fill="#225588"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#113366"/><rect x="2" y="13" width="12" height="1" fill="#0a2244"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#bbeeff"/><rect x="12" y="4" width="1" height="1" fill="#bbeeff"/><rect x="3" y="12" width="1" height="1" fill="#bbeeff"/><rect x="12" y="12" width="1" height="1" fill="#bbeeff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
+                                </svg>
                                 <span class="case-stars-num">15</span>
                             </div>
                             <div class="case-new-info">
@@ -343,9 +406,20 @@
                                 <div class="case-new-price">15 🟡</div>
                             </div>
                         </div>
+
+                        <!-- 25 звёзд -->
                         <div class="case-new-card case-card-silver" onclick="selectCase('stars25')">
                             <div class="case-new-top case-top-silver">
-                                <span class="case-new-emoji">⭐</span>
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#2299cc"/><rect x="4" y="2" width="1" height="2" fill="#2299cc"/><rect x="11" y="2" width="1" height="2" fill="#2299cc"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#33bbdd"/><rect x="2" y="4" width="1" height="3" fill="#116688"/><rect x="13" y="4" width="1" height="3" fill="#116688"/><rect x="3" y="4" width="4" height="1" fill="#88eeff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#0a4455"/><rect x="7" y="6" width="2" height="2" fill="#77ddff"/><rect x="7" y="7" width="2" height="1" fill="#2288aa"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#22aacc"/><rect x="2" y="8" width="1" height="4" fill="#116688"/><rect x="13" y="8" width="1" height="4" fill="#116688"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#0a4455"/><rect x="2" y="13" width="12" height="1" fill="#062233"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#aaffff"/><rect x="12" y="4" width="1" height="1" fill="#aaffff"/><rect x="3" y="12" width="1" height="1" fill="#aaffff"/><rect x="12" y="12" width="1" height="1" fill="#aaffff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffffff"/><rect x="6" y="10" width="4" height="1" fill="#ffffff"/><rect x="7" y="11" width="2" height="1" fill="#ffffff"/><rect x="7" y="9" width="2" height="3" fill="#ffffff"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#ffffff" opacity="0.5"/><rect x="9" y="11" width="1" height="1" fill="#ffffff" opacity="0.5"/>
+                                </svg>
                                 <span class="case-stars-num">25</span>
                             </div>
                             <div class="case-new-info">
@@ -353,9 +427,19 @@
                                 <div class="case-new-price">25 🟡</div>
                             </div>
                         </div>
-                        <div class="case-new-card case-card-gold" onclick="selectCase('stars50')">
-                            <div class="case-new-top case-top-gold">
-                                <span class="case-new-emoji">⭐</span>
+
+                        <!-- 50 звёзд -->
+                        <div class="case-new-card case-card-silver" onclick="selectCase('stars50')">
+                            <div class="case-new-top case-top-silver">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(148,163,184,0.7))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#7799bb"/><rect x="4" y="2" width="1" height="2" fill="#7799bb"/><rect x="11" y="2" width="1" height="2" fill="#7799bb"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#99bbcc"/><rect x="2" y="4" width="1" height="3" fill="#556677"/><rect x="13" y="4" width="1" height="3" fill="#556677"/><rect x="3" y="4" width="4" height="1" fill="#cceeff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#334455"/><rect x="7" y="6" width="2" height="2" fill="#bbddee"/><rect x="7" y="7" width="2" height="1" fill="#778899"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#889aaa"/><rect x="2" y="8" width="1" height="4" fill="#556677"/><rect x="13" y="8" width="1" height="4" fill="#556677"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#334455"/><rect x="2" y="13" width="12" height="1" fill="#223344"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ddeeff"/><rect x="12" y="4" width="1" height="1" fill="#ddeeff"/><rect x="3" y="12" width="1" height="1" fill="#ddeeff"/><rect x="12" y="12" width="1" height="1" fill="#ddeeff"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#eef4ff"/><rect x="6" y="10" width="4" height="1" fill="#eef4ff"/><rect x="7" y="11" width="2" height="1" fill="#eef4ff"/><rect x="7" y="9" width="2" height="3" fill="#eef4ff"/>
+                                </svg>
                                 <span class="case-stars-num">50</span>
                             </div>
                             <div class="case-new-info">
@@ -363,34 +447,90 @@
                                 <div class="case-new-price">50 🟡</div>
                             </div>
                         </div>
-                        <div class="case-new-card case-card-gold" onclick="selectCase('stars100')">
-                            <div class="case-new-top case-top-gold">
-                                <span class="case-new-emoji">⭐</span>
+
+                        <!-- 67 звёзд (новый!) -->
+                        <div class="case-new-card case-card-epic" onclick="selectCase('stars67')">
+                            <div class="case-new-top case-top-epic">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#cc2222"/><rect x="4" y="2" width="1" height="2" fill="#cc2222"/><rect x="11" y="2" width="1" height="2" fill="#cc2222"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#dd3333"/><rect x="2" y="4" width="1" height="3" fill="#881111"/><rect x="13" y="4" width="1" height="3" fill="#881111"/><rect x="3" y="4" width="4" height="1" fill="#ff8888"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#660000"/><rect x="7" y="6" width="2" height="2" fill="#ff7777"/><rect x="7" y="7" width="2" height="1" fill="#bb2222"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#cc2222"/><rect x="2" y="8" width="1" height="4" fill="#881111"/><rect x="13" y="8" width="1" height="4" fill="#881111"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#660000"/><rect x="2" y="13" width="12" height="1" fill="#440000"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="4" width="1" height="1" fill="#ffaaaa"/><rect x="3" y="12" width="1" height="1" fill="#ffaaaa"/><rect x="12" y="12" width="1" height="1" fill="#ffaaaa"/>
+                                    <rect x="7" y="9" width="2" height="1" fill="#ffeeee"/><rect x="6" y="9" width="1" height="1" fill="#ffeeee"/><rect x="9" y="9" width="1" height="1" fill="#ffeeee"/>
+                                    <rect x="6" y="10" width="4" height="1" fill="#ffeeee"/><rect x="7" y="10" width="1" height="1" fill="#cc2222"/><rect x="9" y="10" width="1" height="1" fill="#cc2222"/>
+                                    <rect x="7" y="11" width="1" height="1" fill="#ffeeee"/><rect x="9" y="11" width="1" height="1" fill="#ffeeee"/>
+                                    <rect x="7" y="12" width="1" height="1" fill="#ffeeee"/><rect x="8" y="12" width="1" height="1" fill="#ffeeee"/><rect x="9" y="12" width="1" height="1" fill="#ffeeee"/>
+                                </svg>
+                                <span class="case-stars-num">67</span>
+                            </div>
+                            <div class="case-new-info">
+                                <div class="case-new-name">67 звёзд</div>
+                                <div class="case-new-price special">67 🟡</div>
+                            </div>
+                        </div>
+
+                        <!-- 100 звёзд -->
+                        <div class="case-new-card case-card-epic" onclick="selectCase('stars100')">
+                            <div class="case-new-top case-top-epic">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(239,68,68,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#aa4400"/><rect x="4" y="2" width="1" height="2" fill="#aa4400"/><rect x="11" y="2" width="1" height="2" fill="#aa4400"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#cc5500"/><rect x="2" y="4" width="1" height="3" fill="#773300"/><rect x="13" y="4" width="1" height="3" fill="#773300"/><rect x="3" y="4" width="4" height="1" fill="#ff9955"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#552200"/><rect x="7" y="6" width="2" height="2" fill="#ff8844"/><rect x="7" y="7" width="2" height="1" fill="#993300"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#bb4400"/><rect x="2" y="8" width="1" height="4" fill="#773300"/><rect x="13" y="8" width="1" height="4" fill="#773300"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#552200"/><rect x="2" y="13" width="12" height="1" fill="#331100"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffcc99"/><rect x="12" y="4" width="1" height="1" fill="#ffcc99"/><rect x="3" y="12" width="1" height="1" fill="#ffcc99"/><rect x="12" y="12" width="1" height="1" fill="#ffcc99"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/>
+                                    <rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
+                                    <rect x="7" y="9" width="1" height="1" fill="#ffee44"/><rect x="9" y="9" width="1" height="1" fill="#ffee44"/>
+                                </svg>
                                 <span class="case-stars-num">100</span>
                             </div>
                             <div class="case-new-info">
                                 <div class="case-new-name">100 звёзд</div>
-                                <div class="case-new-price">100 🟡</div>
+                                <div class="case-new-price special">100 🟡</div>
                             </div>
                         </div>
+
+                        <!-- Покой в богатстве -->
                         <div class="case-new-card case-card-peace" onclick="selectCase('peace')">
                             <div class="case-new-top case-top-peace">
-                                <span class="case-new-emoji">🕊️</span>
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(139,92,246,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#8855dd"/><rect x="4" y="2" width="1" height="2" fill="#8855dd"/><rect x="11" y="2" width="1" height="2" fill="#8855dd"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#9966ee"/><rect x="2" y="4" width="1" height="3" fill="#4422aa"/><rect x="13" y="4" width="1" height="3" fill="#4422aa"/><rect x="3" y="4" width="4" height="1" fill="#ccaaff"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#331188"/><rect x="7" y="6" width="2" height="2" fill="#bb99ff"/><rect x="7" y="7" width="2" height="1" fill="#7744cc"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#8855cc"/><rect x="2" y="8" width="1" height="4" fill="#4422aa"/><rect x="13" y="8" width="1" height="4" fill="#4422aa"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#331188"/><rect x="2" y="13" width="12" height="1" fill="#220066"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#eeddff"/><rect x="12" y="4" width="1" height="1" fill="#eeddff"/><rect x="3" y="12" width="1" height="1" fill="#eeddff"/><rect x="12" y="12" width="1" height="1" fill="#eeddff"/>
+                                    <rect x="6" y="9" width="1" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="10" y="9" width="1" height="1" fill="#fff5aa"/><rect x="6" y="10" width="5" height="1" fill="#fff5aa"/><rect x="6" y="11" width="5" height="1" fill="#fff5aa"/>
+                                </svg>
                             </div>
                             <div class="case-new-info">
                                 <div class="case-new-name">Покой в богатстве</div>
                                 <div class="case-new-price peace">555 ⚪ / 555 🟡</div>
                             </div>
                         </div>
-                        <div class="case-new-card case-card-epic" onclick="selectCase('strike')">
-                            <div class="case-new-top case-top-epic">
-                                <span class="case-new-emoji">⚡</span>
+
+                        <!-- СТРАЙК -->
+                        <div class="case-new-card case-card-gold" onclick="selectCase('strike')">
+                            <div class="case-new-top case-top-gold">
+                                <svg style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;filter:drop-shadow(0 0 10px rgba(252,211,77,0.8))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="1" width="6" height="1" fill="#dd9900"/><rect x="4" y="2" width="1" height="2" fill="#dd9900"/><rect x="11" y="2" width="1" height="2" fill="#dd9900"/><rect x="5" y="2" width="6" height="1" fill="#111111"/>
+                                    <rect x="2" y="4" width="12" height="3" fill="#ffcc00"/><rect x="2" y="4" width="1" height="3" fill="#996600"/><rect x="13" y="4" width="1" height="3" fill="#996600"/><rect x="3" y="4" width="4" height="1" fill="#ffee88"/>
+                                    <rect x="2" y="7" width="12" height="1" fill="#774400"/><rect x="7" y="6" width="2" height="2" fill="#ffee44"/><rect x="7" y="7" width="2" height="1" fill="#cc8800"/>
+                                    <rect x="2" y="8" width="12" height="4" fill="#e8a800"/><rect x="2" y="8" width="1" height="4" fill="#996600"/><rect x="13" y="8" width="1" height="4" fill="#996600"/>
+                                    <rect x="2" y="12" width="12" height="1" fill="#774400"/><rect x="2" y="13" width="12" height="1" fill="#553300"/>
+                                    <rect x="3" y="4" width="1" height="1" fill="#ffff99"/><rect x="12" y="4" width="1" height="1" fill="#ffff99"/><rect x="3" y="12" width="1" height="1" fill="#ffff99"/><rect x="12" y="12" width="1" height="1" fill="#ffff99"/>
+                                    <rect x="9" y="9" width="2" height="1" fill="#fff5aa"/><rect x="8" y="9" width="1" height="1" fill="#fff5aa"/><rect x="7" y="10" width="3" height="1" fill="#fff5aa"/><rect x="6" y="11" width="2" height="1" fill="#fff5aa"/><rect x="7" y="12" width="2" height="1" fill="#fff5aa"/>
+                                </svg>
                             </div>
                             <div class="case-new-info">
                                 <div class="case-new-name">СТРАЙК</div>
                                 <div class="case-new-price special">7д депозит</div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -830,7 +970,6 @@
             <div class="topup-tabs">
                 <button id="tab-stars" class="topup-tab topup-tab-active" onclick="switchTopUpTab('stars')">⭐ Stars</button>
                 <button id="tab-usdt"  class="topup-tab" onclick="switchTopUpTab('usdt')">💵 USDT</button>
-                <button id="tab-ton"   class="topup-tab" onclick="switchTopUpTab('ton')">💎 TON</button>
             </div>
 
             <!-- === ВКЛАДКА STARS === -->
@@ -856,44 +995,13 @@
             <div id="topup-usdt-body" style="display:none">
                 <p class="topup-subtitle">100 коинов = 1.50 USDT TRC20. Зачисление автоматически.</p>
                 <div id="usdt-packages"></div>
-
-                <div id="topup-ton-panel" class="topup-tab-panel" style="display:none;">
-                    <div style="text-align:center;margin-bottom:20px;">
-                        <div style="font-size:2.5rem;margin-bottom:8px;">💎</div>
-                        <div style="font-size:0.85rem;color:#888;">Оплата в TON через Telegram Wallet</div>
-                        <div style="font-size:0.75rem;color:#666;margin-top:4px;">1 TON = 1000 🟡 золота</div>
-                    </div>
-                    <div class="star-pkg-grid" style="margin-bottom:16px;">
-                        <div class="star-pkg-card" onclick="openTonPayment(1)">
-                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
-                            <div style="font-size:1rem;font-weight:900;color:#fff;">1 TON</div>
-                            <div style="font-size:0.75rem;color:#888;">→ 🟡 1 000</div>
-                        </div>
-                        <div class="star-pkg-card" onclick="openTonPayment(5)">
-                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
-                            <div style="font-size:1rem;font-weight:900;color:#fff;">5 TON</div>
-                            <div style="font-size:0.75rem;color:#888;">→ 🟡 5 000</div>
-                        </div>
-                        <div class="star-pkg-card" onclick="openTonPayment(10)">
-                            <div style="font-size:1.5rem;margin-bottom:4px;">💎</div>
-                            <div style="font-size:1rem;font-weight:900;color:#fff;">10 TON</div>
-                            <div style="font-size:0.75rem;color:#888;">→ 🟡 10 000</div>
-                        </div>
-                        <div class="star-pkg-card" onclick="openTonPayment(50)" style="border-color:rgba(252,211,77,0.4);">
-                            <div style="font-size:1.5rem;margin-bottom:4px;">🔥</div>
-                            <div style="font-size:1rem;font-weight:900;color:#fcd34d;">50 TON</div>
-                            <div style="font-size:0.75rem;color:#888;">→ 🟡 55 000</div>
-                            <div style="font-size:0.65rem;color:#fcd34d;margin-top:2px;">+10% бонус</div>
-                        </div>
-                    </div>
-                </div>
                 <p class="topup-footer-note">Сеть: TRON TRC20 · Зачисление в течение 1 мин после оплаты.</p>
             </div>
 
         </div>
     </div>
 
-    <script src="script.js?v=23"></script>
+    <script src="script.js?v=33"></script>
 
 </body>
 </html>
