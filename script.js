@@ -350,7 +350,7 @@ function showSection(section) {
 }
 
 function selectGame(game) {
-    // Скрываем список игр и заголовок внутри game-section (не всю секцию!)
+    // Скрываем список игр и заголовок внутри game-section
     const gameSection = document.getElementById('game-section');
     const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
     const title = gameSection ? gameSection.querySelector('.game-section-title') : null;

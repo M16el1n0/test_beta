@@ -133,73 +133,9 @@
 
 
 
-            <!-- Игра "Мины" -->
 
-            <!-- Игра "Ракетка" -->
 
-            <!-- ШТОРКА СТАВКИ — стиль мин -->
-            <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="closeRocketBetSheet(event)">
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 36px;max-width:520px;margin:0 auto;" onclick="event.stopPropagation()">
-                    <!-- Ручка -->
-                    <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
 
-                    <div class="mines-settings-new">
-                        <!-- Заголовок -->
-                        <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">СТАВКА</div>
-                        <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Ракетка</div>
-
-                        <!-- Валюта -->
-                        <div class="mines-control-row">
-                            <span class="mines-label">Валюта</span>
-                            <div class="mines-toggle-group">
-                                <button class="mines-toggle active" id="rocket-currency-silver" onclick="setRocketCurrency('silver')">⚪ F</button>
-                                <button class="mines-toggle" id="rocket-currency-gold" onclick="setRocketCurrency('gold')">🟡 G</button>
-                            </div>
-                        </div>
-
-                        <!-- Ставка -->
-                        <div class="mines-control-row">
-                            <span class="mines-label">Сумма</span>
-                            <div class="mines-bet-row" style="flex:1;justify-content:flex-end;">
-                                <button onclick="changeRocketBet(-10)" class="mines-counter-btn" style="font-size:1.3rem;">−</button>
-                                <input id="rocket-bet-input" type="number" min="10" value="100"
-                                    oninput="setRocketBet(parseInt(this.value)||10)"
-                                    class="mines-bet-input" style="width:90px;" />
-                                <button onclick="changeRocketBet(10)" class="mines-counter-btn" style="font-size:1.3rem;">+</button>
-                            </div>
-                        </div>
-
-                        <!-- Пресеты -->
-                        <div class="mines-control-row" style="gap:6px;">
-                            <button onclick="setRocketBet(50)"  class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">50</button>
-                            <button onclick="setRocketBet(100)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">100</button>
-                            <button onclick="setRocketBet(200)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">200</button>
-                            <button onclick="setRocketBet(500)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">500</button>
-                        </div>
-
-                        <!-- Потенциальный выигрыш -->
-                        <div class="mines-info-row">
-                            <div class="mines-info-chip">
-                                <span class="mines-info-label">Ставка</span>
-                                <span class="mines-info-value" id="rocket-bet-display">100 F</span>
-                            </div>
-                            <div class="mines-info-chip">
-                                <span class="mines-info-label">×2.00</span>
-                                <span class="mines-info-value green" id="rocket-win-display">200 F</span>
-                            </div>
-                        </div>
-
-                        <p style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;" id="rocket-balance-warning2">⚠ Недостаточно средств!</p>
-
-                        <!-- Кнопка ПОСТАВИТЬ -->
-                        <button onclick="confirmRocketBet()" class="mines-play-btn" style="background:linear-gradient(135deg,#3d7ef5,#7c3aed);box-shadow:0 4px 24px rgba(61,126,245,0.4);">
-                            ПОСТАВИТЬ
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Кейсы -->
 
             
         </div>
@@ -641,7 +577,72 @@
 
     <script src="script.js?v=33"></script>
 
-    <!-- GAME CONTAINERS (moved outside .content for proper fixed positioning) -->
+
+    <!-- ROCKET BET SHEET -->
+            <div id="rocket-bet-sheet" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="closeRocketBetSheet(event)">
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#0d0d1c;border-radius:22px 22px 0 0;padding:0 0 36px;max-width:520px;margin:0 auto;" onclick="event.stopPropagation()">
+                    <!-- Ручка -->
+                    <div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:16px auto 0;"></div>
+
+                    <div class="mines-settings-new">
+                        <!-- Заголовок -->
+                        <div style="font-size:0.68rem;font-weight:800;color:#7b5cff;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;">СТАВКА</div>
+                        <div style="font-size:0.78rem;color:#555;text-align:center;margin-bottom:14px;">Ракетка</div>
+
+                        <!-- Валюта -->
+                        <div class="mines-control-row">
+                            <span class="mines-label">Валюта</span>
+                            <div class="mines-toggle-group">
+                                <button class="mines-toggle active" id="rocket-currency-silver" onclick="setRocketCurrency('silver')">⚪ F</button>
+                                <button class="mines-toggle" id="rocket-currency-gold" onclick="setRocketCurrency('gold')">🟡 G</button>
+                            </div>
+                        </div>
+
+                        <!-- Ставка -->
+                        <div class="mines-control-row">
+                            <span class="mines-label">Сумма</span>
+                            <div class="mines-bet-row" style="flex:1;justify-content:flex-end;">
+                                <button onclick="changeRocketBet(-10)" class="mines-counter-btn" style="font-size:1.3rem;">−</button>
+                                <input id="rocket-bet-input" type="number" min="10" value="100"
+                                    oninput="setRocketBet(parseInt(this.value)||10)"
+                                    class="mines-bet-input" style="width:90px;" />
+                                <button onclick="changeRocketBet(10)" class="mines-counter-btn" style="font-size:1.3rem;">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Пресеты -->
+                        <div class="mines-control-row" style="gap:6px;">
+                            <button onclick="setRocketBet(50)"  class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">50</button>
+                            <button onclick="setRocketBet(100)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">100</button>
+                            <button onclick="setRocketBet(200)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">200</button>
+                            <button onclick="setRocketBet(500)" class="mines-toggle" style="flex:1;border-radius:10px;padding:8px 0;">500</button>
+                        </div>
+
+                        <!-- Потенциальный выигрыш -->
+                        <div class="mines-info-row">
+                            <div class="mines-info-chip">
+                                <span class="mines-info-label">Ставка</span>
+                                <span class="mines-info-value" id="rocket-bet-display">100 F</span>
+                            </div>
+                            <div class="mines-info-chip">
+                                <span class="mines-info-label">×2.00</span>
+                                <span class="mines-info-value green" id="rocket-win-display">200 F</span>
+                            </div>
+                        </div>
+
+                        <p style="text-align:center;color:#e74c3c;font-size:0.82rem;margin:8px 0;display:none;" id="rocket-balance-warning2">⚠ Недостаточно средств!</p>
+
+                        <!-- Кнопка ПОСТАВИТЬ -->
+                        <button onclick="confirmRocketBet()" class="mines-play-btn" style="background:linear-gradient(135deg,#3d7ef5,#7c3aed);box-shadow:0 4px 24px rgba(61,126,245,0.4);">
+                            ПОСТАВИТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+    <!-- GAME CONTAINERS (outside .content for fixed positioning) -->
+            <!-- Игра "Мины" -->
             <div id="mines-game" class="game-container" style="display:none;">
                 <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
 
@@ -736,6 +737,7 @@
                 </div>
             </div>
 
+            <!-- Игра "Ракетка" -->
             <div id="rocket-game" class="game-container" style="display:none;">
                 <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
                 <div class="rocket-game-content" style="padding:0;">
@@ -789,6 +791,7 @@
                 </div>
             </div>
 
+            <!-- Кейсы -->
             <div id="cases-game" class="game-container" style="display:none;">
                 <div class="game-screen-header"><button class="back-to-list-btn" onclick="backToGamesList()">← Все игры</button></div>
 
