@@ -1,4 +1,4 @@
-// ===== TELEGRAM WEBAPP =====
+
 const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
@@ -8,23 +8,22 @@ if (tg) {
     try { tg.setBottomBarColor('#000000'); } catch(e) {}
 }
 
-// Форсируем тёмный фон — работает даже без Telegram
 (function forceDarkMode() {
     const r = document.documentElement;
     const b = document.body;
-    // Перебиваем CSS переменные Telegram
+
     r.style.setProperty('--tg-theme-bg-color', '#000000', 'important');
     r.style.setProperty('--tg-theme-secondary-bg-color', '#0d0d1a', 'important');
     r.style.setProperty('--tg-theme-text-color', '#ffffff', 'important');
     r.style.setProperty('--tg-color-scheme', 'dark', 'important');
-    // Принудительный фон
+
     r.style.background = '#000000';
     r.style.backgroundColor = '#000000';
     if (b) {
         b.style.background = '#000000';
         b.style.backgroundColor = '#000000';
     }
-    // MutationObserver — перехватываем Telegram inline-style инъекции
+
     const obs = new MutationObserver(() => {
         if (r.style.backgroundColor !== '#000000' && r.style.backgroundColor !== '') {
             r.style.background = '#000000';
@@ -43,7 +42,6 @@ function getTgUser() {
     return null;
 }
 
-// ===== БД в localStorage =====
 const DB = {
     get: (key, def = null) => {
         try {
@@ -56,7 +54,6 @@ const DB = {
     }
 };
 
-// ===== ДЕФОЛТНЫЕ ДАННЫЕ =====
 function getDefaultUserData() {
     return {
         balance: { silver: 1000, gold: 0 },
@@ -78,7 +75,6 @@ function getDefaultUserData() {
 
 let userData = getDefaultUserData();
 
-// ===== КОНФИГ ИГРЫ МИНЫ =====
 const gameConfig = { size: 3, mines: 1 };
 
 let gameState = {
@@ -94,7 +90,6 @@ let gameState = {
     canCashOut: false
 };
 
-// ===== КОНФИГ РАКЕТКИ =====
 let rocketGameState = {
     isPlaying: false,
     isRoundActive: false,
@@ -110,21 +105,19 @@ let rocketGameState = {
 
 let currentNewGift = null;
 
-// ===== СИСТЕМА ПОДАРКОВ (с редкостью) =====
-// rare: 15-99 монет  |  epic: 100-499  |  legendary: 500+
 const GIFT_SYSTEM = {
     gifts: [
-        // ── RARE (15–99 монет) ──
+
         { type: 'heart',     name: 'Сердце',           tier: 'rare',      minValue: 15,  maxValue: 50,  weight: 30 },
         { type: 'bear',      name: 'Плюшевый медведь', tier: 'rare',      minValue: 15,  maxValue: 50,  weight: 30 },
         { type: 'rose',      name: 'Роза',             tier: 'rare',      minValue: 25,  maxValue: 99,  weight: 25 },
         { type: 'gift',      name: 'Подарок',          tier: 'rare',      minValue: 25,  maxValue: 99,  weight: 20 },
-        // ── EPIC (100–499 монет) ──
+
         { type: 'cake',      name: 'Торт',             tier: 'epic',      minValue: 100, maxValue: 300, weight: 12 },
         { type: 'bouquet',   name: 'Букет',            tier: 'epic',      minValue: 100, maxValue: 300, weight: 12 },
         { type: 'rocket',    name: 'Ракета',           tier: 'epic',      minValue: 100, maxValue: 499, weight: 10 },
         { type: 'champagne', name: 'Шампанское',       tier: 'epic',      minValue: 100, maxValue: 499, weight: 8  },
-        // ── LEGENDARY (500+ монет) ──
+
         { type: 'cup',       name: 'Кубок',            tier: 'legendary', minValue: 500, maxValue: 1000, weight: 5  },
         { type: 'ring',      name: 'Кольцо',           tier: 'legendary', minValue: 500, maxValue: 1000, weight: 4  },
         { type: 'diamond',   name: 'Алмаз',            tier: 'legendary', minValue: 500, maxValue: 2000, weight: 2  }
@@ -138,7 +131,7 @@ const GIFT_SYSTEM = {
     getRandomGift(winAmount) {
         const eligible = this.gifts.filter(g => winAmount >= g.minValue);
         if (!eligible.length) return null;
-        // Взвешенный случайный выбор
+
         const totalWeight = eligible.reduce((s, g) => s + g.weight, 0);
         let rnd = Math.random() * totalWeight;
         for (const g of eligible) {
@@ -149,7 +142,6 @@ const GIFT_SYSTEM = {
     }
 };
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     try {
         loadUserData();
@@ -164,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderCaseCards();
     } catch(e) {
         console.error('INIT ERROR:', e);
-        // Показываем ошибку на экране для дебага
+
         const errDiv = document.createElement('div');
         errDiv.style.cssText = 'position:fixed;top:70px;left:0;right:0;background:#f87171;color:#fff;padding:12px;font-size:12px;z-index:99999;word-break:break-all;';
         errDiv.textContent = 'Init error: ' + e.message + ' at ' + e.stack?.split('\n')[1];
@@ -215,22 +207,21 @@ function loadUserData() {
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
-    // Синхронизируем золото из Telegram CloudStorage (начисляется ботом после оплаты)
+
     syncGoldFromServer();
 }
 
 function saveUserData() {
     DB.set('userData', userData);
-    // Backup inventory count to detect loss
+
     try {
         const invCount = (userData.inventory || []).length;
         DB.set('invCount', invCount);
     } catch(e) {}
 }
 
-// ===== СИНХРОНИЗАЦИЯ ЗОЛОТА С TELEGRAM CLOUDSTORAGE =====
 function syncGoldFromCloud() {
-    // Читаем параметр ?startapp=gold_XXX переданный ботом через deeplink
+
     try {
         const param = tg?.initDataUnsafe?.start_param || '';
         if (param.startsWith('gold_')) {
@@ -263,7 +254,7 @@ function showNotif(text, color = '#8b5cf6') {
         animation:notifSlide .3s ease;
     `;
     notif.textContent = text;
-    // CSS анимация
+
     if (!document.getElementById('notif-style')) {
         const s = document.createElement('style');
         s.id = 'notif-style';
@@ -274,9 +265,8 @@ function showNotif(text, color = '#8b5cf6') {
     setTimeout(() => { notif.style.opacity = '0'; notif.style.transition = 'opacity .3s'; setTimeout(() => notif.remove(), 300); }, 2500);
 }
 
-// ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
 function setupEventListeners() {
-    // Новые кнопки размера поля
+
     document.querySelectorAll('.mines-toggle').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.mines-toggle').forEach(b => b.classList.remove('active'));
@@ -285,7 +275,7 @@ function setupEventListeners() {
             updateCoefficients();
         });
     });
-    // Старые кнопки (совместимость)
+
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -304,7 +294,6 @@ function setupEventListeners() {
     });
 }
 
-// ===== НАВИГАЦИЯ =====
 function showSection(section) {
     const el = document.getElementById('welcome');
     if (el) el.style.display = 'none';
@@ -312,13 +301,12 @@ function showSection(section) {
         const s = document.getElementById(id);
         if (s) s.classList.remove('active-section');
     });
-    // Форсируем тёмный фон на body и html (Telegram может перебивать)
+
     document.body.style.setProperty('background','#000','important');
     document.body.style.setProperty('background-color','#000','important');
     document.documentElement.style.setProperty('background','#000','important');
     document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active-btn'));
 
-    // Восстановить нижнюю навигацию и скрыть кнопку назад
     const nav = document.querySelector('.navigation');
     if (nav) nav.style.bottom = '';
     const backBtn = document.getElementById('global-back-btn');
@@ -344,30 +332,27 @@ function showSection(section) {
         const n = document.getElementById('nav-inventory'); if(n) n.classList.add('active-btn');
         setTimeout(updateInventory, 30);
     } else if (section === 'rating') {
-        // Rating section placeholder
+
         const n = document.getElementById('nav-rating'); if(n) n.classList.add('active-btn');
     }
 }
 
 function selectGame(game) {
-    // Скрываем список игр и заголовок внутри game-section
+
     const gameSection = document.getElementById('game-section');
     const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
     const title = gameSection ? gameSection.querySelector('.game-section-title') : null;
     if (cardsList) cardsList.style.display = 'none';
     if (title) title.style.display = 'none';
 
-    // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
 
-    // Показываем нужную игру
     const target = document.getElementById(game + '-game');
     if (target) {
         target.style.display = 'block';
         target.classList.add('game-fullscreen');
     }
 
-    // Блокируем скролл body, скрываем навигацию, показываем кнопку назад
     document.body.classList.add('game-open');
     const nav = document.querySelector('.navigation');
     if (nav) nav.style.bottom = '-120px';
@@ -376,20 +361,18 @@ function selectGame(game) {
 }
 
 function backToGamesList() {
-    // Скрываем все игры
+
     document.querySelectorAll('.game-container').forEach(el => {
         el.style.display = 'none';
         el.classList.remove('game-fullscreen');
     });
 
-    // Показываем список игр и заголовок
     const gameSection = document.getElementById('game-section');
     const cardsList = gameSection ? gameSection.querySelector('.game-cards-list') : null;
     const title = gameSection ? gameSection.querySelector('.game-section-title') : null;
     if (cardsList) cardsList.style.display = '';
     if (title) title.style.display = '';
 
-    // Разблокируем скролл body, возвращаем навигацию
     document.body.classList.remove('game-open');
     const nav = document.querySelector('.navigation');
     if (nav) nav.style.bottom = '';
@@ -397,12 +380,10 @@ function backToGamesList() {
     if (backBtn) backBtn.style.display = 'none';
 }
 
-// ===== БЕЗОПАСНЫЕ ХЕЛПЕРЫ =====
 function $id(id) { return document.getElementById(id); }
 function setText(id, val) { const el = $id(id); if (el) el.textContent = val; }
 function setHTML(id, html) { const el = $id(id); if (el) el.innerHTML = html; }
 
-// ===== БАЛАНС =====
 function updateBalance() {
     const gold = userData.balance.gold;
     const silver = userData.balance.silver;
@@ -416,12 +397,11 @@ function updateBalance() {
     setHTML('rocket-balance',  `${silver} <span class="coin-symbol silver">F</span>`);
     setText('cases-balance-val', silver);
     setText('cases-gold-val', gold);
-    // Новый дизайн мины
+
     setText('game-balance-val', silver);
     checkBetValidity();
 }
 
-// ===== СТАВКИ МИНЫ =====
 function checkBetValidity() {
     const bet = gameState.currentBet;
     const balance = userData.balance[gameState.betType];
@@ -443,7 +423,7 @@ function updateBetDisplay() {
     setText('current-bet', gameState.currentBet);
     const win = Math.floor(gameState.currentBet * gameState.currentCoefficient);
     setText('potential-win', win);
-    // Новый дизайн
+
     const inp = document.getElementById('mines-bet-input');
     if (inp) inp.value = gameState.currentBet;
     setText('potential-win-new', win + ' F');
@@ -460,7 +440,6 @@ function setBet(amount) {
     updateBetDisplay();
 }
 
-// Новые функции управления для нового дизайна
 function minesBetInputChange(val) {
     gameState.currentBet = Math.max(1, parseInt(val) || 1);
     updateBetDisplay();
@@ -484,7 +463,7 @@ function updateCoefficients() {
     const sc = sizeCoef[gameConfig.size]   || 1.5;
     const mc = minesCoef[gameConfig.mines] || 2.0;
     gameState.baseCoefficient = sc * mc;
-    // До начала игры показываем 1.00
+
     if (!gameState.isPlaying) {
         gameState.currentCoefficient = 1.00;
     }
@@ -495,7 +474,6 @@ function updateCoefficients() {
     updateBetDisplay();
 }
 
-// ===== ИГРА МИНЫ =====
 function startGame() {
     const bet = gameState.currentBet;
     if (bet > userData.balance[gameState.betType]) {
@@ -510,7 +488,7 @@ function startGame() {
 
     gameState.isPlaying = true;
     gameState.currentCoefficient = 1.00;
-    // Инициализируем baseCoefficient чтобы не было NaN
+
     const sizeCoef  = { 3: 1.2, 5: 1.5 };
     const minesCoef = { 1: 1.5, 2: 2.0, 3: 2.5, 5: 3.5 };
     gameState.baseCoefficient = (sizeCoef[gameConfig.size] || 1.5) * (minesCoef[gameConfig.mines] || 2.0);
@@ -539,7 +517,7 @@ function createGameBoard() {
     if (!grid) return;
     grid.innerHTML = '';
     grid.style.gridTemplateColumns = `repeat(${gameConfig.size}, 1fr)`;
-    // Адаптируем размер эмодзи под размер поля
+
     const fontSize = gameConfig.size <= 3 ? '2rem' : gameConfig.size <= 5 ? '1.5rem' : '1rem';
     grid.style.fontSize = fontSize;
     gameState.gameBoard = [];
@@ -579,7 +557,7 @@ function revealCell(index) {
         cell.element.classList.add('safe');
         gameState.revealedCells++;
         gameState.canCashOut = true;
-        // Растим коэффициент: каждый шаг умножает на базу ^ (1 / безопасных клеток)
+
         const safeCells = gameState.totalCells - gameConfig.mines;
         const stepMult = Math.pow(gameState.baseCoefficient, 1 / safeCells);
         gameState.currentCoefficient = Math.max(gameState.currentCoefficient * stepMult, 1.00);
@@ -704,7 +682,6 @@ function updateGameHistory() {
     });
 }
 
-// ===== РАКЕТКА =====
 function updateRocketUI() {
     setText('rocket-current-bet', rocketGameState.currentBet);
     const inp = $id('rocket-bet-input');
@@ -734,7 +711,7 @@ function setRocketBet(amount) {
     rocketGameState.currentBet = Math.max(1, amount);
     const inp = document.getElementById('rocket-bet-input');
     if (inp) inp.value = rocketGameState.currentBet;
-    // Обновляем дисплей в шторке
+
     const betDisp = document.getElementById('rocket-bet-display');
     const winDisp = document.getElementById('rocket-win-display');
     const curr = rocketGameState.betType === 'gold' ? 'G' : 'F';
@@ -745,7 +722,7 @@ function setRocketBet(amount) {
 
 function setRocketCurrency(type) {
     rocketGameState.betType = type;
-    // Обновляем дисплей
+
     setRocketBet(rocketGameState.currentBet);
     const silver = document.getElementById('rocket-currency-silver');
     const gold   = document.getElementById('rocket-currency-gold');
@@ -804,7 +781,7 @@ function setMinesCurrency(type) {
 }
 
 function openRocketBetSheet() {
-    if (rocketGameState.isRoundActive) return; // нельзя ставить во время раунда
+    if (rocketGameState.isRoundActive) return;
     const sheet = $id('rocket-bet-sheet');
     if (sheet) sheet.style.display = 'block';
     updateRocketUI();
@@ -845,7 +822,6 @@ function startRocketGame() {
     rocketGameState.startTime = Date.now();
     rocketGameState.crashPoint = generateCrashPoint();
 
-    // Кнопка → "Забрать"
     const playBtn = $id('rocket-play-btn');
     const cashBtn = $id('rocket-cashout-btn');
     if (playBtn) playBtn.style.display = 'none';
@@ -856,7 +832,6 @@ function startRocketGame() {
 
     animateRocket();
 
-    // t = log(crashPoint) / log(1.10)
     const crashTime = Math.log(rocketGameState.crashPoint) / Math.log(1.10) * 1000;
     setTimeout(() => {
         if (rocketGameState.isRoundActive) endRocketGame(false, rocketGameState.currentCoefficient);
@@ -880,13 +855,10 @@ function animateRocket() {
 
     let lastElapsed = 0;
 
-    // Ракета на экране всегда в этой точке (25% ширины, 75% высоты)
     const rocketPctX = 0.50;
     const rocketPctY = 0.50;
 
-    // Мировые координаты растут: X — линейно, Y — вверх с коэфом
-    // Масштаб: сколько пикселей мира = 1 пиксель экрана изначально
-    const speedX = 80; // мировых px/сек по горизонтали
+    const speedX = 80;
 
     function animate() {
         if (!rocketGameState.isRoundActive && !rocketGameState._continueAfterCashout) return;
@@ -903,37 +875,29 @@ function animateRocket() {
             if (cashBtn) cashBtn.textContent = `ЗАБРАТЬ ×${coef.toFixed(2)}`;
         }
 
-        // Мировая позиция ракеты
         const worldX = elapsed * speedX;
         const worldY = -(coef - 1) * 350;
 
-        // Стартовая точка — левый нижний угол
         const startSX = W * 0.10;
         const startSY = H * 0.88;
         const targetSX = W * 0.50;
         const targetSY = H * 0.50;
 
-        // До центра — ракета просто летит по экрану
-        // После центра — камера следит
         const rawSX = startSX + worldX;
         const rawSY = startSY + worldY;
         const camX = rawSX > targetSX ? worldX - (targetSX - startSX) : 0;
         const camY = rawSY < targetSY ? worldY - (targetSY - startSY) : 0;
 
-        // Сохраняем точку следа
         rocketGameState.trailPoints.push({ wx: worldX, wy: worldY });
 
-        // Экранные координаты точки мира
         function toScreen(wx, wy) {
             return { x: startSX + wx - camX, y: startSY + wy - camY };
         }
 
-        // Рисуем
         ctx.clearRect(0, 0, W, H);
         ctx.fillStyle = '#080814';
         ctx.fillRect(0, 0, W, H);
 
-        // Сетка — прокручивается с камерой + плавное покачивание
         ctx.strokeStyle = 'rgba(255,255,255,0.05)';
         ctx.lineWidth = 1;
         const gridX = 80, gridY = 60;
@@ -954,7 +918,6 @@ function animateRocket() {
             const pts = tp.map(p => toScreen(p.wx, p.wy));
             const last = pts[pts.length - 1];
 
-            // Заливка
             ctx.beginPath();
             ctx.moveTo(origin.x, origin.y);
             for (const p of pts) ctx.lineTo(p.x, p.y);
@@ -966,7 +929,6 @@ function animateRocket() {
             ctx.fillStyle = fillGrad;
             ctx.fill();
 
-            // Линия следа
             ctx.beginPath();
             ctx.moveTo(origin.x, origin.y);
             for (const p of pts) ctx.lineTo(p.x, p.y);
@@ -979,7 +941,6 @@ function animateRocket() {
             ctx.lineCap = 'round';
             ctx.stroke();
 
-            // Свечение
             const glow = ctx.createRadialGradient(last.x, last.y, 0, last.x, last.y, 24);
             glow.addColorStop(0, 'rgba(200,160,255,0.7)');
             glow.addColorStop(1, 'rgba(123,92,255,0)');
@@ -989,7 +950,6 @@ function animateRocket() {
             ctx.fill();
         }
 
-        // Позиция ракеты на экране
         const rPos = toScreen(worldX, worldY);
         const sx = rPos.x;
         const sy = rPos.y;
@@ -1008,27 +968,23 @@ function animateRocket() {
     animate();
 }
 
-
 function cashOutRocket() {
     if (!rocketGameState.isPlaying || !rocketGameState.isRoundActive) return;
 
     const multiplier = rocketGameState.currentCoefficient;
     const winAmount  = Math.floor(rocketGameState.currentBet * multiplier);
 
-    // Начисляем выигрыш
     userData.balance[rocketGameState.betType] += winAmount;
     userData.stats.totalWon += winAmount;
     saveUserData();
     updateBalance();
 
-    // Записываем в историю
     const result = { timestamp: new Date().toISOString(), bet: rocketGameState.currentBet,
                      win: winAmount, coefficient: multiplier, isWin: true };
     userData.rocketHistory.unshift(result);
     if (userData.rocketHistory.length > 20) userData.rocketHistory = userData.rocketHistory.slice(0,20);
     userData.stats.rocketPlayed=(userData.stats.rocketPlayed||0)+1; updateTasks();
 
-    // Подарок
     if (winAmount >= 15) {
         const gift = GIFT_SYSTEM.getRandomGift(winAmount);
         if (gift) setTimeout(() => showGiftChoiceModal(gift, winAmount), 1200);
@@ -1037,21 +993,17 @@ function cashOutRocket() {
     updateStats();
     updateRocketHistory();
 
-    // Прячем кнопку забрать, НО ракетка продолжает лететь до краша
     const cashBtn = $id('rocket-cashout-btn');
     if (cashBtn) cashBtn.style.display = 'none';
 
-    // Показываем «забрал» на коэффициенте
     setText('rocket-coefficient', '✓ ×' + multiplier.toFixed(2));
 
-    // Флаг: раунд закончился для игрока, но анимация продолжается
     rocketGameState.isRoundActive = false;
     rocketGameState._continueAfterCashout = true;
 
-    // Ждём краша (оставшееся время) — потом запускаем сброс
     const elapsed    = rocketGameState._elapsed || 0;
     const crashCoef  = rocketGameState.crashPoint;
-    // Когда 1.06^t = crashCoef → t = log(crashCoef)/log(1.06)
+
     const crashTime  = Math.log(crashCoef) / Math.log(1.10);
     const remaining  = Math.max((crashTime - elapsed) * 1000, 500);
 
@@ -1069,7 +1021,7 @@ function endRocketGame(isWin, multiplier) {
     rocketGameState._continueAfterCashout = false;
 
     if (!isWin) {
-        // Краш — записываем проигрыш
+
         const result = { timestamp: new Date().toISOString(), bet: rocketGameState.currentBet,
                          win: 0, coefficient: multiplier, isWin: false };
         userData.rocketHistory.unshift(result);
@@ -1081,7 +1033,6 @@ function endRocketGame(isWin, multiplier) {
         updateRocketPrevRounds();
     }
 
-    // Восстановить кнопки
     const playBtn = $id('rocket-play-btn');
     const cashBtn = $id('rocket-cashout-btn');
     if (cashBtn) cashBtn.style.display = 'none';
@@ -1125,7 +1076,6 @@ function crashAnimateRocket() {
             for (let x = 0; x < W; x += W/6){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
             for (let y = 0; y < H; y += H/5){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-            // Рисуем сохранённый след
             const tp = rocketGameState.trailPoints;
             if (tp && tp.length > 1) {
                 ctx.beginPath();
@@ -1211,7 +1161,7 @@ function startRocketCountdown() {
     if (status) status.style.display = 'block';
     setText('round-timer', 5);
     const playBtn = $id('rocket-play-btn');
-    // Показываем кнопку сразу но заблокированной
+
     if (playBtn) {
         playBtn.style.display = 'block';
         playBtn.disabled = true;
@@ -1233,7 +1183,6 @@ function startRocketCountdown() {
     }, 1000);
 }
 
-// ===== ПРОФИЛЬ =====
 function updateStats() {
     const s = userData.stats;
     setText('games-played', s.gamesPlayed || 0);
@@ -1246,7 +1195,6 @@ function updateStats() {
     setText('max-coef',        s.maxCoefficient ? s.maxCoefficient.toFixed(2) : '0');
     renderProfileHistory();
 }
-
 
 function renderProfileHistory() {
     const list = document.getElementById('profile-history-list');
@@ -1285,7 +1233,6 @@ function updateProfileInfo() {
         : `Игрок#${Math.abs(regDate.getTime() % 10000).toString().padStart(4,'0')}`;
     setText('user-name', userName);
 
-    // Фото профиля Telegram
     if (tgUser?.photo_url) {
         const img = document.getElementById('prf-tg-photo');
         const em  = document.getElementById('prf-avatar-emoji');
@@ -1359,7 +1306,6 @@ function copyRefLink() {
     }
 }
 
-// ===== ЕЖЕДНЕВНЫЙ БОНУС =====
 function claimDailyBonus() {
     const now = new Date();
     const last = userData.lastDailyBonus ? new Date(userData.lastDailyBonus) : null;
@@ -1397,7 +1343,6 @@ function updateDailyBonusButton() {
     }
 }
 
-// ===== ЗАДАНИЯ =====
 const TASKS = {
     1: { name:'Пополнить баланс', target:1, reward:15,  rewardType:'gold',   type:'deposit100'  },
     2: { name:'Мины',             target:5, reward:10,  rewardType:'silver', type:'minesPlayed' },
@@ -1444,7 +1389,6 @@ function claimTaskReward(id) {
     if (typeof showNotif==='function') showNotif('🎉 +'+task.reward+' '+cur+' получено!','#7b5cff');
 }
 
-// ===== КЕЙСЫ — КОНФИГ =====
 const CASE_CONFIG = {
     peace:    { name: 'Покой в богатстве', currency: 'silver', cost: 555,  goldCost: 555, allowGold: true },
     stars67:  { name: '67 звёзд',          currency: 'gold',   cost: 67,   allowGold: true  },
@@ -1456,7 +1400,6 @@ const CASE_CONFIG = {
     stars100: { name: '100 звёзд',          currency: 'gold',   cost: 100,  allowGold: true  },
 };
 
-// ===== ПИКСЕЛЬ-АРТ SVG ИКОНКИ КЕЙСОВ =====
 const CASE_PIXEL_ICONS = {
     daily: `<svg class="case-pixel-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="5" y="1" width="6" height="1" fill="#22aa44"/><rect x="4" y="2" width="1" height="2" fill="#22aa44"/><rect x="11" y="2" width="1" height="2" fill="#22aa44"/><rect x="5" y="2" width="6" height="1" fill="#0a1a0a"/>
@@ -1578,9 +1521,6 @@ function renderCaseCards() {
     });
 }
 
-// ===== КЕЙСЫ - ПОДАРКИ С ЦЕНАМИ =====
-// CASE_GIFTS — используются в спин-анимации кейса
-// tier: rare(15-99) | epic(100-499) | legendary(500+)
 const CASE_GIFTS = [
     { type: 'heart',     name: 'Сердце',           emoji: '❤️',  value: 15,  tier: 'rare',      weight: 28 },
     { type: 'bear',      name: 'Мишка',            emoji: '🐻',  value: 15,  tier: 'rare',      weight: 25 },
@@ -1612,15 +1552,12 @@ function selectCase(type) {
     const cfg = CASE_CONFIG[type];
     if (!cfg) return;
 
-    // Открываем модальное окно
     const modal = $id('case-select-modal');
     if (!modal) return;
 
-    // Название
     const nameEl = $id('case-modal-name');
     if (nameEl) nameEl.textContent = cfg.name;
 
-    // Цена
     const priceEl = $id('case-modal-price');
     if (priceEl) {
         if (cfg.free) priceEl.textContent = 'Бесплатно';
@@ -1630,7 +1567,6 @@ function selectCase(type) {
         else priceEl.textContent = cfg.cost + ' ⚪ серебра';
     }
 
-    // Кнопки валюты
     const silverBtn = $id('case-currency-silver');
     const goldBtn   = $id('case-currency-gold');
     const currDiv   = $id('case-modal-currency');
@@ -1639,12 +1575,12 @@ function selectCase(type) {
         if (currDiv) currDiv.style.display = 'none';
         selectedCaseCurrency = null;
     } else if (cfg.goldCost) {
-        // peace — и серебро и золото
+
         if (currDiv) { currDiv.style.display = 'flex'; currDiv.style.flexDirection = 'row'; currDiv.style.gap = '10px'; }
         selectedCaseCurrency = 'silver';
         setCaseCurrency('silver');
     } else if (cfg.allowGold) {
-        // звёздные — только золото
+
         if (currDiv) currDiv.style.display = 'none';
         selectedCaseCurrency = 'gold';
     } else {
@@ -1652,7 +1588,6 @@ function selectCase(type) {
         selectedCaseCurrency = 'silver';
     }
 
-    // Подарки из CASE_GIFTS с процентами
     const oddsList = $id('case-odds-list');
     if (oddsList) {
         const weights = CASE_GIFTS.map(g => g.weight);
@@ -1721,7 +1656,6 @@ function checkCaseBalance() {
     if (btn) { btn.disabled = !enough; btn.style.opacity = enough ? '1' : '0.5'; }
 }
 
-
 function showCasesList() {
     const listPanel = $id('cases-list-panel');
     const openPanel = $id('case-open-panel');
@@ -1733,7 +1667,6 @@ function confirmOpenCase() {
     const cfg = CASE_CONFIG[selectedCaseType];
     if (!cfg) return;
 
-    // Проверки
     if (cfg.strike) {
         const streak = userData.depositStreak || 0;
         if (streak < 7) { alert(`Нужно ${7 - streak} дней подряд депозита!`); return; }
@@ -1751,7 +1684,6 @@ function confirmOpenCase() {
         saveUserData(); updateBalance(); updateTasks();
     }
 
-    // Скрываем панель, открываем кейс
     closeCaseSelectModal();
     openCase(selectedCaseType);
 }
@@ -1759,8 +1691,7 @@ function confirmOpenCase() {
 function openCase(type) {
     pendingCaseType = type;
 
-    // Случайный победитель (взвешенно: дешёвые чаще)
-    const weights = [2, 3, 3, 2, 2, 1]; // rocket50, heart15, bear15, diamond50, champagne50, cup100
+    const weights = [2, 3, 3, 2, 2, 1];
     const total = weights.reduce((a,b)=>a+b,0);
     let r = Math.random() * total;
     let winIdx = 0;
@@ -1770,21 +1701,18 @@ function openCase(type) {
     }
     pendingCasePrize = CASE_GIFTS[winIdx];
 
-    // Показываем модал
     const modal = document.getElementById('case-open-modal');
     modal.style.display = 'flex';
 
-    // Скрыть результат
     document.getElementById('spin-result').style.display = 'none';
 
-    // Строим ленту: много случайных + победитель в позиции ~60 (из 80 итемов)
     const track = document.getElementById('spin-track');
     track.style.transition = 'none';
     track.style.transform = 'translateX(0)';
     track.innerHTML = '';
 
-    const ITEM_W = 100; // px (ширина + gap)
-    const WIN_POS = 62; // индекс победителя в ленте
+    const ITEM_W = 100;
+    const WIN_POS = 62;
     const TOTAL_ITEMS = 80;
 
     const items = [];
@@ -1807,11 +1735,9 @@ function openCase(type) {
         track.appendChild(el);
     });
 
-    // Вычислить смещение — победитель по центру viewport
     const viewportW = document.getElementById('spin-viewport').offsetWidth;
     const targetOffset = WIN_POS * ITEM_W - (viewportW / 2 - 45) + Math.random() * 20 - 10;
 
-    // Запуск анимации
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             track.style.transition = 'transform 4s cubic-bezier(0.12, 0.8, 0.2, 1)';
@@ -1820,14 +1746,14 @@ function openCase(type) {
     });
 
     setTimeout(() => {
-        // Подсветить победителя
+
         const winEl = track.children[WIN_POS];
         if (winEl) {
             winEl.style.background = 'rgba(255,215,0,0.2)';
             winEl.style.borderColor = 'rgba(255,215,0,0.8)';
             winEl.style.boxShadow = '0 0 20px rgba(255,215,0,0.5)';
         }
-        // Показать результат
+
         document.getElementById('spin-prize-icon').textContent  = pendingCasePrize.emoji;
         document.getElementById('spin-prize-name').textContent  = pendingCasePrize.name;
         document.getElementById('spin-prize-value').textContent = `Стоимость: ${pendingCasePrize.value} F`;
@@ -1839,7 +1765,6 @@ function claimCasePrize() {
     if (!pendingCasePrize) return;
     const val = pendingCasePrize.value;
 
-    // Добавляем подарок в инвентарь
     if (!userData.inventory) userData.inventory = [];
     const tier = (pendingCasePrize && pendingCasePrize.tier) || (val >= 500 ? 'legendary' : val >= 100 ? 'epic' : val >= 15 ? 'rare' : 'common');
     userData.inventory.push({
@@ -1891,7 +1816,6 @@ function updateCasesHistory() {
     });
 }
 
-// ===== ИНВЕНТАРЬ =====
 function updateInventory() {
     const GIFT_ICONS = {
         bear:'🐻',heart:'❤️',rose:'🌹',gift:'🎁',cake:'🎂',
@@ -1937,7 +1861,7 @@ function updateInventory() {
     renderMcGrid('inventory-active-grid', active);
     renderMcGrid('inventory-ready-grid',  ready);
     renderMcGrid('inventory-sold-grid',   sold);
-    // Обновляем счётчики
+
     const elActive = document.getElementById('inv-count-active');
     const elReady = document.getElementById('inv-count-ready');
     const elTotal = document.getElementById('inv-total-value');
@@ -1946,7 +1870,7 @@ function updateInventory() {
     const allItems = [...active, ...ready];
     const totalVal = allItems.reduce((s, g) => s + (g.value||0), 0);
     if (elTotal) elTotal.textContent = totalVal;
-    // Показываем/скрываем empty states
+
     const emptyActive = document.getElementById('no-active-items');
     const emptyReady = document.getElementById('no-ready-items');
     const emptySold = document.getElementById('no-sold-items');
@@ -1964,7 +1888,6 @@ function showInventoryTab(tab) {
     if (activeBtn) activeBtn.classList.add('active');
 }
 
-// ===== ПОДАРКИ =====
 const GIFT_EMOJIS = {bear:'🧸',heart:'❤️',rose:'🌹',gift:'🎁',cake:'🎂',champagne:'🥂',bouquet:'💐',cup:'🏆',ring:'💍',diamond:'💎'};
 const GIFT_IMGS = {
     bear: 'data:image/png;base64,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',
@@ -2009,7 +1932,6 @@ function showGiftChoiceModal(gift, winAmount) {
     if (sellEl) sellEl.textContent = sellPrice;
     if (keepEl) keepEl.textContent = remainder > 0 ? '+ '+remainder+' F остаток на баланс' : '';
 
-    // Закрываем все другие модалы чтобы не перекрывали
     const manageModal = document.getElementById('manage-gift-modal');
     if (manageModal) manageModal.style.display = 'none';
 
@@ -2054,37 +1976,35 @@ function sellGift() {
 function showManageGiftModal(giftId) {
     const gift = (userData.inventory||[]).find(g => g.id === giftId);
     if (!gift || gift.status === 'sold') return;
-    
+
     const sellPrice = gift.minValue || gift.value || 0;
     const receivedDate = new Date(gift.receivedDate || Date.now());
     const unlockDate = new Date(receivedDate.getTime() + 21*24*60*60*1000);
     const now = new Date();
     const canWithdraw = now >= unlockDate;
     const daysLeft = Math.ceil((unlockDate - now) / (24*60*60*1000));
-    
+
     const emoji = (function() {
         const m = {bear:'🧸',heart:'❤️',rose:'🌹',gift:'🎁',cake:'🎂',champagne:'🥂',bouquet:'💐',cup:'🏆',ring:'💍',diamond:'💎',crown:'👑',rocket:'🚀'};
         return m[gift.type] || '🎁';
     })();
-    
-    // Create a bottom-sheet modal
+
     let overlay = document.getElementById('manage-gift-overlay');
     if (overlay) overlay.remove();
-    
+
     overlay = document.createElement('div');
     overlay.id = 'manage-gift-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.8);display:flex;align-items:flex-end;justify-content:center;';
     overlay.onclick = () => overlay.remove();
-    
+
     const sheet = document.createElement('div');
     sheet.style.cssText = 'background:#13131f;border-radius:24px 24px 0 0;padding:20px 20px 48px;width:100%;max-width:520px;';
     sheet.onclick = e => e.stopPropagation();
-    
+
     const withdrawBtn = canWithdraw
         ? `<button onclick="withdrawGift(${giftId})" style="width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-size:0.95rem;font-weight:800;cursor:pointer;margin-bottom:10px;">📤 Вывести подарок</button>`
         : `<button disabled style="width:100%;padding:14px;border:1.5px solid #2a2a3a;border-radius:14px;background:#1a1a2a;color:#555;font-size:0.9rem;font-weight:700;cursor:not-allowed;margin-bottom:10px;">🔒 Вывод через ${daysLeft} ${daysLeft===1?'день':daysLeft<5?'дня':'дней'}</button>`;
-    
-    // Build HTML without nested template literals
+
     const handle = '<div style="width:40px;height:4px;background:#2a2a3a;border-radius:2px;margin:0 auto 20px;"></div>';
     const giftInfo = '<div style="text-align:center;margin-bottom:20px;">'
         + '<div style="font-size:3.5rem;margin-bottom:10px;">' + emoji + '</div>'
@@ -2106,13 +2026,11 @@ async function withdrawGift(giftId) {
     const overlay = document.getElementById('manage-gift-overlay');
     if (overlay) overlay.remove();
 
-    // Отправляем запрос в Telegram бота через inline кнопку «написать боту»
     const userId = tg?.initDataUnsafe?.user?.id;
     const username = tg?.initDataUnsafe?.user?.username || '';
     const giftName = gift.name || 'Подарок';
     const giftEmoji = ({bear:'🧸',heart:'❤️',rose:'🌹',gift:'🎁',cake:'🎂',champagne:'🥂',bouquet:'💐',cup:'🏆',ring:'💍',diamond:'💎',crown:'👑'})[gift.type] || '🎁';
 
-    // Отправляем на сервер
     try {
         await fetch(BACKEND_URL + '/withdraw_gift', {
             method: 'POST',
@@ -2128,7 +2046,6 @@ async function withdrawGift(giftId) {
         });
     } catch(e) {}
 
-    // Обновляем статус локально
     gift.status = 'withdrawn';
     saveUserData();
 
@@ -2150,22 +2067,19 @@ function sellGiftFromInventory(giftId) {
     if (typeof updateInventory==='function') updateInventory();
 }
 
-// ===== ПОПОЛНЕНИЕ БАЛАНСА (TELEGRAM STARS) =====
-
-// Промокоды: code → bonus multiplier
 const PROMO_CODES = {
-    'VESNA26': { type: 'bonus', value: 0.20 }   // +20% к пополнению
+    'VESNA26': { type: 'bonus', value: 0.20 }
 };
 
 const GIFT_PROMO_CODES = {
-    'X7K2M9R4': { gold: 500, silver: 500 }   // 500 золота + 500 серебра
+    'X7K2M9R4': { gold: 500, silver: 500 }
 };
 
-let topUpCurrency = 'gold'; // Звёзды → только золотые монеты
-let activePromo = null;     // { code, bonus } или null
-let topUpTab = 'stars';     // 'stars' | 'usdt'
-let usdtInvoice = null;     // текущий USDT инвойс { wallet, amount, coins, expires }
-let usdtPollTimer = null;   // таймер ожидания оплаты
+let topUpCurrency = 'gold';
+let activePromo = null;
+let topUpTab = 'stars';
+let usdtInvoice = null;
+let usdtPollTimer = null;
 
 const USDT_PACKAGES = [
     { coins: 50,   usdt: 0.75  },
@@ -2175,7 +2089,6 @@ const USDT_PACKAGES = [
     { coins: 1000, usdt: 15.00 },
 ];
 
-// Пакеты звёзд → золотые коины (1 звезда = 1 золотой коин)
 const STAR_PACKAGES = [
     { stars: 50,   coins: 50   },
     { stars: 100,  coins: 100  },
@@ -2231,7 +2144,6 @@ function renderStarPackages() {
         container.appendChild(el);
     });
 
-    // Карточка "своя сумма"
     const customCard = document.createElement('div');
     customCard.className = 'star-pkg-card star-pkg-custom';
     customCard.innerHTML = `
@@ -2263,7 +2175,6 @@ function applyPromoCode() {
     const code = (inp?.value || '').trim().toUpperCase();
     const promoStatus = document.getElementById('promo-status');
 
-    // Проверяем подарочные промокоды (монеты сразу)
     if (GIFT_PROMO_CODES[code]) {
         const reward = GIFT_PROMO_CODES[code];
         userData.balance.gold = (userData.balance.gold || 0) + reward.gold;
@@ -2279,7 +2190,6 @@ function applyPromoCode() {
         return;
     }
 
-    // Обычные промокоды (бонус к пополнению)
     if (PROMO_CODES[code]) {
         activePromo = { code, bonus: PROMO_CODES[code].value };
         if (promoStatus) {
@@ -2310,8 +2220,6 @@ function updatePromoDisplay() {
     }
 }
 
-
-// ─── USDT ОПЛАТА ──────────────────────────────────────────────────────────────
 function switchTopUpTab(tab) {
     topUpTab = tab;
     const starsTab  = document.getElementById('tab-stars');
@@ -2366,11 +2274,9 @@ async function buyUsdtPackage(coins, usdt) {
         const data = await resp.json();
         if (!data.wallet) throw new Error(data.error || 'no wallet');
 
-        // Сервер возвращает {wallet:pay_url, invoice_id, amount}
-        // добавляем expires: 30 мин от сейчас
         usdtInvoice = { ...data, expires: Math.floor(Date.now()/1000) + 30*60, coins };
         showUsdtPayScreen(usdtInvoice);
-        // Сразу открываем CryptoBot - без задержки
+
         if (data.wallet) {
             openUsdtLink(data.wallet);
         }
@@ -2409,7 +2315,7 @@ function copyUsdtAmount(val) {
     showNotif('📋 Сумма скопирована: ' + val, '#22c55e');
 }
 function openUsdtLink(url) {
-    // pay_url = https://t.me/CryptoBot?start=IV... — открываем прямо в Telegram
+
     if (tg && url && (url.includes('t.me/') || url.includes('telegram.me/'))) {
         tg.openTelegramLink(url);
     } else if (tg?.openLink) {
@@ -2471,7 +2377,6 @@ function cancelUsdtInvoice() {
     renderUsdtTab();
 }
 
-// ═══ ОПЛАТА ЧЕРЕЗ TELEGRAM STARS (нативный WebApp Invoice) ═══
 const BACKEND_URL = 'https://web-production-42c21.up.railway.app';
 async function syncGoldFromServer() {
     try {
@@ -2483,7 +2388,7 @@ async function syncGoldFromServer() {
         const serverGold = parseInt(data.gold_coins) || 0;
         const serverSilver = parseInt(data.silver_coins) || 0;
         let changed = false;
-        // Золото — берём максимум из сервера и локального (сервер авторитетен для gold)
+
         if (serverGold > 0 || userData.balance.gold === 0) {
             if (serverGold !== userData.balance.gold) {
                 userData.balance.gold = Math.max(serverGold, userData.balance.gold);
@@ -2494,9 +2399,8 @@ async function syncGoldFromServer() {
             saveUserData();
             updateBalance();
         }
-    } catch(e) { /* сервер недоступен — используем локальный баланс */ }
+    } catch(e) {  }
 }
-
 
 async function buyStarPackage(stars, coins) {
     if (!tg) {
@@ -2530,9 +2434,8 @@ async function buyStarPackage(stars, coins) {
         const data = await resp.json();
         if (!data.invoice_url) throw new Error(data.error || 'no invoice_url');
 
-        // Проверяем что openInvoice доступен (Telegram WebApp 6.1+)
         if (typeof tg.openInvoice !== 'function') {
-            // Старый Telegram - открываем через ссылку напрямую
+
             tg.openLink ? tg.openLink(data.invoice_url) : window.open(data.invoice_url, '_blank');
             showNotif('⭐ Открываем оплату…', '#8b5cf6');
             return;
@@ -2561,7 +2464,7 @@ async function buyStarPackage(stars, coins) {
                     } catch(e) {}
                 }
                 if (!synced) {
-                    // Fallback: зачисляем локально если сервер не ответил
+
                     creditCoins(coins, stars);
                 }
             } else if (status === 'cancelled') {
@@ -2581,11 +2484,10 @@ function trackDeposit(coins){
     if(coins>100){userData.taskProgress=userData.taskProgress||{};userData.taskProgress.deposit100=1;if(typeof saveUserData==="function")saveUserData();updateTasks();}
 }
 function creditCoins(coins, stars) {
-    // Монеты всегда чётные
+
     const finalCoins = makeEven(coins);
     userData.balance.gold += finalCoins;
-    
-    // Сохраняем транзакцию
+
     userData.topupHistory = userData.topupHistory || [];
     userData.topupHistory.unshift({
         timestamp: new Date().toISOString(),
@@ -2594,16 +2496,16 @@ function creditCoins(coins, stars) {
         promo: activePromo?.code || null
     });
     if (userData.topupHistory.length > 50) userData.topupHistory = userData.topupHistory.slice(0, 50);
-    
+
     saveUserData();
     updateBalance();
     closeTopUpModal();
-    
+
     showTopUpSuccess(finalCoins, stars);
 }
 
 function showTopUpSuccess(coins, stars, method = 'stars') {
-    // Показываем красивое уведомление
+
     const notif = document.createElement('div');
     notif.style.cssText = `
         position:fixed;top:20px;left:50%;transform:translateX(-50%);
@@ -2619,7 +2521,6 @@ function showTopUpSuccess(coins, stars, method = 'stars') {
     setTimeout(() => notif.remove(), 3500);
 }
 
-// Устаревшие функции (оставлены для совместимости)
 function setTopUpCurrency(type) { topUpCurrency = type; }
 function setTopUpAmount(val) {}
 function changeTopUpAmount(delta) {}
