@@ -1010,28 +1010,5 @@
                 </div>
             </div>
 
-    <div id="case-select-modal" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.82);align-items:flex-end;justify-content:center;" onclick="closeCaseSelectModal()">
-        <div onclick="event.stopPropagation()" style="background:#0f0f1c;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:520px;box-sizing:border-box;border-top:1.5px solid rgba(123,92,255,0.3);">
-            <div style="width:42px;height:4px;background:#2a2a3a;border-radius:2px;margin:0 auto 20px;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <div style="font-size:1.1rem;font-weight:900;color:#fff;" id="case-modal-name">Кейс</div>
-                <button onclick="closeCaseSelectModal()" style="background:rgba(255,255,255,0.08);border:none;color:#aaa;font-size:1.3rem;width:34px;height:34px;border-radius:50%;cursor:pointer;line-height:1;">x</button>
-            </div>
-            <div id="case-modal-price" style="color:#888;font-size:0.8rem;margin-bottom:18px;"></div>
-            <div id="case-modal-currency" style="display:none;margin-bottom:16px;">
-                <div style="color:#666;font-size:0.72rem;font-weight:700;margin-bottom:8px;">ВАЛЮТА</div>
-                <div style="display:flex;gap:10px;">
-                    <button id="case-currency-silver" onclick="setCaseCurrency('silver')" style="flex:1;padding:14px 10px;border-radius:14px;border:1.5px solid rgba(123,92,255,0.5);background:rgba(123,92,255,0.18);color:#c4b5fd;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;"><span style="font-size:1.4rem;display:block;margin-bottom:3px;font-weight:900;">F</span>Серебро</button>
-                    <button id="case-currency-gold" onclick="setCaseCurrency('gold')" style="flex:1;padding:14px 10px;border-radius:14px;border:1.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#888;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;"><span style="font-size:1.4rem;display:block;margin-bottom:3px;">🟡</span>Золото</button>
-                </div>
-            </div>
-            <div style="display:flex;justify-content:space-between;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 16px;margin-bottom:16px;">
-                <span style="color:#666;font-size:0.78rem;">Баланс</span>
-                <span id="case-modal-balance" style="color:#c4b5fd;font-size:0.85rem;font-weight:800;"></span>
-            </div>
-            <p id="case-balance-warning" style="text-align:center;color:#f87171;font-size:0.8rem;margin:0 0 12px;display:none;">Недостаточно средств!</p>
-            <button id="case-open-btn" onclick="confirmOpenCase()" style="width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#7b5cff,#a855f7);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(123,92,255,0.45);font-family:inherit;">ОТКРЫТЬ КЕЙС</button>
-        </div>
-    </div>
 </body>
 </html>

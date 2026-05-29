@@ -1446,14 +1446,14 @@ function claimTaskReward(id) {
 
 // ===== КЕЙСЫ — КОНФИГ =====
 const CASE_CONFIG = {
-    peace:    { name: 'Покой в богатстве', currency: 'silver', cost: 555,  goldCost: 555, allowGold: true },
-    stars67:  { name: '67 звёзд',          currency: 'gold',   cost: 67,   allowGold: true  },
-    daily:    { name: 'Ежедневный',         currency: null,     cost: 0,    free: true       },
-    strike:   { name: 'СТРАЙК',            currency: null,     cost: 0,    strike: true     },
-    stars15:  { name: '15 звёзд',           currency: 'gold',   cost: 15,   allowGold: true  },
-    stars25:  { name: '25 звёзд',           currency: 'gold',   cost: 25,   allowGold: true  },
-    stars50:  { name: '50 звёзд',           currency: 'gold',   cost: 50,   allowGold: true  },
-    stars100: { name: '100 звёзд',          currency: 'gold',   cost: 100,  allowGold: true  },
+    daily:    { name: 'Ежедневный',        emoji: '📅', free: true,   silverCost: 0,   goldCost: 0   },
+    peace:    { name: 'Покой в богатстве', emoji: '☮️',  free: false,  silverCost: 555, goldCost: 555 },
+    strike:   { name: 'СТРАЙК',           emoji: '⚡', strike: true, silverCost: 0,   goldCost: 0   },
+    stars15:  { name: '15 звёзд',          emoji: '⭐', free: false,  silverCost: 150, goldCost: 15  },
+    stars25:  { name: '25 звёзд',          emoji: '⭐', free: false,  silverCost: 250, goldCost: 25  },
+    stars50:  { name: '50 звёзд',          emoji: '⭐', free: false,  silverCost: 500, goldCost: 50  },
+    stars67:  { name: '67 звёзд',          emoji: '🌟', free: false,  silverCost: 670, goldCost: 67  },
+    stars100: { name: '100 звёзд',         emoji: '💫', free: false,  silverCost: 1000,goldCost: 100 },
 };
 
 // ===== ПИКСЕЛЬ-АРТ SVG ИКОНКИ КЕЙСОВ =====
@@ -1612,44 +1612,32 @@ function selectCase(type) {
     const cfg = CASE_CONFIG[type];
     if (!cfg) return;
 
-    // Открываем модальное окно
     const modal = $id('case-select-modal');
     if (!modal) return;
 
-    // Название
     const nameEl = $id('case-modal-name');
-    if (nameEl) nameEl.textContent = cfg.name;
-
-    // Цена
-    const priceEl = $id('case-modal-price');
-    if (priceEl) {
-        if (cfg.free) priceEl.textContent = 'Бесплатно';
-        else if (cfg.strike) priceEl.textContent = 'Требуется 7 дней подряд депозита';
-        else if (cfg.goldCost) priceEl.textContent = cfg.cost + ' ⚪ серебром  или  ' + cfg.goldCost + ' 🟡 золотом';
-        else if (cfg.allowGold) priceEl.textContent = cfg.cost + ' 🟡 золотых';
-        else priceEl.textContent = cfg.cost + ' ⚪ серебра';
+    if (nameEl) {
+        nameEl.innerHTML = (cfg.emoji ? cfg.emoji + ' ' : '') + cfg.name;
     }
 
-    // Кнопки валюты
-    const silverBtn = $id('case-currency-silver');
-    const goldBtn   = $id('case-currency-gold');
-    const currDiv   = $id('case-modal-currency');
+    const priceEl = $id('case-modal-price');
+    if (priceEl) {
+        if (cfg.free) priceEl.innerHTML = '<span style="color:#4ade80;font-weight:800;">Бесплатно</span>';
+        else if (cfg.strike) priceEl.textContent = 'Требуется 7 дней подряд депозита';
+        else priceEl.innerHTML =
+            '<span style="color:#c4b5fd;font-weight:700;">' + cfg.silverCost + ' F серебра</span>' +
+            ' &nbsp;или&nbsp; ' +
+            '<span style="color:#fcd34d;font-weight:700;">' + cfg.goldCost + ' 🟡 золота</span>';
+    }
 
+    const currDiv = $id('case-modal-currency');
     if (cfg.free || cfg.strike) {
         if (currDiv) currDiv.style.display = 'none';
         selectedCaseCurrency = null;
-    } else if (cfg.goldCost) {
-        // peace — и серебро и золото
-        if (currDiv) { currDiv.style.display = 'flex'; currDiv.style.flexDirection = 'row'; currDiv.style.gap = '10px'; }
+    } else {
+        if (currDiv) currDiv.style.display = 'block';
         selectedCaseCurrency = 'silver';
         setCaseCurrency('silver');
-    } else if (cfg.allowGold) {
-        // звёздные — только золото
-        if (currDiv) currDiv.style.display = 'none';
-        selectedCaseCurrency = 'gold';
-    } else {
-        if (currDiv) currDiv.style.display = 'none';
-        selectedCaseCurrency = 'silver';
     }
 
     // Подарки из CASE_GIFTS с процентами
@@ -1678,13 +1666,96 @@ function selectCase(type) {
     }
 
     checkCaseBalance();
-    const balEl = $id('case-modal-balance');
-    if (balEl) {
-        const s = userData.balance.silver || 0;
-        const g = userData.balance.gold   || 0;
-        balEl.textContent = s + ' F серебра  •  ' + g + ' 🟡 золота';
-    }
     modal.style.display = 'flex';
+}
+
+function openCaseAnimation() {
+    const CASE_GIFTS_CONFIG = typeof CASE_GIFTS !== 'undefined' ? CASE_GIFTS : GIFT_SYSTEM.gifts;
+    const weights = CASE_GIFTS_CONFIG.map(g => g.weight || 10);
+    const total   = weights.reduce((a,b) => a+b, 0);
+    let rand = Math.random() * total;
+    let prize = CASE_GIFTS_CONFIG[CASE_GIFTS_CONFIG.length - 1];
+    for (let i = 0; i < CASE_GIFTS_CONFIG.length; i++) {
+        rand -= weights[i];
+        if (rand <= 0) { prize = CASE_GIFTS_CONFIG[i]; break; }
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'case-open-overlay';
+    overlay.style.cssText = [
+        'position:fixed','inset:0','z-index:2000',
+        'background:rgba(0,0,0,0.93)',
+        'display:flex','flex-direction:column',
+        'align-items:center','justify-content:center',
+        'animation:fadeIn 0.3s ease'
+    ].join(';');
+
+    const content = document.createElement('div');
+    content.style.cssText = 'text-align:center;';
+
+    const boxEl = document.createElement('div');
+    boxEl.style.cssText = [
+        'font-size:5rem','line-height:1',
+        'animation:caseShake 0.6s ease',
+        'margin-bottom:24px','filter:drop-shadow(0 0 30px rgba(123,92,255,0.8))'
+    ].join(';');
+    boxEl.textContent = '🎁';
+
+    const opening = document.createElement('div');
+    opening.style.cssText = 'color:#888;font-size:0.9rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;';
+    opening.textContent = 'Открываем...';
+
+    content.appendChild(boxEl);
+    content.appendChild(opening);
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        boxEl.style.animation = 'casePop 0.5s ease forwards';
+        boxEl.innerHTML = typeof giftIcon === 'function' ? giftIcon(prize.type || prize.id, 100) : (prize.emoji || '🎁');
+        opening.textContent = '';
+
+        const prizeLabel = document.createElement('div');
+        prizeLabel.style.cssText = [
+            'color:#fff','font-size:1.3rem','font-weight:900',
+            'margin-bottom:8px','animation:fadeIn 0.4s ease'
+        ].join(';');
+        prizeLabel.textContent = prize.name || 'Подарок';
+
+        const prizeVal = document.createElement('div');
+        prizeVal.style.cssText = [
+            'background:rgba(123,92,255,0.15)',
+            'border:1.5px solid rgba(123,92,255,0.4)',
+            'border-radius:12px','padding:8px 20px',
+            'color:#c4b5fd','font-weight:800','font-size:1rem',
+            'display:inline-block','margin-bottom:24px',
+            'animation:fadeIn 0.5s ease'
+        ].join(';');
+        prizeVal.textContent = '🟡 ' + (prize.value || prize.minValue || 0) + ' золота';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Забрать!';
+        closeBtn.style.cssText = [
+            'padding:14px 40px','border:none','border-radius:14px',
+            'background:linear-gradient(135deg,#7b5cff,#a855f7)',
+            'color:#fff','font-size:1rem','font-weight:800',
+            'cursor:pointer','font-family:inherit',
+            'box-shadow:0 4px 20px rgba(123,92,255,0.5)',
+            'animation:fadeIn 0.6s ease'
+        ].join(';');
+        closeBtn.onclick = () => {
+            overlay.remove();
+            if (typeof showGiftChoiceModal === 'function' && (prize.value || prize.minValue) >= 15) {
+                showGiftChoiceModal(prize, prize.value || prize.minValue);
+            } else if (typeof showSmallWinModal === 'function') {
+                showSmallWinModal(prize.value || prize.minValue || 0);
+            }
+        };
+
+        content.appendChild(prizeLabel);
+        content.appendChild(prizeVal);
+        content.appendChild(closeBtn);
+    }, 1200);
 }
 
 function closeCaseSelectModal() {
@@ -1697,16 +1768,8 @@ function setCaseCurrency(type) {
     selectedCaseCurrency = type;
     const silverBtn = $id('case-currency-silver');
     const goldBtn   = $id('case-currency-gold');
-    if (silverBtn) {
-        silverBtn.style.borderColor = type === 'silver' ? '#7b5cff' : '#2a2a3a';
-        silverBtn.style.background  = type === 'silver' ? 'rgba(123,92,255,0.25)' : '#1a1a2a';
-        silverBtn.style.color       = type === 'silver' ? '#fff' : '#aaa';
-    }
-    if (goldBtn) {
-        goldBtn.style.borderColor = type === 'gold' ? '#fbbf24' : '#2a2a3a';
-        goldBtn.style.background  = type === 'gold' ? 'rgba(251,191,36,0.2)' : '#1a1a2a';
-        goldBtn.style.color       = type === 'gold' ? '#fbbf24' : '#aaa';
-    }
+    if (silverBtn) silverBtn.classList.toggle('active-currency', type === 'silver');
+    if (goldBtn)   goldBtn.classList.toggle('active-currency', type === 'gold');
     checkCaseBalance();
 }
 
@@ -1715,18 +1778,30 @@ function checkCaseBalance() {
     if (!cfg) return;
     const warning = $id('case-balance-warning');
     const btn = $id('case-open-btn');
+    const balEl = $id('case-modal-balance');
+
+    const silver = userData.balance.silver || 0;
+    const gold   = userData.balance.gold   || 0;
+    if (balEl) balEl.innerHTML =
+        '<span style="color:#c4b5fd;">' + silver + ' F</span>' +
+        ' &nbsp;•&nbsp; ' +
+        '<span style="color:#fcd34d;">' + gold + ' 🟡</span>';
+
     if (cfg.free || cfg.strike) {
         if (warning) warning.style.display = 'none';
         if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
         return;
     }
-    const cost = (selectedCaseCurrency === 'gold' && cfg.goldCost) ? cfg.goldCost : cfg.cost;
-    const balance = userData.balance[selectedCaseCurrency] || 0;
+    const currency = selectedCaseCurrency || 'silver';
+    const cost = currency === 'gold' ? (cfg.goldCost || 0) : (cfg.silverCost || 0);
+    const balance = currency === 'gold' ? gold : silver;
     const enough = balance >= cost;
-    if (warning) warning.style.display = enough ? 'none' : 'block';
-    if (btn) { btn.disabled = !enough; btn.style.opacity = enough ? '1' : '0.5'; }
+    if (warning) {
+        warning.style.display = enough ? 'none' : 'block';
+        warning.textContent = 'Недостаточно ' + (currency === 'gold' ? '🟡 золота' : 'F серебра') + '!';
+    }
+    if (btn) { btn.disabled = !enough; btn.style.opacity = enough ? '1' : '0.45'; }
 }
-
 
 function showCasesList() {
     const listPanel = $id('cases-list-panel');
@@ -1739,28 +1814,34 @@ function confirmOpenCase() {
     const cfg = CASE_CONFIG[selectedCaseType];
     if (!cfg) return;
 
-    // Проверки
     if (cfg.strike) {
         const streak = userData.depositStreak || 0;
-        if (streak < 7) { alert(`Нужно ${7 - streak} дней подряд депозита!`); return; }
-    }
-    if (cfg.free) {
-        const today = new Date().toDateString();
-        if (userData.lastDailyCase === today) { alert('Ежедневный кейс уже получен сегодня!'); return; }
-        userData.lastDailyCase = today;
-    }
-    if (!cfg.free && !cfg.strike) {
-        const cost = (selectedCaseCurrency === 'gold' && cfg.goldCost) ? cfg.goldCost : cfg.cost;
-        if ((userData.balance[selectedCaseCurrency]||0) < cost) { alert('Недостаточно средств!'); return; }
-        userData.balance[selectedCaseCurrency] -= cost;
-        userData.taskProgress=userData.taskProgress||{}; userData.taskProgress.casesOpened=(userData.taskProgress.casesOpened||0)+1;
-        saveUserData(); updateBalance(); updateTasks();
+        if (streak < 7) { showNotif('Нужно ' + (7-streak) + ' дней подряд депозита!', '#f87171'); return; }
     }
 
-    // Скрываем панель, открываем кейс
+    if (cfg.free) {
+        const today = new Date().toDateString();
+        if (userData.lastDailyCase === today) { showNotif('Ежедневный кейс уже получен!', '#f87171'); return; }
+        userData.lastDailyCase = today;
+    }
+
+    if (!cfg.free && !cfg.strike) {
+        const currency = selectedCaseCurrency || 'silver';
+        const cost = currency === 'gold' ? (cfg.goldCost || 0) : (cfg.silverCost || 0);
+        const balance = userData.balance[currency] || 0;
+        if (balance < cost) {
+            showNotif('Недостаточно ' + (currency === 'gold' ? '🟡 золота' : 'F серебра') + '!', '#f87171');
+            return;
+        }
+        userData.balance[currency] -= cost;
+    }
+
     closeCaseSelectModal();
-    openCase(selectedCaseType);
+    openCaseAnimation();
+    saveUserData();
+    updateBalance();
 }
+
 
 function openCase(type) {
     pendingCaseType = type;
