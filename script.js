@@ -1797,8 +1797,10 @@ function confirmOpenCaseModal() { confirmOpenCase(); }
 function checkCaseBalance() {
     const cfg = CASE_CONFIG[selectedCaseType];
     if (!cfg) return;
-    const warning = $id('case-balance-warning-modal') || $id('case-balance-warning');
-    const btn = $id('case-open-btn-modal') || $id('case-open-btn');
+    const warning  = $id('case-balance-warning-modal') || $id('case-balance-warning');
+    const warning2 = $id('case-balance-warning');
+    const btn  = $id('case-open-btn-modal');
+    const btn2 = $id('case-open-btn');
     const balEl = $id('case-modal-balance');
 
     const silver = userData.balance.silver || 0;
@@ -1809,19 +1811,22 @@ function checkCaseBalance() {
         '<span style="color:#fcd34d;">' + gold + ' 🟡</span>';
 
     if (cfg.free || cfg.strike) {
-        if (warning) warning.style.display = 'none';
-        if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+        if (warning)  warning.style.display  = 'none';
+        if (warning2) warning2.style.display = 'none';
+        [btn, btn2].forEach(b => { if (b) { b.disabled = false; b.style.opacity = '1'; } });
         return;
     }
     const currency = selectedCaseCurrency || 'silver';
-    const cost = currency === 'gold' ? (cfg.goldCost || 0) : (cfg.silverCost || 0);
+    const cost    = currency === 'gold' ? (cfg.goldCost || 0) : (cfg.silverCost || 0);
     const balance = currency === 'gold' ? gold : silver;
-    const enough = balance >= cost;
-    if (warning) {
-        warning.style.display = enough ? 'none' : 'block';
-        warning.textContent = 'Недостаточно ' + (currency === 'gold' ? '🟡 золота' : 'F серебра') + '!';
-    }
-    if (btn) { btn.disabled = !enough; btn.style.opacity = enough ? '1' : '0.45'; }
+    const enough  = balance >= cost;
+    const warnText = 'Недостаточно ' + (currency === 'gold' ? '🟡 золота' : 'F серебра') + '!';
+    [warning, warning2].forEach(w => {
+        if (!w) return;
+        w.style.display = enough ? 'none' : 'block';
+        w.textContent   = warnText;
+    });
+    [btn, btn2].forEach(b => { if (b) { b.disabled = !enough; b.style.opacity = enough ? '1' : '0.45'; } });
 }
 
 function showCasesList() {
@@ -1857,8 +1862,9 @@ function confirmOpenCase() {
         userData.balance[currency] -= cost;
     }
 
+    const caseTypeToOpen = selectedCaseType;
     closeCaseSelectModal();
-    openCaseAnimation();
+    openCase(caseTypeToOpen);
     saveUserData();
     updateBalance();
 }
