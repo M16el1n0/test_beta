@@ -4349,7 +4349,7 @@ body[style*="background"] {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     display: block !important;
-    padding-top: 64px !important;
+    padding-top: 0 !important;
     box-sizing: border-box !important;
 }
 

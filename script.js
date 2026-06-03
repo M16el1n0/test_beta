@@ -357,6 +357,10 @@ function selectGame(game) {
     if (cardsList) cardsList.style.display = 'none';
     if (title) title.style.display = 'none';
 
+    // Скрываем шапку
+    const header = document.querySelector('.header');
+    if (header) header.style.display = 'none';
+
     // Скрываем все game-container
     document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
 
@@ -365,6 +369,7 @@ function selectGame(game) {
     if (target) {
         target.style.display = 'block';
         target.classList.add('game-fullscreen');
+        target.style.paddingTop = '0';
     }
 
     // Блокируем скролл body, скрываем навигацию, показываем кнопку назад
@@ -380,6 +385,7 @@ function backToGamesList() {
     document.querySelectorAll('.game-container').forEach(el => {
         el.style.display = 'none';
         el.classList.remove('game-fullscreen');
+        el.style.paddingTop = '';
     });
 
     // Показываем список игр и заголовок
@@ -388,6 +394,10 @@ function backToGamesList() {
     const title = gameSection ? gameSection.querySelector('.game-section-title') : null;
     if (cardsList) cardsList.style.display = '';
     if (title) title.style.display = '';
+
+    // Возвращаем шапку
+    const header = document.querySelector('.header');
+    if (header) header.style.display = '';
 
     // Разблокируем скролл body, возвращаем навигацию
     document.body.classList.remove('game-open');
