@@ -1762,22 +1762,33 @@ function closeCaseSelectModal() {
     const modal = $id('case-select-modal');
     if (modal) modal.style.display = 'none';
     selectedCaseType = null;
+    selectedCaseCurrency = 'silver';
 }
 
 function setCaseCurrency(type) {
+    setCaseCurrencyModal(type);
+}
+
+function setCaseCurrencyModal(type) {
     selectedCaseCurrency = type;
-    const silverBtn = $id('case-currency-silver');
-    const goldBtn   = $id('case-currency-gold');
-    if (silverBtn) silverBtn.classList.toggle('active-currency', type === 'silver');
-    if (goldBtn)   goldBtn.classList.toggle('active-currency', type === 'gold');
+    const silverBtn = $id('case-currency-silver-modal');
+    const goldBtn   = $id('case-currency-gold-modal');
+    if (silverBtn) { silverBtn.classList.toggle('active', type === 'silver'); }
+    if (goldBtn)   { goldBtn.classList.toggle('active', type === 'gold'); }
+    const silverBtnOld = $id('case-currency-silver');
+    const goldBtnOld   = $id('case-currency-gold');
+    if (silverBtnOld) silverBtnOld.classList.toggle('active', type === 'silver');
+    if (goldBtnOld)   goldBtnOld.classList.toggle('active', type === 'gold');
     checkCaseBalance();
 }
+
+function confirmOpenCaseModal() { confirmOpenCase(); }
 
 function checkCaseBalance() {
     const cfg = CASE_CONFIG[selectedCaseType];
     if (!cfg) return;
-    const warning = $id('case-balance-warning');
-    const btn = $id('case-open-btn');
+    const warning = $id('case-balance-warning-modal') || $id('case-balance-warning');
+    const btn = $id('case-open-btn-modal') || $id('case-open-btn');
     const balEl = $id('case-modal-balance');
 
     const silver = userData.balance.silver || 0;

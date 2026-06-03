@@ -4433,3 +4433,221 @@ body.game-open {
     transition: opacity 0.2s, transform 0.15s;
 }
 #case-open-btn:active { transform: scale(0.97); }
+
+/* ===== НОВОЕ МЕНЮ ИГР ===== */
+.game-menu-header {
+    padding: 20px 16px 4px;
+    text-align: center;
+}
+.game-menu-title {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #7b5cff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+.game-menu-sub {
+    font-size: 0.72rem;
+    color: #3a3a55;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.game-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 14px 100px;
+}
+.game-cards-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* Базовая карточка */
+.game-big-card {
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.22s;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    -webkit-tap-highlight-color: transparent;
+}
+.game-big-card:active { transform: scale(0.96); }
+
+/* Половинки */
+.game-big-card--half {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Фоновый слой (цвет у каждой игры свой) */
+.game-big-card__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.game-big-card__glow {
+    position: absolute;
+    z-index: 1;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+/* РАКЕТКА */
+.game-big-card--rocket .game-big-card__bg {
+    background: linear-gradient(145deg, #16102e 0%, #1e1040 50%, #0f0f1e 100%);
+}
+.game-big-card--rocket .game-big-card__glow {
+    width: 180px; height: 180px;
+    top: -40px; right: -30px;
+    background: radial-gradient(circle, rgba(123,92,255,0.7), transparent 70%);
+}
+.game-big-card--rocket {
+    border-color: rgba(123,92,255,0.3);
+    box-shadow: 0 8px 32px rgba(123,92,255,0.18);
+}
+.game-big-card--rocket:active {
+    box-shadow: 0 2px 12px rgba(123,92,255,0.3);
+}
+
+/* МИНЫ */
+.game-big-card--mines .game-big-card__bg {
+    background: linear-gradient(145deg, #0d1d10 0%, #122016 50%, #0a130a 100%);
+}
+.game-big-card--mines .game-big-card__glow {
+    width: 140px; height: 140px;
+    top: -20px; right: -20px;
+    background: radial-gradient(circle, rgba(34,197,94,0.65), transparent 70%);
+}
+.game-big-card--mines {
+    border-color: rgba(34,197,94,0.28);
+    box-shadow: 0 6px 24px rgba(34,197,94,0.14);
+}
+
+/* КЕЙСЫ */
+.game-big-card--cases .game-big-card__bg {
+    background: linear-gradient(145deg, #1e1505 0%, #241800 50%, #13110a 100%);
+}
+.game-big-card--cases .game-big-card__glow {
+    width: 140px; height: 140px;
+    top: -20px; right: -20px;
+    background: radial-gradient(circle, rgba(251,191,36,0.6), transparent 70%);
+}
+.game-big-card--cases {
+    border-color: rgba(251,191,36,0.28);
+    box-shadow: 0 6px 24px rgba(251,191,36,0.12);
+}
+
+/* Внутренний контент — горизонтальный (ракетка) */
+.game-big-card__inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 20px;
+}
+
+/* Вертикальный (мины, кейсы) */
+.game-big-card__inner--col {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 26px 14px 20px;
+    gap: 8px;
+}
+
+.game-big-card__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.game-big-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.game-big-card__name {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.game-big-card--half .game-big-card__name {
+    font-size: 1.05rem;
+}
+
+.game-big-card__desc {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+.game-big-card--half .game-big-card__desc {
+    font-size: 0.65rem;
+    margin-bottom: 8px;
+}
+
+.game-big-card__online {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.game-big-card__inner--col .game-big-card__online {
+    justify-content: center;
+}
+
+.game-big-card__dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #7b5cff;
+    box-shadow: 0 0 6px rgba(123,92,255,0.8);
+    animation: dotPulse 2s infinite;
+    flex-shrink: 0;
+}
+.game-big-card__dot--green {
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34,197,94,0.8);
+}
+.game-big-card__dot--gold {
+    background: #fbbf24;
+    box-shadow: 0 0 6px rgba(251,191,36,0.8);
+}
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.game-big-card__arrow {
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.2);
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Верхняя полоска-блик */
+.game-big-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    z-index: 3;
+}
