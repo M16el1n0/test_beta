@@ -50,20 +50,21 @@
     
     <div class="content">
         <div id="game-section" class="content-section">
-            <div class="game-menu-header">
-                <div class="game-menu-title">ИГРЫ</div>
-                <div class="game-menu-sub">Выбери и начни</div>
+            <div style="padding:18px 16px 8px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:800;color:#7b5cff;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;">ИГРЫ</div>
+                <div style="font-size:0.7rem;color:#333;font-weight:500;">Выбери и начни</div>
             </div>
 
-            <!-- Новые большие карточки игр -->
-            <div class="game-cards-list">
+            <div class="game-cards-list" style="display:flex;flex-direction:column;gap:12px;padding:8px 14px 100px;">
 
-                <!-- РАКЕТКА — широкая -->
-                <div class="game-big-card game-big-card--rocket" onclick="selectGame('rocket')">
-                    <div class="game-big-card__bg"></div>
-                    <div class="game-big-card__glow"></div>
-                    <div class="game-big-card__inner">
-                        <div class="game-big-card__icon">
+                <!-- РАКЕТКА -->
+                <div onclick="selectGame('rocket')" style="position:relative;border-radius:22px;overflow:hidden;cursor:pointer;border:1.5px solid rgba(123,92,255,0.35);box-shadow:0 8px 32px rgba(123,92,255,0.2);background:linear-gradient(135deg,#16102e 0%,#1e1040 60%,#0f0f1e 100%);-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+                    <!-- свечение -->
+                    <div style="position:absolute;top:-40px;right:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,92,255,0.5),transparent 70%);filter:blur(30px);pointer-events:none;"></div>
+                    <!-- блик сверху -->
+                    <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);"></div>
+                    <div style="position:relative;z-index:2;display:flex;align-items:center;gap:18px;padding:22px 20px;">
+                        <div style="flex-shrink:0;">
                             <svg style="image-rendering:pixelated;width:72px;height:72px;filter:drop-shadow(0 0 14px rgba(255,120,40,0.9))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="7" y="0" width="2" height="1" fill="#ff4444"/><rect x="6" y="1" width="4" height="1" fill="#ff6666"/><rect x="5" y="2" width="6" height="1" fill="#ff8888"/>
                                 <rect x="5" y="3" width="6" height="1" fill="#eeeeee"/><rect x="5" y="4" width="6" height="1" fill="#dddddd"/>
@@ -79,69 +80,78 @@
                                 <rect x="6" y="15" width="4" height="1" fill="#ff4400"/>
                             </svg>
                         </div>
-                        <div class="game-big-card__info">
-                            <div class="game-big-card__name">Ракетка</div>
-                            <div class="game-big-card__desc">Лети выше — забирай больше</div>
-                            <div class="game-big-card__online"><span class="game-big-card__dot"></span><span id="online-rocket">— ОНЛАЙН</span></div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:1.3rem;font-weight:900;color:#fff;letter-spacing:0.5px;margin-bottom:5px;text-shadow:0 2px 12px rgba(0,0,0,0.6);">Ракетка</div>
+                            <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);margin-bottom:10px;">Лети выше — забирай больше</div>
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#7b5cff;box-shadow:0 0 8px rgba(123,92,255,1);flex-shrink:0;display:inline-block;"></span>
+                                <span id="online-rocket" style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:0.5px;text-transform:uppercase;">— ОНЛАЙН</span>
+                            </div>
                         </div>
-                        <div class="game-big-card__arrow">›</div>
+                        <div style="font-size:1.6rem;color:rgba(255,255,255,0.2);font-weight:200;flex-shrink:0;">›</div>
                     </div>
                 </div>
 
-                <!-- МИНЫ + КЕЙСЫ — два в ряд -->
-                <div class="game-cards-row">
+                <!-- МИНЫ + КЕЙСЫ рядом -->
+                <div style="display:flex;gap:12px;">
 
-                    <div class="game-big-card game-big-card--mines game-big-card--half" onclick="selectGame('mines')">
-                        <div class="game-big-card__bg"></div>
-                        <div class="game-big-card__glow"></div>
-                        <div class="game-big-card__inner game-big-card__inner--col">
-                            <div class="game-big-card__icon">
-                                <svg style="image-rendering:pixelated;width:64px;height:64px;filter:drop-shadow(0 0 12px rgba(60,210,60,0.9))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="8" y="0" width="1" height="1" fill="#ffee00"/><rect x="7" y="0" width="1" height="1" fill="#ff8800" opacity="0.9"/><rect x="9" y="0" width="1" height="1" fill="#ffcc00" opacity="0.7"/>
-                                    <rect x="8" y="1" width="1" height="1" fill="#eecc00"/><rect x="7" y="2" width="2" height="1" fill="#cc9900"/><rect x="7" y="3" width="2" height="1" fill="#886600"/>
-                                    <rect x="6" y="4" width="4" height="1" fill="#33aa33"/>
-                                    <rect x="5" y="5" width="6" height="1" fill="#33bb33"/><rect x="4" y="6" width="8" height="1" fill="#44cc44"/>
-                                    <rect x="4" y="7" width="8" height="1" fill="#55dd55"/><rect x="4" y="8" width="8" height="1" fill="#44cc44"/>
-                                    <rect x="4" y="9" width="8" height="1" fill="#33bb33"/><rect x="5" y="10" width="6" height="1" fill="#229922"/>
-                                    <rect x="6" y="11" width="4" height="1" fill="#187018"/>
-                                    <rect x="5" y="6" width="2" height="1" fill="#88ff88"/><rect x="5" y="7" width="1" height="1" fill="#77ee77"/>
-                                    <rect x="9" y="8" width="2" height="1" fill="#1a8818"/><rect x="9" y="9" width="2" height="1" fill="#116611"/>
-                                    <rect x="7" y="7" width="2" height="3" fill="#115511"/><rect x="6" y="8" width="4" height="1" fill="#115511"/>
-                                </svg>
+                    <!-- МИНЫ -->
+                    <div onclick="selectGame('mines')" style="flex:1;position:relative;border-radius:22px;overflow:hidden;cursor:pointer;border:1.5px solid rgba(34,197,94,0.3);box-shadow:0 6px 24px rgba(34,197,94,0.15);background:linear-gradient(145deg,#0d1d10 0%,#122016 60%,#0a130a 100%);-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+                        <div style="position:absolute;top:-20px;right:-20px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,0.5),transparent 70%);filter:blur(25px);pointer-events:none;"></div>
+                        <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);"></div>
+                        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px 20px;gap:8px;">
+                            <svg style="image-rendering:pixelated;width:64px;height:64px;filter:drop-shadow(0 0 12px rgba(60,210,60,0.9))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="0" width="1" height="1" fill="#ffee00"/><rect x="7" y="0" width="1" height="1" fill="#ff8800" opacity="0.9"/><rect x="9" y="0" width="1" height="1" fill="#ffcc00" opacity="0.7"/>
+                                <rect x="8" y="1" width="1" height="1" fill="#eecc00"/><rect x="7" y="2" width="2" height="1" fill="#cc9900"/><rect x="7" y="3" width="2" height="1" fill="#886600"/>
+                                <rect x="6" y="4" width="4" height="1" fill="#33aa33"/>
+                                <rect x="5" y="5" width="6" height="1" fill="#33bb33"/><rect x="4" y="6" width="8" height="1" fill="#44cc44"/>
+                                <rect x="4" y="7" width="8" height="1" fill="#55dd55"/><rect x="4" y="8" width="8" height="1" fill="#44cc44"/>
+                                <rect x="4" y="9" width="8" height="1" fill="#33bb33"/><rect x="5" y="10" width="6" height="1" fill="#229922"/>
+                                <rect x="6" y="11" width="4" height="1" fill="#187018"/>
+                                <rect x="5" y="6" width="2" height="1" fill="#88ff88"/><rect x="5" y="7" width="1" height="1" fill="#77ee77"/>
+                                <rect x="9" y="8" width="2" height="1" fill="#1a8818"/><rect x="9" y="9" width="2" height="1" fill="#116611"/>
+                                <rect x="7" y="7" width="2" height="3" fill="#115511"/><rect x="6" y="8" width="4" height="1" fill="#115511"/>
+                            </svg>
+                            <div style="font-size:1.1rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.6);">Мины</div>
+                            <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">Избегай мин</div>
+                            <div style="display:flex;align-items:center;gap:5px;justify-content:center;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,1);flex-shrink:0;display:inline-block;"></span>
+                                <span id="online-mines" style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">—</span>
                             </div>
-                            <div class="game-big-card__name">Мины</div>
-                            <div class="game-big-card__desc">Избегай мин</div>
-                            <div class="game-big-card__online"><span class="game-big-card__dot game-big-card__dot--green"></span><span id="online-mines">—</span></div>
                         </div>
                     </div>
 
-                    <div class="game-big-card game-big-card--cases game-big-card--half" onclick="selectGame('cases')">
-                        <div class="game-big-card__bg"></div>
-                        <div class="game-big-card__glow"></div>
-                        <div class="game-big-card__inner game-big-card__inner--col">
-                            <div class="game-big-card__icon">
-                                <svg style="image-rendering:pixelated;width:64px;height:64px;filter:drop-shadow(0 0 12px rgba(255,200,40,0.9))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="5" y="2" width="6" height="1" fill="#cc8800"/><rect x="4" y="3" width="1" height="2" fill="#cc8800"/><rect x="11" y="3" width="1" height="2" fill="#cc8800"/><rect x="5" y="3" width="6" height="1" fill="#111111"/>
-                                    <rect x="2" y="5" width="12" height="3" fill="#ffcc44"/><rect x="2" y="5" width="1" height="3" fill="#bb8800"/><rect x="13" y="5" width="1" height="3" fill="#bb8800"/>
-                                    <rect x="3" y="5" width="5" height="1" fill="#ffee99"/><rect x="2" y="8" width="12" height="1" fill="#996600"/>
-                                    <rect x="7" y="7" width="2" height="2" fill="#ffdd44"/><rect x="7" y="8" width="2" height="1" fill="#ffaa00"/>
-                                    <rect x="2" y="9" width="12" height="4" fill="#e8a820"/><rect x="2" y="9" width="1" height="4" fill="#aa7700"/><rect x="13" y="9" width="1" height="4" fill="#aa7700"/>
-                                    <rect x="2" y="13" width="12" height="1" fill="#996600"/><rect x="2" y="14" width="12" height="1" fill="#774400"/>
-                                    <rect x="3" y="5" width="1" height="1" fill="#ffff99"/><rect x="12" y="5" width="1" height="1" fill="#ffff99"/>
-                                    <rect x="3" y="13" width="1" height="1" fill="#ffff99"/><rect x="12" y="13" width="1" height="1" fill="#ffff99"/>
-                                    <rect x="7" y="10" width="2" height="1" fill="#fff8cc"/><rect x="9" y="10" width="1" height="1" fill="#fff8cc"/>
-                                    <rect x="9" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="12" width="1" height="1" fill="#fff8cc"/>
-                                </svg>
+                    <!-- КЕЙСЫ -->
+                    <div onclick="selectGame('cases')" style="flex:1;position:relative;border-radius:22px;overflow:hidden;cursor:pointer;border:1.5px solid rgba(251,191,36,0.3);box-shadow:0 6px 24px rgba(251,191,36,0.13);background:linear-gradient(145deg,#1c1400 0%,#231800 60%,#130f00 100%);-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+                        <div style="position:absolute;top:-20px;right:-20px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,0.5),transparent 70%);filter:blur(25px);pointer-events:none;"></div>
+                        <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);"></div>
+                        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px 20px;gap:8px;">
+                            <svg style="image-rendering:pixelated;width:64px;height:64px;filter:drop-shadow(0 0 12px rgba(255,200,40,0.9))" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="5" y="2" width="6" height="1" fill="#cc8800"/><rect x="4" y="3" width="1" height="2" fill="#cc8800"/><rect x="11" y="3" width="1" height="2" fill="#cc8800"/><rect x="5" y="3" width="6" height="1" fill="#111111"/>
+                                <rect x="2" y="5" width="12" height="3" fill="#ffcc44"/><rect x="2" y="5" width="1" height="3" fill="#bb8800"/><rect x="13" y="5" width="1" height="3" fill="#bb8800"/>
+                                <rect x="3" y="5" width="5" height="1" fill="#ffee99"/><rect x="2" y="8" width="12" height="1" fill="#996600"/>
+                                <rect x="7" y="7" width="2" height="2" fill="#ffdd44"/><rect x="7" y="8" width="2" height="1" fill="#ffaa00"/>
+                                <rect x="2" y="9" width="12" height="4" fill="#e8a820"/><rect x="2" y="9" width="1" height="4" fill="#aa7700"/><rect x="13" y="9" width="1" height="4" fill="#aa7700"/>
+                                <rect x="2" y="13" width="12" height="1" fill="#996600"/><rect x="2" y="14" width="12" height="1" fill="#774400"/>
+                                <rect x="3" y="5" width="1" height="1" fill="#ffff99"/><rect x="12" y="5" width="1" height="1" fill="#ffff99"/>
+                                <rect x="3" y="13" width="1" height="1" fill="#ffff99"/><rect x="12" y="13" width="1" height="1" fill="#ffff99"/>
+                                <rect x="7" y="10" width="2" height="1" fill="#fff8cc"/><rect x="9" y="10" width="1" height="1" fill="#fff8cc"/>
+                                <rect x="9" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="11" width="1" height="1" fill="#fff8cc"/><rect x="8" y="12" width="1" height="1" fill="#fff8cc"/>
+                            </svg>
+                            <div style="font-size:1.1rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.6);">Кейсы</div>
+                            <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">Открой подарок</div>
+                            <div style="display:flex;align-items:center;gap:5px;justify-content:center;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,1);flex-shrink:0;display:inline-block;"></span>
+                                <span id="online-cases" style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">—</span>
                             </div>
-                            <div class="game-big-card__name">Кейсы</div>
-                            <div class="game-big-card__desc">Открой подарок</div>
-                            <div class="game-big-card__online"><span class="game-big-card__dot game-big-card__dot--gold"></span><span id="online-cases">—</span></div>
                         </div>
                     </div>
 
                 </div>
 
             </div>
+
+
 
 
 
