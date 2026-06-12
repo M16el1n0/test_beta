@@ -2586,7 +2586,7 @@ function cancelUsdtInvoice() {
 }
 
 // ═══ ОПЛАТА ЧЕРЕЗ TELEGRAM STARS (нативный WebApp Invoice) ═══
-const BACKEND_URL = 'https://web-production-42c21.up.railway.app';
+const BACKEND_URL = 'https://ДОМЕН_КЕНТА_ТУТ';
 async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
