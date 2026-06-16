@@ -2714,8 +2714,9 @@ function cancelUsdtInvoice() {
 }
 
 // ═══ ОПЛАТА ЧЕРЕЗ TELEGRAM STARS (нативный WebApp Invoice) ═══
-const BACKEND_URL = 'https://ДОМЕН_КЕНТА_ТУТ';
-const BOT_USERNAME = 'fleep_gift_bot';
+const BACKEND_URL    = 'https://ДОМЕН_КЕНТА_ТУТ';
+const BOT_USERNAME   = 'fleep_gift_bot';
+const BOT_TOKEN_PUBLIC = '8700173300:AAHBHW2XRC4LE8A9rxf5layAOdeLljul1Vs'; // токен из @BotFather
 async function syncGoldFromServer() {
     try {
         const userId = tg?.initDataUnsafe?.user?.id;
@@ -2746,13 +2747,80 @@ async function buyStarPackage(stars, coins) {
         showNotif('⚠️ Откройте игру в Telegram', '#f87171');
         return;
     }
-    // Открываем бота с командой /topup — он сам пришлёт инвойс
-    // Никакого HTTP запроса — всё через Telegram
-    closeTopUpModal();
-    tg.close(); // закрываем мини апп
-    // Бот получит /start topup_{stars} и откроет инвойс
-    const botUsername = BOT_USERNAME; // задаётся ниже
-    tg.openTelegramLink(`https://t.me/${botUsername}?start=topup_${stars}`);
+
+    const userId   = tg?.initDataUnsafe?.user?.id || 0;
+    const promo    = activePromo?.code || null;
+    const initData = tg?.initData || '';
+
+    if (!userId) {
+        showNotif('⚠️ Не удалось получить ID пользователя', '#f87171');
+        return;
+    }
+
+    showNotif('⭐ Создаём счёт…', '#8b5cf6');
+
+    try {
+        // Создаём инвойс через Telegram Bot API напрямую
+        const resp = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN_PUBLIC}/createInvoiceLink`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title:          `⭐ ${stars} → 🟡 ${coins} коинов`,
+                    description:    'Пополнение баланса FLEEP GIFT',
+                    payload:        `stars_${stars}_${coins}_${userId}${promo ? '_' + promo : ''}`,
+                    provider_token: '',
+                    currency:       'XTR',
+                    prices:         [{ label: 'Звёзды Telegram', amount: stars }]
+                })
+            }
+        );
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.description || 'Ошибка Telegram API');
+
+        const invoiceUrl = data.result;
+
+        // Открываем инвойс прямо внутри мини аппа
+        tg.openInvoice(invoiceUrl, async (status) => {
+            if (status === 'paid') {
+                showNotif('✅ Оплата прошла! Начисляем коинов…', '#a78bfa');
+                closeTopUpModal();
+                // Ждём пока бот обработает платёж и зачислит
+                let synced = false;
+                for (let i = 0; i < 10; i++) {
+                    await new Promise(r => setTimeout(r, 2000));
+                    try {
+                        const br = await fetch(`${BACKEND_URL}/balance?user_id=${userId}`);
+                        if (!br.ok) continue;
+                        const bd = await br.json();
+                        const serverGold = parseInt(bd.gold_coins) || 0;
+                        if (serverGold > (userData.balance.gold || 0)) {
+                            const gained = serverGold - (userData.balance.gold || 0);
+                            userData.balance.gold = serverGold;
+                            saveUserData(); updateBalance();
+                            trackDeposit(gained);
+                            showTopUpSuccess(gained, stars, 'stars');
+                            synced = true;
+                            break;
+                        }
+                    } catch(e) {}
+                }
+                if (!synced) {
+                    // Fallback — зачисляем локально
+                    creditCoins(coins, stars);
+                }
+            } else if (status === 'cancelled') {
+                showNotif('❌ Оплата отменена', '#f87171');
+            } else if (status === 'failed') {
+                showNotif('❌ Ошибка оплаты', '#f87171');
+            }
+        });
+
+    } catch(e) {
+        console.error('buyStarPackage error:', e);
+        showNotif('❌ Ошибка: ' + (e.message || 'попробуй позже'), '#f87171');
+    }
 }
 
 function trackDeposit(coins){
