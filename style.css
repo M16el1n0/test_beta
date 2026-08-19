@@ -1,5 +1,3 @@
-@import url('https://fonts.cdnfonts.com/css/bounded');
-
 /* ═══ MEGA FIX: FORCE DARK - NO WHITE BACKGROUNDS ═══ */
 /* ═══ INVENTORY DARK FORCE ═══ */
 #inventory-section,
@@ -753,7 +751,8 @@ body[style*="background"] {
     background-position: center;
     padding: 12px 20px;
     position: fixed;
-    bottom: 18px;
+    /* iOS: поднимаем плавающее меню над домашней полосой iPhone (safe-area). На устройствах без выреза env()=0 → прежние 18px. */
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     width: 92%;
@@ -2407,8 +2406,7 @@ body[style*="background"] {
     height: 32px;
     margin-bottom: 8px;
     object-fit: contain;
-    mix-blend-mode: screen;
-    filter: invert(1);
+    opacity: 0.55;
 }
 
 /* Active nav icon (filled version) */
@@ -2418,8 +2416,6 @@ body[style*="background"] {
     height: 32px;
     margin-bottom: 8px;
     object-fit: contain;
-    mix-blend-mode: screen;
-    filter: invert(1);
 }
 
 .nav-button.active-btn .nav-icon {
@@ -3400,6 +3396,30 @@ body[style*="background"] {
     margin-top: 4px;
 }
 
+/* Вкладка «Вывод» */
+.withdraw-balance-row {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    margin: 6px 0 14px;
+}
+.withdraw-balance-row b { color: #fcd34d; font-weight: 900; }
+.withdraw-input-wrap { margin-bottom: 8px; }
+.withdraw-preview {
+    text-align: center;
+    color: #4ade80;
+    font-weight: 800;
+    font-size: 1rem;
+    margin-top: 8px;
+}
+.withdraw-status {
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-height: 18px;
+    margin-top: 8px;
+}
+
 .usdt-pay-amount {
     background: rgba(34,197,94,0.12);
     border: 1.5px solid rgba(34,197,94,0.4);
@@ -4017,118 +4037,211 @@ body[style*="background"] {
 
 /* Задания — делаем стат-чипы в стиле инвентаря */
 .task-card-prf {
-    background: linear-gradient(145deg, #13131f, #1a1a2e);
-    border: 1px solid rgba(123,92,255,0.2);
-    border-radius: 16px;
-    padding: 14px;
+    background: linear-gradient(150deg, #191826 0%, #14131f 60%, #17141f 100%);
+    border: 1px solid rgba(123,92,255,0.16);
+    border-radius: 18px;
+    padding: 15px 15px 15px 16px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 .task-card-prf::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #7b5cff, #a855f7);
-    opacity: 0.5;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #7b5cff, #a855f7);
+    border-radius: 4px 0 0 4px;
 }
-.task-card-prf.done::before {
-    background: linear-gradient(90deg, #4ade80, #22c55e);
+.task-card-prf::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 0% 0%, rgba(123,92,255,0.10), transparent 55%);
+    pointer-events: none;
 }
+.task-card-prf:active { transform: scale(0.99); }
+.task-card-prf.done,
+.task-card-prf.task-done {
+    border-color: rgba(74,222,128,0.35);
+    box-shadow: 0 6px 22px rgba(34,197,94,0.14), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.task-card-prf.done::before,
+.task-card-prf.task-done::before {
+    background: linear-gradient(180deg, #4ade80, #22c55e);
+}
+.task-card-prf.done::after,
+.task-card-prf.task-done::after {
+    background: radial-gradient(120% 90% at 0% 0%, rgba(74,222,128,0.12), transparent 55%);
+}
+
 .task-card-ico {
-    font-size: 1.8rem;
-    width: 44px;
-    height: 44px;
+    font-size: 1.7rem;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(123,92,255,0.12);
-    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(123,92,255,0.22), rgba(168,85,247,0.10));
+    border: 1px solid rgba(168,85,247,0.25);
+    border-radius: 14px;
     flex-shrink: 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 1;
 }
+/* Разноцветные иконки по заданию */
+#task-1 .task-card-ico { background: linear-gradient(145deg, rgba(252,211,77,0.26), rgba(245,158,11,0.10)); border-color: rgba(252,211,77,0.35); }
+#task-2 .task-card-ico { background: linear-gradient(145deg, rgba(239,68,68,0.24), rgba(190,24,24,0.10));  border-color: rgba(239,68,68,0.35); }
+#task-3 .task-card-ico { background: linear-gradient(145deg, rgba(96,165,250,0.24), rgba(37,99,235,0.10));  border-color: rgba(96,165,250,0.35); }
+#task-4 .task-card-ico { background: linear-gradient(145deg, rgba(168,85,247,0.26), rgba(124,58,237,0.10)); border-color: rgba(168,85,247,0.38); }
+
 .task-card-left {
     flex: 1;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
     min-width: 0;
+    position: relative;
+    z-index: 1;
 }
-.task-card-info {
-    flex: 1;
-    min-width: 0;
-}
+.task-card-info { flex: 1; min-width: 0; }
 .task-card-name {
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     font-weight: 800;
-    color: #e0d0ff;
-    margin-bottom: 2px;
+    color: #fff;
+    margin-bottom: 3px;
+    letter-spacing: 0.2px;
 }
 .task-card-desc {
-    font-size: 0.68rem;
-    color: #666;
-    margin-bottom: 6px;
+    font-size: 0.7rem;
+    color: #8a86a0;
+    margin-bottom: 9px;
 }
 .task-card-bar-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 .task-card-bar {
     flex: 1;
-    height: 4px;
+    height: 7px;
     background: rgba(255,255,255,0.07);
-    border-radius: 2px;
+    border-radius: 20px;
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
 }
 .task-card-fill {
     height: 100%;
-    background: linear-gradient(90deg, #7b5cff, #a855f7);
-    border-radius: 2px;
-    transition: width 0.3s;
+    background: linear-gradient(90deg, #7b5cff, #a855f7, #c084fc);
+    background-size: 200% 100%;
+    border-radius: 20px;
+    transition: width 0.5s cubic-bezier(.2,1,.3,1);
+    box-shadow: 0 0 10px rgba(168,85,247,0.6);
+    animation: taskFillShine 2.4s linear infinite;
+}
+@keyframes taskFillShine { 0%{background-position:0% 0} 100%{background-position:200% 0} }
+.task-card-prf.done .task-card-fill,
+.task-card-prf.task-done .task-card-fill {
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    box-shadow: 0 0 10px rgba(34,197,94,0.6);
 }
 .task-card-prog {
-    font-size: 0.62rem;
-    color: #555;
-    font-weight: 700;
+    font-size: 0.66rem;
+    color: #9a96b0;
+    font-weight: 800;
     flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
 }
 .task-card-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 .task-card-rew {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 900;
     color: #fcd34d;
-    background: rgba(252,211,77,0.1);
-    border: 1px solid rgba(252,211,77,0.2);
-    border-radius: 8px;
-    padding: 3px 8px;
+    background: linear-gradient(135deg, rgba(252,211,77,0.16), rgba(245,158,11,0.06));
+    border: 1px solid rgba(252,211,77,0.3);
+    border-radius: 10px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(252,211,77,0.12);
+}
+.task-card-rew-silver {
+    color: #cbd5e1;
+    background: linear-gradient(135deg, rgba(203,213,225,0.16), rgba(148,163,184,0.06));
+    border: 1px solid rgba(203,213,225,0.3);
+    box-shadow: 0 2px 8px rgba(148,163,184,0.12);
+}
+.task-card-rew-nft {
+    color: #e9d5ff;
+    background: linear-gradient(135deg, rgba(168,85,247,0.28), rgba(123,92,255,0.12));
+    border: 1px solid rgba(168,85,247,0.5);
+    box-shadow: 0 2px 12px rgba(168,85,247,0.28);
+    animation: nftRewGlow 1.9s ease-in-out infinite;
+}
+@keyframes nftRewGlow { 0%,100%{box-shadow:0 2px 10px rgba(168,85,247,0.25)} 50%{box-shadow:0 2px 20px rgba(168,85,247,0.6)} }
+
+/* Баннер-завлекалка сверху квестов */
+.quest-hero {
+    display: flex; align-items: center; gap: 11px;
+    padding: 12px 13px; margin-bottom: 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(123,92,255,0.10) 55%, rgba(252,211,77,0.10));
+    border: 1px solid rgba(168,85,247,0.35);
+    box-shadow: 0 6px 22px rgba(123,92,255,0.22);
+    position: relative; overflow: hidden;
+}
+.quest-hero::after {
+    content:''; position:absolute; top:-60%; left:-30%; width:50%; height:220%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: rotate(18deg); animation: questShine 3.2s ease-in-out infinite;
+}
+@keyframes questShine { 0%{left:-40%} 60%,100%{left:130%} }
+.quest-hero-emoji { font-size: 1.9rem; filter: drop-shadow(0 2px 6px rgba(168,85,247,0.5)); animation: floatY 2.6s ease-in-out infinite; }
+.quest-hero-txt { flex:1; text-align:left; }
+.quest-hero-title { font-size: 0.9rem; font-weight: 900; color:#fff; }
+.quest-hero-sub { font-size: 0.72rem; color:#c9b8ff; margin-top:1px; }
+.quest-hero-badge {
+    font-size: 0.82rem; font-weight: 900; color:#fff;
+    background: linear-gradient(135deg,#a855f7,#7b5cff);
+    border-radius: 999px; padding: 5px 12px;
+    box-shadow: 0 3px 12px rgba(168,85,247,0.5);
 }
 .task-card-btn {
-    padding: 6px 12px;
-    border-radius: 10px;
+    padding: 8px 16px;
+    border-radius: 11px;
     border: none;
     background: linear-gradient(135deg, #7b5cff, #a855f7);
     color: #fff;
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 800;
+    letter-spacing: 0.3px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    box-shadow: 0 4px 14px rgba(123,92,255,0.4);
+    transition: transform .15s ease, opacity .2s, box-shadow .2s;
 }
+.task-card-btn:not(:disabled) { animation: taskBtnPulse 1.8s ease-in-out infinite; }
+@keyframes taskBtnPulse { 0%,100%{box-shadow:0 4px 14px rgba(123,92,255,0.4)} 50%{box-shadow:0 4px 22px rgba(168,85,247,0.75)} }
+.task-card-btn:not(:disabled):active { transform: scale(0.94); }
 .task-card-btn:disabled {
-    background: #1a1a2a;
-    border: 1px solid #2a2a3a;
-    color: #444;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #4a4a58;
     cursor: not-allowed;
+    box-shadow: none;
+    animation: none;
 }
-.task-card-btn:not(:disabled):hover { opacity: 0.85; }
 
 /* Инвентарь — стат-чипы в стиле профиля */
 .inv-stat-chip {
@@ -4349,7 +4462,7 @@ body[style*="background"] {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     display: block !important;
-    padding-top: 0 !important;
+    padding-top: 64px !important;
     box-sizing: border-box !important;
 }
 
@@ -4651,3 +4764,424 @@ body.game-open {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
     z-index: 3;
 }
+
+/* ===== Красивые анимации (доп.) ===== */
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+@keyframes shineSweep { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes popIn { 0%{transform:scale(.7);opacity:0} 60%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
+@keyframes glowPulse { 0%,100%{filter:drop-shadow(0 0 4px rgba(252,211,77,.4))} 50%{filter:drop-shadow(0 0 16px rgba(252,211,77,.9))} }
+@keyframes spinPrizePulse { 0%{transform:scale(.5) rotate(-12deg);opacity:0} 55%{transform:scale(1.15) rotate(4deg);opacity:1} 100%{transform:scale(1) rotate(0)} }
+
+.inv-gift-emoji { animation: floatY 3s ease-in-out infinite; }
+.inv-gift-card { transition: transform .18s ease, box-shadow .18s ease; }
+.inv-gift-card:active { transform: scale(.96); }
+.inv-gift-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.35); }
+.case-odds-emoji { display:inline-block; animation: floatY 3.4s ease-in-out infinite; }
+#new-gift-icon { animation: popIn .5s cubic-bezier(.2,1.3,.4,1) both, glowPulse 2.2s ease-in-out 0.5s infinite; }
+.spin-prize-icon { animation: spinPrizePulse .6s cubic-bezier(.2,1.4,.4,1) both; }
+.case-card { transition: transform .2s ease, box-shadow .2s ease; }
+.case-card:hover { transform: translateY(-4px) scale(1.02); }
+
+/* ===== Цвета новых кейсов (200–5000) ===== */
+.case-top-blue    { background: linear-gradient(135deg, #0c2d5a, #1e4d8c, #2f6fd0); border-bottom:1px solid rgba(96,165,250,0.3); }
+.case-card-blue   { border-color: rgba(96,165,250,0.4); box-shadow:0 4px 20px rgba(59,130,246,0.15); }
+.case-card-blue:hover  { box-shadow:0 8px 32px rgba(59,130,246,0.35); border-color: rgba(96,165,250,0.8); }
+.case-card-blue .case-pixel-icon   { filter: drop-shadow(0 0 10px rgba(96,165,250,0.85)); }
+
+.case-top-violet  { background: linear-gradient(135deg, #3b0a5a, #6b21a8, #a855f7); border-bottom:1px solid rgba(192,132,252,0.3); }
+.case-card-violet { border-color: rgba(192,132,252,0.4); box-shadow:0 4px 20px rgba(168,85,247,0.15); }
+.case-card-violet:hover { box-shadow:0 8px 32px rgba(168,85,247,0.35); border-color: rgba(192,132,252,0.8); }
+.case-card-violet .case-pixel-icon { filter: drop-shadow(0 0 10px rgba(192,132,252,0.85)); }
+
+.case-top-crown   { background: linear-gradient(135deg, #4d3606, #a97a12, #fcd34d); border-bottom:1px solid rgba(252,211,77,0.35); }
+.case-card-crown  { border-color: rgba(252,211,77,0.45); box-shadow:0 4px 20px rgba(252,211,77,0.18); }
+.case-card-crown:hover  { box-shadow:0 8px 34px rgba(252,211,77,0.4); border-color: rgba(252,211,77,0.9); }
+.case-card-crown .case-pixel-icon  { filter: drop-shadow(0 0 12px rgba(252,211,77,0.95)); }
+
+.case-top-teal    { background: linear-gradient(135deg, #063d3a, #0d7a72, #2dd4bf); border-bottom:1px solid rgba(45,212,191,0.3); }
+.case-card-teal   { border-color: rgba(45,212,191,0.4); box-shadow:0 4px 20px rgba(20,184,166,0.15); }
+.case-card-teal:hover  { box-shadow:0 8px 32px rgba(20,184,166,0.35); border-color: rgba(45,212,191,0.85); }
+.case-card-teal .case-pixel-icon   { filter: drop-shadow(0 0 12px rgba(45,212,191,0.9)); }
+
+.case-top-crimson { background: linear-gradient(135deg, #4a0410, #9f1239, #f43f5e); border-bottom:1px solid rgba(244,63,94,0.35); }
+.case-card-crimson{ border-color: rgba(244,63,94,0.45); box-shadow:0 4px 22px rgba(244,63,94,0.2); }
+.case-card-crimson:hover { box-shadow:0 8px 36px rgba(244,63,94,0.45); border-color: rgba(244,63,94,0.95); }
+.case-card-crimson .case-pixel-icon{ filter: drop-shadow(0 0 14px rgba(244,63,94,1)); }
+
+/* ═══ Мины: NFT-обложка клеток ═══ */
+.cell-nft-img {
+    width: 74%;
+    height: 74%;
+    object-fit: contain;
+    opacity: 0.3;
+    filter: grayscale(0.4) brightness(0.8);
+    pointer-events: none;
+    user-select: none;
+    transition: opacity .2s, filter .2s, transform .2s;
+}
+.cell.revealed.safe .cell-nft-img,
+.cell.safe .cell-nft-img {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.06);
+    animation: gemGlow 1s infinite alternate;
+}
+.cell.mine .cell-nft-img { opacity: 0; }
+.cell.mine::after {
+    content: '💣';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    animation: bombShake 0.5s;
+}
+
+/* ═══ Кнопка "История игр" снизу + модалка ═══ */
+.history-open-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 14px;
+    color: #aab;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background .18s, border-color .18s, color .18s;
+}
+.history-open-btn:hover { background: rgba(123,92,255,0.12); border-color: rgba(123,92,255,0.4); color: #fff; }
+.history-open-arrow { margin-left: auto; font-size: 1.3rem; opacity: 0.6; }
+
+.history-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(0,0,0,0.72);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.history-modal.open { display: flex; animation: fadeIn .2s ease; }
+.history-modal-card {
+    width: 100%;
+    max-width: 480px;
+    max-height: 82vh;
+    background: linear-gradient(180deg, #14141f, #0e0e16);
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: none;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .28s cubic-bezier(.2,1,.3,1);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.history-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.history-modal-head h3 { margin: 0; font-size: 1.05rem; color: #fff; }
+.history-modal-close {
+    background: rgba(255,255,255,0.06);
+    border: none;
+    color: #ccc;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.history-modal-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 2px;
+}
+
+/* ═══ Поле мин — крупнее, по центру ═══ */
+.mines-board-new { min-height: 58vh; justify-content: center; }
+.mines-grid-new {
+    max-width: min(86vw, 360px);
+    margin: 0 auto;
+    gap: 10px;
+}
+.mines-grid-new .cell { font-size: 1.9rem; border-radius: 14px; }
+.mines-cashout-btn { max-width: min(86vw, 400px); margin: 6px auto 0; }
+
+
+/* Мины/Ракетка: контролы сверху, "История игр" прижата к самому низу экрана */
+#mines-game.game-fullscreen,
+#rocket-game.game-fullscreen {
+    display: flex !important;
+    flex-direction: column;
+}
+#mines-game .history-open-btn,
+#rocket-game .history-open-btn {
+    margin-top: auto;
+    margin-bottom: calc(10px + env(safe-area-inset-bottom));
+    flex-shrink: 0;
+}
+
+/* 🎉 Празднование дорогого дропа в кейсах */
+@keyframes bwFlash { 0%{opacity:0} 25%{opacity:1} 100%{opacity:0} }
+@keyframes bwRays { 0%{opacity:0;transform:rotate(0) scale(.6)} 20%{opacity:.85} 100%{opacity:0;transform:rotate(160deg) scale(1.25)} }
+@keyframes bwConfetti {
+    0%   { opacity:0; transform:translate(0,0) rotate(0deg); }
+    10%  { opacity:1; }
+    100% { opacity:0; transform:translate(var(--dx), 115vh) rotate(720deg); }
+}
+
+.prf-side-spacer{width:46px;height:46px;flex-shrink:0;}
+
+.topup-promo-row{align-items:stretch;width:100%;}
+.topup-promo-input{min-width:0;}
+
+/* ══════════════════════════════════════════
+   РУЛЕТКА
+   ══════════════════════════════════════════ */
+
+/* Карточки игроков */
+.roulette-player-card {
+    flex: 1;
+    background: linear-gradient(145deg, #13131f, #1a1a2e);
+    border: 1.5px solid rgba(239,68,68,0.25);
+    border-radius: 16px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+}
+.roulette-player-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+.roulette-player-card:last-child {
+    border-color: rgba(123,92,255,0.25);
+}
+.roulette-player-card:last-child::before {
+    background: linear-gradient(90deg, #7b5cff, #a855f7);
+}
+.roulette-player-card.empty {
+    opacity: 0.5;
+}
+.roulette-player-avatar {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.roulette-player-name {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #e0d0ff;
+    text-align: center;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.roulette-player-bet {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #fcd34d;
+}
+.roulette-player-pct {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #ef4444;
+}
+.roulette-player-card:last-child .roulette-player-pct {
+    color: #a855f7;
+}
+
+/* Полоска шансов */
+.roulette-chance-bar {
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    background: #1a1a2a;
+}
+.roulette-chance-fill-left {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 6px 0 0 6px;
+}
+.roulette-chance-fill-right {
+    background: linear-gradient(90deg, #7b5cff, #a855f7);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 6px 6px 0;
+}
+
+/* Колесо */
+.roulette-wheel-wrap {
+    position: relative;
+    width: 100%;
+    height: 72px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #0d0d1c;
+    border: 1.5px solid rgba(239,68,68,0.25);
+}
+.roulette-wheel-track {
+    display: flex;
+    height: 100%;
+    will-change: transform;
+    transition: transform 4s cubic-bezier(0.15, 0.85, 0.35, 1.0);
+    align-items: center;
+}
+.roulette-wheel-pointer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    transform: translateX(-50%);
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    z-index: 10;
+    border-radius: 2px;
+}
+.roulette-wheel-pointer::before {
+    content: '▼';
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 0.7rem;
+}
+.roulette-wheel-pointer::after {
+    content: '▲';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 0.7rem;
+}
+.roulette-wheel-segment {
+    height: 52px;
+    min-width: 52px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    margin: 0 3px;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 6px;
+    letter-spacing: 0.3px;
+}
+.roulette-wheel-segment.p1 {
+    background: linear-gradient(135deg, rgba(239,68,68,0.6), rgba(239,68,68,0.3));
+    border: 1px solid rgba(239,68,68,0.5);
+    color: #fca5a5;
+}
+.roulette-wheel-segment.p2 {
+    background: linear-gradient(135deg, rgba(123,92,255,0.6), rgba(123,92,255,0.3));
+    border: 1px solid rgba(123,92,255,0.5);
+    color: #c4b5fd;
+}
+
+/* Карточки комнат в лобби */
+.roulette-room-card {
+    background: linear-gradient(145deg, #13131f, #1a1a2e);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.roulette-room-card:hover {
+    border-color: rgba(239,68,68,0.5);
+    transform: translateY(-1px);
+}
+.roulette-room-host {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #e0d0ff;
+    flex: 1;
+}
+.roulette-room-bet-badge {
+    background: rgba(252,211,77,0.1);
+    border: 1px solid rgba(252,211,77,0.2);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #fcd34d;
+}
+.roulette-join-btn {
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.roulette-join-btn:hover { opacity: 0.85; }
+
+/* mines-info-row / mines-info-chip — если ещё нет */
+.mines-info-row {
+    display: flex;
+    gap: 8px;
+}
+.mines-info-chip {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.mines-info-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: #555;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+.mines-info-value {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #e0d0ff;
+}
+.mines-info-value.green { color: #4ade80; }
