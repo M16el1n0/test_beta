@@ -150,7 +150,7 @@ const DB = {
 // ===== ДЕФОЛТНЫЕ ДАННЫЕ =====
 function getDefaultUserData() {
     return {
-        balance: { silver: 0, gold: 0 },
+        balance: { silver: 10000, gold: 0 }, // тестовый стартовый баланс — перезаписывается сервером, если он доступен
         registrationDate: new Date().toISOString(),
         lastVisit: new Date().toISOString(),
         lastDailyBonus: null,
