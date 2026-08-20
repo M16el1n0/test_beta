@@ -857,7 +857,7 @@ function updateCoefficients() {
 function legacyStartGame() {
     // Нормализуем состояние — на некоторых устройствах size/mines приходили строкой,
     // а balance/betType могли быть не заданы → игра «не запускалась».
-    if (!userData.balance) userData.balance = { gold: 0, silver: 0 };
+    if (!userData.balance) userData.balance = { gold: 10000, silver: 10000 };
     if (gameState.betType !== 'gold' && gameState.betType !== 'silver') gameState.betType = 'silver';
     gameConfig.size  = parseInt(gameConfig.size)  || 3;
     gameConfig.mines = parseInt(gameConfig.mines) || 1;
