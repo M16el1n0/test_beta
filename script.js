@@ -5827,3 +5827,267 @@ async function cashOut() {
         gameState._serverCashoutPending = false;
     }
 }
+
+// ══════════════════════════════════════════════════════
+//  РУЛЕТКА
+// ══════════════════════════════════════════════════════
+const rouletteState = { bet: 100, rooms: [], joinedRoom: null, isHost: false };
+
+function rouletteInit() {
+    const el = document.getElementById('roulette-balance-val');
+    if (el) el.textContent = userData.balance.silver;
+    rouletteSetBet(rouletteState.bet);
+    rouletteRenderRooms();
+    rouletteShowPanel('lobby');
+}
+
+function rouletteShowPanel(panel) {
+    ['roulette-lobby','roulette-room','roulette-spin','roulette-result'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+    const t = document.getElementById('roulette-' + panel);
+    if (t) t.style.display = 'flex';
+}
+
+function rouletteSetBet(val) {
+    rouletteState.bet = Math.max(10, Math.floor(val));
+    const inp = document.getElementById('roulette-bet-input');
+    if (inp) inp.value = rouletteState.bet;
+}
+function rouletteBetChange(d) { rouletteSetBet(rouletteState.bet + d); }
+
+function rouletteCreateRoom() {
+    const bet = rouletteState.bet;
+    if (bet > userData.balance.silver) { showNotif('⚠️ Недостаточно средств!', '#ef4444'); return; }
+    const name = (typeof getTgUser === 'function' && getTgUser()?.username) || 'Игрок';
+    userData.balance.silver -= bet;
+    saveUserData(); updateBalance();
+    document.getElementById('roulette-balance-val').textContent = userData.balance.silver;
+
+    const room = { id: Date.now().toString(36), host: name, hostBet: bet, guest: null, guestBet: 0, createdAt: Date.now() };
+    rouletteState.rooms.push(room);
+    rouletteState.joinedRoom = room;
+    rouletteState.isHost = true;
+    rouletteRenderRoom(room);
+}
+
+function rouletteJoinRoom(roomId) {
+    const room = rouletteState.rooms.find(r => r.id === roomId);
+    if (!room || room.guest) { showNotif('Комната уже занята', '#ef4444'); return; }
+    const bet = room.hostBet;
+    if (bet > userData.balance.silver) { showNotif('⚠️ Нужно ' + bet + ' F', '#ef4444'); return; }
+    const name = (typeof getTgUser === 'function' && getTgUser()?.username) || 'Гость';
+    userData.balance.silver -= bet;
+    saveUserData(); updateBalance();
+    document.getElementById('roulette-balance-val').textContent = userData.balance.silver;
+
+    room.guest = name; room.guestBet = bet;
+    rouletteState.joinedRoom = room;
+    rouletteState.isHost = false;
+    rouletteRenderRoom(room);
+    setTimeout(() => rouletteStartSpin(room), 1500);
+}
+
+function rouletteRenderRoom(room) {
+    rouletteShowPanel('room');
+    const setText = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+    setText('r-p1-name', room.host);
+    setText('r-p1-bet', room.hostBet + ' F');
+    setText('r-p1-pct', '—%');
+
+    const p2card = document.getElementById('r-player2-card');
+    if (room.guest) {
+        setText('r-p2-name', room.guest);
+        setText('r-p2-bet', room.guestBet + ' F');
+        if (p2card) p2card.style.opacity = '1';
+        const total = room.hostBet + room.guestBet;
+        const p1 = Math.round(room.hostBet / total * 100);
+        rouletteUpdateBar(p1, 100 - p1);
+        setText('r-p1-pct', p1 + '%');
+        setText('r-p2-pct', (100-p1) + '%');
+    } else {
+        setText('r-p2-name', 'Ожидание...');
+        setText('r-p2-bet', '— F');
+        if (p2card) p2card.style.opacity = '0.5';
+    }
+    setText('r-total-pot-label', 'Банк: ' + (room.hostBet + (room.guestBet||0)) + ' F');
+
+    const cancelBtn = document.getElementById('r-cancel-btn');
+    if (cancelBtn) cancelBtn.style.display = (rouletteState.isHost && !room.guest) ? 'block' : 'none';
+
+    const statusEl = document.getElementById('r-status-text');
+    if (statusEl) statusEl.innerHTML = room.guest
+        ? '<span style="font-size:0.82rem;color:#4ade80;">Игрок вошёл! Запускаем…</span>'
+        : '<span style="font-size:0.82rem;color:#666;">Ожидаем второго игрока…</span>';
+
+    rouletteRenderRooms();
+}
+
+function rouletteUpdateBar(p1, p2) {
+    const wrap = document.getElementById('r-chance-bar-wrap');
+    if (wrap) wrap.style.display = 'block';
+    const l = document.getElementById('r-chance-left'); if(l) l.style.width = p1+'%';
+    const r = document.getElementById('r-chance-right'); if(r) r.style.width = p2+'%';
+    const ll = document.getElementById('r-chance-left-label'); if(ll) ll.textContent = p1+'%';
+    const rl = document.getElementById('r-chance-right-label'); if(rl) rl.textContent = p2+'%';
+}
+
+function rouletteCancelRoom() {
+    const room = rouletteState.joinedRoom;
+    if (room) {
+        userData.balance.silver += room.hostBet;
+        saveUserData(); updateBalance();
+        document.getElementById('roulette-balance-val').textContent = userData.balance.silver;
+        rouletteState.rooms = rouletteState.rooms.filter(r => r.id !== room.id);
+    }
+    rouletteState.joinedRoom = null;
+    rouletteState.isHost = false;
+    rouletteShowPanel('lobby');
+    rouletteRenderRooms();
+}
+
+function rouletteStartSpin(room) {
+    const total = room.hostBet + room.guestBet;
+    const p1pct = room.hostBet / total;
+    const p1Wins = Math.random() < p1pct;
+    rouletteShowPanel('spin');
+    rouletteBuildWheel(p1pct, p1Wins, room);
+}
+
+function rouletteBuildWheel(p1pct, p1Wins, room) {
+    const track = document.getElementById('r-wheel-track');
+    if (!track) return;
+    track.style.transition = 'none';
+    track.style.transform = 'translateX(0)';
+    track.innerHTML = '';
+
+    const totalSegs = 60;
+    const p1count = Math.round(totalSegs * p1pct);
+    let segs = [];
+    for (let i = 0; i < p1count; i++) segs.push({ type: 'p1', label: room.host.slice(0,5) });
+    for (let i = 0; i < totalSegs - p1count; i++) segs.push({ type: 'p2', label: room.guest.slice(0,5) });
+    for (let i = segs.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [segs[i],segs[j]]=[segs[j],segs[i]]; }
+
+    const allSegs = [...segs,...segs,...segs,...segs];
+    const segW = 58;
+    allSegs.forEach(seg => {
+        const div = document.createElement('div');
+        div.style.cssText = `height:52px;min-width:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;margin:0 3px;flex-shrink:0;padding:0 6px;`;
+        if (seg.type === 'p1') {
+            div.style.background = 'rgba(239,68,68,0.5)';
+            div.style.border = '1px solid rgba(239,68,68,0.6)';
+            div.style.color = '#fca5a5';
+        } else {
+            div.style.background = 'rgba(123,92,255,0.5)';
+            div.style.border = '1px solid rgba(123,92,255,0.6)';
+            div.style.color = '#c4b5fd';
+        }
+        div.textContent = seg.label;
+        track.appendChild(div);
+    });
+
+    const wrapW = document.querySelector('#roulette-spin > div')?.offsetWidth || 340;
+    const centerPx = wrapW / 2;
+    const winnerType = p1Wins ? 'p1' : 'p2';
+    let targetIdx = totalSegs * 2;
+    for (let i = totalSegs*2; i < totalSegs*3; i++) {
+        if (allSegs[i].type === winnerType) { targetIdx = i; break; }
+    }
+    const finalOffset = targetIdx * segW + segW/2 - centerPx + (Math.random()-0.5)*30;
+
+    requestAnimationFrame(() => setTimeout(() => {
+        track.style.transition = 'transform 4s cubic-bezier(0.15,0.85,0.35,1.0)';
+        track.style.transform = `translateX(-${finalOffset}px)`;
+        setTimeout(() => rouletteShowResult(p1Wins, room), 4300);
+    }, 100));
+}
+
+function rouletteShowResult(p1Wins, room) {
+    const iWin = (rouletteState.isHost && p1Wins) || (!rouletteState.isHost && !p1Wins);
+    const total = room.hostBet + room.guestBet;
+    const myBet = rouletteState.isHost ? room.hostBet : room.guestBet;
+
+    rouletteShowPanel('result');
+    const setT = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+
+    setT('r-result-bet', myBet + ' F');
+
+    if (iWin) {
+        userData.balance.silver += total;
+        saveUserData(); updateBalance();
+        document.getElementById('roulette-balance-val').textContent = userData.balance.silver;
+        document.getElementById('r-result-icon').textContent = '🎉';
+        setT('r-result-title', 'ПОБЕДА!');
+        document.getElementById('r-result-title').style.color = '#4ade80';
+        setT('r-result-sub', 'Колесо выпало на вас!');
+        const winEl = document.getElementById('r-result-win');
+        if (winEl) { winEl.textContent = '+' + (total - myBet) + ' F'; winEl.style.color = '#4ade80'; }
+        showNotif('🎉 Победа! +' + (total - myBet) + ' F', '#22c55e');
+    } else {
+        document.getElementById('r-result-icon').textContent = '😔';
+        setT('r-result-title', 'ПОРАЖЕНИЕ');
+        document.getElementById('r-result-title').style.color = '#ef4444';
+        setT('r-result-sub', 'Не повезло в этот раз!');
+        const winEl = document.getElementById('r-result-win');
+        if (winEl) { winEl.textContent = '−' + myBet + ' F'; winEl.style.color = '#ef4444'; }
+        showNotif('😔 Поражение, −' + myBet + ' F', '#ef4444');
+    }
+
+    if (!userData.rouletteHistory) userData.rouletteHistory = [];
+    userData.rouletteHistory.unshift({ ts: Date.now(), bet: myBet, total, win: iWin, opponent: rouletteState.isHost ? (room.guest||'?') : room.host });
+    if (userData.rouletteHistory.length > 20) userData.rouletteHistory.length = 20;
+    saveUserData();
+    rouletteState.rooms = rouletteState.rooms.filter(r => r.id !== room.id);
+    rouletteState.joinedRoom = null;
+    rouletteRenderHistory();
+}
+
+function rouletteBackToLobby() {
+    rouletteShowPanel('lobby');
+    rouletteRenderRooms();
+    const el = document.getElementById('roulette-balance-val');
+    if (el) el.textContent = userData.balance.silver;
+}
+
+function rouletteRenderRooms() {
+    const container = document.getElementById('roulette-rooms-list');
+    const noRooms = document.getElementById('roulette-no-rooms');
+    if (!container) return;
+    const now = Date.now();
+    const open = rouletteState.rooms.filter(r => !r.guest && now - r.createdAt < 600000);
+    container.querySelectorAll('.r-room-card').forEach(e => e.remove());
+    if (!open.length) { if (noRooms) noRooms.style.display = 'block'; return; }
+    if (noRooms) noRooms.style.display = 'none';
+    open.forEach(room => {
+        const card = document.createElement('div');
+        card.className = 'r-room-card';
+        card.style.cssText = 'background:linear-gradient(145deg,#13131f,#1a1a2e);border:1px solid rgba(239,68,68,0.2);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;';
+        card.innerHTML = `<div style="font-size:1.4rem;">🎰</div>
+            <div style="flex:1;"><div style="font-size:0.8rem;font-weight:800;color:#e0d0ff;">${room.host}</div><div style="font-size:0.62rem;color:#555;">ждёт соперника</div></div>
+            <div style="background:rgba(252,211,77,0.1);border:1px solid rgba(252,211,77,0.2);border-radius:8px;padding:3px 10px;font-size:0.78rem;font-weight:900;color:#fcd34d;">${room.hostBet} F</div>
+            <button onclick="rouletteJoinRoom('${room.id}')" style="padding:7px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-size:0.72rem;font-weight:800;cursor:pointer;">Войти</button>`;
+        container.appendChild(card);
+    });
+}
+
+function rouletteRenderHistory() {
+    const list = document.getElementById('roulette-history-list');
+    if (!list) return;
+    const hist = userData.rouletteHistory || [];
+    if (!hist.length) { list.innerHTML = '<div style="text-align:center;padding:12px;color:#444;font-size:0.78rem;">Нет игр</div>'; return; }
+    list.innerHTML = hist.slice(0,10).map(h => {
+        const t = new Date(h.ts);
+        const time = t.getHours()+':'+String(t.getMinutes()).padStart(2,'0');
+        const color = h.win ? '#22c55e' : '#ef4444';
+        const diff = h.win ? (h.total - h.bet) : h.bet;
+        return `<div class="history-item" style="border-left-color:${color}"><span class="history-time">${time}</span><span class="history-desc">Ставка: ${h.bet}F vs ${h.opponent}</span><span class="history-result" style="color:${color}">${h.win?'+':'-'}${diff}F</span></div>`;
+    }).join('');
+}
+
+// Хук в selectGame
+const _rouletteOrigSG = window.selectGame;
+window.selectGame = function(game) {
+    if (_rouletteOrigSG) _rouletteOrigSG(game);
+    if (game === 'roulette') setTimeout(rouletteInit, 50);
+};
