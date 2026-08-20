@@ -150,7 +150,7 @@ const DB = {
 // ===== ДЕФОЛТНЫЕ ДАННЫЕ =====
 function getDefaultUserData() {
     return {
-        balance: { silver: 10000, gold: 0 }, // тестовый стартовый баланс — перезаписывается сервером, если он доступен
+        balance: { silver: 10000, gold: 100 },
         registrationDate: new Date().toISOString(),
         lastVisit: new Date().toISOString(),
         lastDailyBonus: null,
@@ -202,7 +202,7 @@ function switchTelegramAccount(userId) {
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
-    syncGoldFromServer();
+    // syncGoldFromServer(); // ТЕСТ-РЕЖИМ
     return true;
 }
 
@@ -388,8 +388,7 @@ function simulateOnlineCounts() {
         'online-rocket': [25, 45],
         'online-mines': [18, 38],
         'online-roulette': [40, 70],
-        'online-cases': [10, 25],
-        'online-roulette': [8, 22]
+        'online-cases': [10, 25]
     };
     function update() {
         for (const [id, [min, max]] of Object.entries(counts)) {
@@ -405,6 +404,9 @@ function simulateOnlineCounts() {
 }
 
 function loadUserData() {
+    // ТЕСТ-РЕЖИМ: сбрасываем если баланс был 0
+    const saved = DB.get('userData');
+    if (saved && (saved.balance?.silver || 0) === 0) DB.set('userData', null);
     const saved = DB.get('userData');
     if (saved) userData = Object.assign(getDefaultUserData(), saved);
     if (!userData.serverTaskClaims || typeof userData.serverTaskClaims !== 'object') userData.serverTaskClaims = {};
@@ -693,8 +695,6 @@ function selectGame(game) {
     if (header) header.style.display = 'none';
 
     document.querySelectorAll('.game-container').forEach(el => el.style.display = 'none');
-
-    if (game === 'roulette') setTimeout(rouletteInit, 50);
 
     const target = document.getElementById(game + '-game');
     if (target) {
@@ -4472,7 +4472,7 @@ function startTonWait(inv) {
                 const snapshot = readAuthoritativeBalanceSnapshot(cd);
                 if (!snapshot || !applyRocketServerBalance(snapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    syncGoldFromServer();
+                    // syncGoldFromServer(); // ТЕСТ-РЕЖИМ
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, snapshot.gold - beforeGold);
@@ -4624,7 +4624,7 @@ function startUsdtWait(inv) {
                 const beforeGold = parseAuthoritativeBalanceValue(userData.balance?.gold);
                 if (!serverSnapshot || !applyRocketServerBalance(serverSnapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    syncGoldFromServer();
+                    // syncGoldFromServer(); // ТЕСТ-РЕЖИМ
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, serverSnapshot.gold - beforeGold);
@@ -4826,7 +4826,7 @@ async function buyStarPackage(stars, coins) {
                 if (!synced) {
                     // Do not fake a local credit: the server will apply the verified payment.
                     showNotif('⏳ Платёж подтверждён. Баланс обновится после зачисления сервером.', '#fbbf24');
-                    syncGoldFromServer();
+                    // syncGoldFromServer(); // ТЕСТ-РЕЖИМ
                 }
             } else if (status === 'cancelled') {
                 showNotif('❌ Оплата отменена', '#f87171');
@@ -4848,7 +4848,7 @@ function creditCoins(coins, stars) {
     // Kept as a compatibility shim for old bundles. Verified payments are
     // credited by the backend webhook and then read from /balance.
     console.warn('ignored client-side creditCoins call', { coins, stars });
-    syncGoldFromServer();
+    // syncGoldFromServer(); // ТЕСТ-РЕЖИМ
 }
 
 function showTopUpSuccess(coins, stars, method = 'stars') {
@@ -5721,413 +5721,3 @@ async function cashOut() {
         gameState._serverCashoutPending = false;
     }
 }
-
-// ══════════════════════════════════════════════════════
-//  РУЛЕТКА — Multiplayer (2 игрока, процентные сегменты)
-// ══════════════════════════════════════════════════════
-
-const rouletteState = {
-    bet: 100,
-    rooms: [],           // список лобби-комнат
-    myRoom: null,        // комната где я хост
-    joinedRoom: null,    // комната куда я вошёл
-    isHost: false,
-    spinning: false
-};
-
-// ── Инициализация при открытии ──
-function rouletteInit() {
-    const silver = userData.balance.silver;
-    const el = document.getElementById('roulette-balance-val');
-    if (el) el.textContent = silver;
-    rouletteSetBet(rouletteState.bet);
-    rouletteRenderRooms();
-    rouletteShow('lobby');
-}
-
-// ── Показ нужной панели ──
-function rouletteShow(panel) {
-    ['roulette-lobby','roulette-room','roulette-spin','roulette-result'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-    const target = document.getElementById('roulette-' + panel);
-    if (target) target.style.display = 'flex';
-}
-
-// ── Ставка ──
-function rouletteSetBet(val) {
-    rouletteState.bet = Math.max(10, val);
-    const inp = document.getElementById('roulette-bet-input');
-    if (inp) inp.value = rouletteState.bet;
-}
-function rouletteBetChange(delta) {
-    rouletteSetBet(rouletteState.bet + delta);
-}
-
-// ── Создать комнату ──
-function rouletteCreateRoom() {
-    const bet = rouletteState.bet;
-    if (bet > userData.balance.silver) {
-        showNotif('⚠️ Недостаточно средств!', '#ef4444'); return;
-    }
-    const tgUser = getTgUser && getTgUser();
-    const name = tgUser ? (tgUser.username || tgUser.first_name || 'Игрок') : 'Игрок';
-
-    // Снимаем ставку сразу (резервируем)
-    userData.balance.silver -= bet;
-    saveUserData();
-    updateBalance();
-    const el = document.getElementById('roulette-balance-val');
-    if (el) el.textContent = userData.balance.silver;
-
-    const room = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2,5),
-        host: name,
-        hostBet: bet,
-        guest: null,
-        guestBet: 0,
-        createdAt: Date.now()
-    };
-    rouletteState.rooms.push(room);
-    rouletteState.myRoom = room;
-    rouletteState.isHost = true;
-    rouletteState.joinedRoom = room;
-
-    rouletteShowRoom(room, true);
-}
-
-// ── Войти в комнату ──
-function rouletteJoinRoom(roomId) {
-    const room = rouletteState.rooms.find(r => r.id === roomId);
-    if (!room || room.guest) { showNotif('Комната уже занята', '#ef4444'); return; }
-
-    // Ставка гостя = ставка хоста (равная игра)
-    const bet = room.hostBet;
-    if (bet > userData.balance.silver) {
-        showNotif('⚠️ Недостаточно средств для ставки ' + bet + ' F!', '#ef4444'); return;
-    }
-    const tgUser = getTgUser && getTgUser();
-    const name = tgUser ? (tgUser.username || tgUser.first_name || 'Игрок') : 'Гость';
-
-    userData.balance.silver -= bet;
-    saveUserData();
-    updateBalance();
-    const el = document.getElementById('roulette-balance-val');
-    if (el) el.textContent = userData.balance.silver;
-
-    room.guest = name;
-    room.guestBet = bet;
-    rouletteState.isHost = false;
-    rouletteState.joinedRoom = room;
-
-    rouletteShowRoom(room, false);
-
-    // Гость вошёл → сразу запускаем спин через 1.5 сек
-    setTimeout(() => rouletteStartSpin(room), 1500);
-}
-
-// ── Отобразить комнату ──
-function rouletteShowRoom(room, isHost) {
-    rouletteShow('room');
-
-    // P1 = хост (красный)
-    setText('r-p1-name', room.host);
-    setText('r-p1-bet', room.hostBet + ' F');
-
-    // P2 = гость
-    const p2card = document.getElementById('r-player2-card');
-    if (room.guest) {
-        setText('r-p2-name', room.guest);
-        setText('r-p2-bet', room.guestBet + ' F');
-        if (p2card) p2card.classList.remove('empty');
-    } else {
-        setText('r-p2-name', 'Ожидание...');
-        setText('r-p2-bet', '— F');
-        if (p2card) p2card.classList.add('empty');
-    }
-
-    // Шансы
-    if (room.guest) {
-        const total = room.hostBet + room.guestBet;
-        const p1pct = Math.round(room.hostBet / total * 100);
-        const p2pct = 100 - p1pct;
-        rouletteUpdateChanceBar(p1pct, p2pct);
-    } else {
-        // Ждём гостя — шансы 50/50 пока
-        rouletteUpdateChanceBar(50, 50);
-    }
-
-    setText('r-total-pot-label', 'Банк: ' + (room.hostBet + (room.guestBet || 0)) + ' F');
-
-    // Кнопка отмены только хосту пока нет гостя
-    const cancelBtn = document.getElementById('r-cancel-btn');
-    if (cancelBtn) cancelBtn.style.display = (isHost && !room.guest) ? 'block' : 'none';
-
-    const statusEl = document.getElementById('r-status-text');
-    if (statusEl) {
-        statusEl.innerHTML = room.guest
-            ? '<span style="font-size:0.82rem;color:#4ade80;">Второй игрок вошёл! Запускаем…</span>'
-            : '<span style="font-size:0.82rem;color:#666;">Ожидаем второго игрока…</span>';
-    }
-
-    rouletteRenderRooms(); // обновляем лобби в фоне
-}
-
-// ── Шкала шансов ──
-function rouletteUpdateChanceBar(p1pct, p2pct) {
-    const wrap = document.getElementById('r-chance-bar-wrap');
-    if (wrap) wrap.style.display = 'block';
-    const left = document.getElementById('r-chance-left');
-    const right = document.getElementById('r-chance-right');
-    const ll = document.getElementById('r-chance-left-label');
-    const rl = document.getElementById('r-chance-right-label');
-    if (left) left.style.width = p1pct + '%';
-    if (right) right.style.width = p2pct + '%';
-    if (ll) ll.textContent = p1pct + '%';
-    if (rl) rl.textContent = p2pct + '%';
-    setText('r-p1-pct', p1pct + '%');
-    setText('r-p2-pct', p2pct + '%');
-}
-
-// ── Отменить комнату (хост) ──
-function rouletteCancelRoom() {
-    const room = rouletteState.joinedRoom;
-    if (room) {
-        // Возвращаем ставку
-        userData.balance.silver += room.hostBet;
-        saveUserData(); updateBalance();
-        const el = document.getElementById('roulette-balance-val');
-        if (el) el.textContent = userData.balance.silver;
-        // Удаляем из списка
-        rouletteState.rooms = rouletteState.rooms.filter(r => r.id !== room.id);
-    }
-    rouletteState.myRoom = null;
-    rouletteState.joinedRoom = null;
-    rouletteState.isHost = false;
-    rouletteShow('lobby');
-    rouletteRenderRooms();
-}
-
-// ── Запуск спина ──
-function rouletteStartSpin(room) {
-    const total = room.hostBet + room.guestBet;
-    const p1pct = room.hostBet / total;   // доля хоста (красный)
-    const p2pct = room.guestBet / total;  // доля гостя (фиолетовый)
-
-    // Определяем победителя (взвешенно по ставкам)
-    const rand = Math.random();
-    const p1Wins = rand < p1pct;
-
-    rouletteShow('spin');
-    rouletteBuildWheel(p1pct, p2pct, p1Wins, room);
-}
-
-// ── Строим колесо и анимируем ──
-function rouletteBuildWheel(p1pct, p2pct, p1Wins, room) {
-    const track = document.getElementById('r-wheel-track');
-    if (!track) return;
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0)';
-    track.innerHTML = '';
-
-    // Генерируем ~60 сегментов пропорционально шансам
-    const totalSegs = 60;
-    const p1count = Math.round(totalSegs * p1pct);
-    const p2count = totalSegs - p1count;
-
-    // Создаём массив сегментов и перемешиваем (но храним позиции)
-    let segs = [];
-    for (let i = 0; i < p1count; i++) segs.push({ type: 'p1', label: room.host.slice(0,6) });
-    for (let i = 0; i < p2count; i++) segs.push({ type: 'p2', label: room.guest.slice(0,6) });
-
-    // Перемешиваем Fisher-Yates
-    for (let i = segs.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [segs[i], segs[j]] = [segs[j], segs[i]];
-    }
-
-    const segW = 58; // ширина сегмента + gap
-    const trackEl = track;
-
-    // Дублируем 4 раза для бесшовной прокрутки
-    const allSegs = [...segs, ...segs, ...segs, ...segs];
-    allSegs.forEach((seg, idx) => {
-        const div = document.createElement('div');
-        div.className = 'roulette-wheel-segment ' + seg.type;
-        div.textContent = seg.label;
-        div.dataset.idx = idx;
-        trackEl.appendChild(div);
-    });
-
-    // Центр указателя — середина колеса в px
-    const wheelWrap = document.querySelector('.roulette-wheel-wrap');
-    const wrapW = wheelWrap ? wheelWrap.offsetWidth : 340;
-    const centerPx = wrapW / 2;
-
-    // Выбираем целевой сегмент победителя в 3-й копии (idx 2*totalSegs .. 3*totalSegs-1)
-    const winnerType = p1Wins ? 'p1' : 'p2';
-    const thirdCopyStart = totalSegs * 2;
-    const thirdCopyEnd = totalSegs * 3 - 1;
-    // Находим подходящий сегмент в третьей копии
-    let targetIdx = -1;
-    for (let i = thirdCopyStart; i <= thirdCopyEnd; i++) {
-        if (allSegs[i].type === winnerType) { targetIdx = i; break; }
-    }
-    if (targetIdx < 0) targetIdx = thirdCopyStart; // fallback
-
-    // Смещение = центр сегмента - центр колеса
-    const targetOffset = targetIdx * segW + segW / 2 - centerPx;
-
-    // Небольшой рандом внутри сегмента чтобы не всегда в центр
-    const jitter = (Math.random() - 0.5) * (segW * 0.6);
-    const finalOffset = targetOffset + jitter;
-
-    // Запускаем анимацию через 100ms (DOM должен отрисоваться)
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            trackEl.style.transition = 'transform 4s cubic-bezier(0.15, 0.85, 0.35, 1.0)';
-            trackEl.style.transform = `translateX(-${finalOffset}px)`;
-
-            // Через 4.2 сек показываем результат
-            setTimeout(() => rouletteShowResult(p1Wins, room), 4300);
-        }, 100);
-    });
-}
-
-// ── Показ результата ──
-function rouletteShowResult(p1Wins, room) {
-    const isHost = rouletteState.isHost;
-    const iWin = (isHost && p1Wins) || (!isHost && !p1Wins);
-    const total = room.hostBet + room.guestBet;
-    const myBet = isHost ? room.hostBet : room.guestBet;
-
-    rouletteShow('result');
-
-    const iconEl = document.getElementById('r-result-icon');
-    const titleEl = document.getElementById('r-result-title');
-    const subEl = document.getElementById('r-result-sub');
-    const winEl = document.getElementById('r-result-win');
-    const betEl = document.getElementById('r-result-bet');
-
-    if (betEl) betEl.textContent = myBet + ' F';
-
-    if (iWin) {
-        // Победа — забираем весь банк
-        userData.balance.silver += total;
-        saveUserData(); updateBalance();
-        const el = document.getElementById('roulette-balance-val');
-        if (el) el.textContent = userData.balance.silver;
-
-        if (iconEl) iconEl.textContent = '🎉';
-        if (titleEl) { titleEl.textContent = 'ПОБЕДА!'; titleEl.style.color = '#4ade80'; }
-        if (subEl) subEl.textContent = 'Колесо выпало на вас!';
-        if (winEl) { winEl.textContent = '+' + (total - myBet) + ' F'; winEl.style.color = '#4ade80'; }
-
-        showNotif('🎉 Победа! +' + (total - myBet) + ' F', '#22c55e');
-
-        // Подарок за крупный выигрыш
-        if (total >= 15) {
-            const gift = GIFT_SYSTEM.getRandomGift(total);
-            if (gift) setTimeout(() => showGiftChoiceModal(gift, total), 800);
-        }
-    } else {
-        // Поражение
-        if (iconEl) iconEl.textContent = '😔';
-        if (titleEl) { titleEl.textContent = 'ПОРАЖЕНИЕ'; titleEl.style.color = '#ef4444'; }
-        if (subEl) subEl.textContent = 'Не повезло в этот раз!';
-        if (winEl) { winEl.textContent = '−' + myBet + ' F'; winEl.style.color = '#ef4444'; }
-
-        showNotif('😔 Поражение, −' + myBet + ' F', '#ef4444');
-    }
-
-    // Пишем в историю
-    userData.stats = userData.stats || {};
-    userData.stats.gamesPlayed = (userData.stats.gamesPlayed || 0) + 1;
-    if (iWin) userData.stats.gamesWon = (userData.stats.gamesWon || 0) + 1;
-    else userData.stats.gamesLost = (userData.stats.gamesLost || 0) + 1;
-
-    if (!userData.rouletteHistory) userData.rouletteHistory = [];
-    userData.rouletteHistory.unshift({
-        ts: Date.now(),
-        bet: myBet,
-        total,
-        win: iWin,
-        opponent: isHost ? (room.guest || '?') : room.host
-    });
-    if (userData.rouletteHistory.length > 20) userData.rouletteHistory.length = 20;
-    saveUserData();
-    updateTasks();
-    rouletteRenderHistory();
-
-    // Удаляем комнату из списка
-    rouletteState.rooms = rouletteState.rooms.filter(r => r.id !== room.id);
-    rouletteState.joinedRoom = null;
-    rouletteState.myRoom = null;
-}
-
-// ── Вернуться в лобби ──
-function rouletteBackToLobby() {
-    rouletteShow('lobby');
-    rouletteRenderRooms();
-    const el = document.getElementById('roulette-balance-val');
-    if (el) el.textContent = userData.balance.silver;
-}
-
-// ── Рендер списка комнат ──
-function rouletteRenderRooms() {
-    const container = document.getElementById('roulette-rooms-list');
-    const noRooms = document.getElementById('roulette-no-rooms');
-    if (!container) return;
-
-    // Фильтруем — только открытые (без гостя, не старше 10 мин)
-    const now = Date.now();
-    const openRooms = rouletteState.rooms.filter(r => !r.guest && now - r.createdAt < 600000);
-
-    if (openRooms.length === 0) {
-        if (noRooms) noRooms.style.display = 'block';
-        // Убираем старые карточки
-        container.querySelectorAll('.roulette-room-card').forEach(el => el.remove());
-        return;
-    }
-    if (noRooms) noRooms.style.display = 'none';
-    container.querySelectorAll('.roulette-room-card').forEach(el => el.remove());
-
-    openRooms.forEach(room => {
-        const card = document.createElement('div');
-        card.className = 'roulette-room-card';
-        card.innerHTML = `
-            <div style="font-size:1.5rem;">🎰</div>
-            <div style="flex:1;">
-                <div class="roulette-room-host">${room.host}</div>
-                <div style="font-size:0.62rem;color:#555;">ждёт соперника</div>
-            </div>
-            <div class="roulette-room-bet-badge">${room.hostBet} F</div>
-            <button class="roulette-join-btn" onclick="rouletteJoinRoom('${room.id}')">Войти</button>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ── История ──
-function rouletteRenderHistory() {
-    const list = document.getElementById('roulette-history-list');
-    if (!list) return;
-    const hist = userData.rouletteHistory || [];
-    if (!hist.length) { list.innerHTML = '<div style="text-align:center;padding:12px;color:#444;font-size:0.78rem;">Нет игр</div>'; return; }
-
-    list.innerHTML = hist.slice(0, 10).map(h => {
-        const t = new Date(h.ts);
-        const time = t.getHours() + ':' + String(t.getMinutes()).padStart(2,'0');
-        const color = h.win ? '#22c55e' : '#ef4444';
-        const sign = h.win ? '+' : '-';
-        const diff = h.win ? (h.total - h.bet) : h.bet;
-        return `<div class="history-item" style="border-left-color:${color}">
-            <span class="history-time">${time}</span>
-            <span class="history-desc">Ставка: ${h.bet}F vs ${h.opponent}</span>
-            <span class="history-result" style="color:${color}">${sign}${diff}F</span>
-        </div>`;
-    }).join('');
-}
-
-// rouletteInit вызывается из selectGame ниже
