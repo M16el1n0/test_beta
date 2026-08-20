@@ -202,7 +202,7 @@ function switchTelegramAccount(userId) {
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
-    // syncGoldFromServer(); // ТЕСТ
+    //syncGoldFromServer();
     return true;
 }
 
@@ -405,9 +405,7 @@ function simulateOnlineCounts() {
 
 function loadUserData() {
     const saved = DB.get('userData');
-    // ТЕСТ-РЕЖИМ: если баланс 0 — сбрасываем чтобы получить 10к
-    if (saved && (saved.balance?.silver || 0) === 0) { DB.set('userData', null); }
-    else if (saved) userData = Object.assign(getDefaultUserData(), saved);
+    if (saved) userData = Object.assign(getDefaultUserData(), saved);
     if (!userData.serverTaskClaims || typeof userData.serverTaskClaims !== 'object') userData.serverTaskClaims = {};
     userData.lastVisit = new Date().toISOString();
     saveUserData();
@@ -857,7 +855,7 @@ function updateCoefficients() {
 function legacyStartGame() {
     // Нормализуем состояние — на некоторых устройствах size/mines приходили строкой,
     // а balance/betType могли быть не заданы → игра «не запускалась».
-    if (!userData.balance) userData.balance = { gold: 10000, silver: 10000 };
+    if (!userData.balance) userData.balance = { gold: 0, silver: 0 };
     if (gameState.betType !== 'gold' && gameState.betType !== 'silver') gameState.betType = 'silver';
     gameConfig.size  = parseInt(gameConfig.size)  || 3;
     gameConfig.mines = parseInt(gameConfig.mines) || 1;
@@ -4471,7 +4469,7 @@ function startTonWait(inv) {
                 const snapshot = readAuthoritativeBalanceSnapshot(cd);
                 if (!snapshot || !applyRocketServerBalance(snapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    // syncGoldFromServer(); // ТЕСТ
+                    //syncGoldFromServer();
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, snapshot.gold - beforeGold);
@@ -4623,7 +4621,7 @@ function startUsdtWait(inv) {
                 const beforeGold = parseAuthoritativeBalanceValue(userData.balance?.gold);
                 if (!serverSnapshot || !applyRocketServerBalance(serverSnapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    // syncGoldFromServer(); // ТЕСТ
+                    //syncGoldFromServer();
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, serverSnapshot.gold - beforeGold);
@@ -4825,7 +4823,7 @@ async function buyStarPackage(stars, coins) {
                 if (!synced) {
                     // Do not fake a local credit: the server will apply the verified payment.
                     showNotif('⏳ Платёж подтверждён. Баланс обновится после зачисления сервером.', '#fbbf24');
-                    // syncGoldFromServer(); // ТЕСТ
+                    //syncGoldFromServer();
                 }
             } else if (status === 'cancelled') {
                 showNotif('❌ Оплата отменена', '#f87171');
@@ -4847,7 +4845,7 @@ function creditCoins(coins, stars) {
     // Kept as a compatibility shim for old bundles. Verified payments are
     // credited by the backend webhook and then read from /balance.
     console.warn('ignored client-side creditCoins call', { coins, stars });
-    // syncGoldFromServer(); // ТЕСТ
+    //syncGoldFromServer();
 }
 
 function showTopUpSuccess(coins, stars, method = 'stars') {
