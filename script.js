@@ -715,6 +715,15 @@ function selectGame(game) {
 }
 
 function backToGamesList() {
+    // Если в рулетке — удаляем комнату и возвращаем ставку
+    if (rouletteState.joinedRoom && !rouletteState.joinedRoom.guest) {
+        const room = rouletteState.joinedRoom;
+        userData.balance.silver += room.hostBet;
+        saveUserData(); updateBalance();
+        rouletteState.rooms = rouletteState.rooms.filter(r => r.id !== room.id);
+        rouletteState.joinedRoom = null;
+        rouletteState.isHost = false;
+    }
     document.querySelectorAll('.game-container').forEach(el => {
         el.style.display = 'none';
         el.classList.remove('game-fullscreen');
