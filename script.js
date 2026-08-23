@@ -150,7 +150,7 @@ const DB = {
 // ===== ДЕФОЛТНЫЕ ДАННЫЕ =====
 function getDefaultUserData() {
     return {
-        balance: { silver: 10000, gold: 100 },
+                balance: { silver: 0, gold: 0 },
         registrationDate: new Date().toISOString(),
         lastVisit: new Date().toISOString(),
         lastDailyBonus: null,
@@ -202,7 +202,7 @@ function switchTelegramAccount(userId) {
     updateProfileInfo();
     updateGameHistory();
     updateCasesHistory();
-    //syncGoldFromServer();
+    syncGoldFromServer();
     return true;
 }
 
@@ -4478,7 +4478,7 @@ function startTonWait(inv) {
                 const snapshot = readAuthoritativeBalanceSnapshot(cd);
                 if (!snapshot || !applyRocketServerBalance(snapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    //syncGoldFromServer();
+                    syncGoldFromServer();
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, snapshot.gold - beforeGold);
@@ -4630,7 +4630,7 @@ function startUsdtWait(inv) {
                 const beforeGold = parseAuthoritativeBalanceValue(userData.balance?.gold);
                 if (!serverSnapshot || !applyRocketServerBalance(serverSnapshot, true)) {
                     showNotif('⏳ Платёж подтверждён, но баланс ещё синхронизируется.', '#fbbf24');
-                    //syncGoldFromServer();
+                    syncGoldFromServer();
                     return;
                 }
                 const gained = beforeGold === null ? 0 : Math.max(0, serverSnapshot.gold - beforeGold);
@@ -4832,7 +4832,7 @@ async function buyStarPackage(stars, coins) {
                 if (!synced) {
                     // Do not fake a local credit: the server will apply the verified payment.
                     showNotif('⏳ Платёж подтверждён. Баланс обновится после зачисления сервером.', '#fbbf24');
-                    //syncGoldFromServer();
+                    syncGoldFromServer();
                 }
             } else if (status === 'cancelled') {
                 showNotif('❌ Оплата отменена', '#f87171');
@@ -4854,7 +4854,7 @@ function creditCoins(coins, stars) {
     // Kept as a compatibility shim for old bundles. Verified payments are
     // credited by the backend webhook and then read from /balance.
     console.warn('ignored client-side creditCoins call', { coins, stars });
-    //syncGoldFromServer();
+    syncGoldFromServer();
 }
 
 function showTopUpSuccess(coins, stars, method = 'stars') {
@@ -5095,115 +5095,6 @@ function applyRocketServerBalance(data, isMutation = false) {
 }
 
 async function fleepGameApi(path, payload) {
-    // ═══ ТЕСТ-МОД: локальная эмуляция без сервера ═══
-    return await _localGameApi(path, payload || {});
-}
-async function _localGameApi(path, payload) {
-    const ud = userData;
-    const bal = ud.balance;
-
-    // ── МИНЫ ──
-    if (path === '/game/mines/start') {
-        const { bet, currency, size, mines } = payload;
-        const total = size * size;
-        // Генерируем позиции мин
-        const positions = new Set();
-        while (positions.size < mines) positions.add(Math.floor(Math.random() * total));
-        // Сохраняем сессию локально
-        ud._minesSession = { bet, currency, size, mines: [...positions], revealed: [], lost: false };
-        bal[currency] -= bet;
-        saveUserData(); updateBalance();
-        return { ok: true, session_id: 'local', currency, bet, size, mines, revealed: [], coefficient: 1.0 };
-    }
-    if (path === '/game/mines/reveal') {
-        const s = ud._minesSession;
-        if (!s) throw Object.assign(new Error('no_session'), { data: { error: 'no_session' } });
-        const { index } = payload;
-        const isMine = s.mines.includes(index);
-        s.revealed.push(index);
-        const safeTotal = s.size * s.size - s.mines.length;
-        const coef = Math.pow(safeTotal / (safeTotal - s.revealed.filter(i => !s.mines.includes(i)).length + 1), 0.7);
-        if (isMine) {
-            s.lost = true;
-            return { ok: true, status: 'lost', is_mine: true, mines: s.mines, win: 0, coefficient: coef };
-        }
-        const safeRevealed = s.revealed.filter(i => !s.mines.includes(i)).length;
-        const canCashOut = safeRevealed > 0;
-        return { ok: true, status: 'active', is_mine: false, coefficient: +(1 + safeRevealed * 0.15).toFixed(2), can_cashout: canCashOut };
-    }
-    if (path === '/game/mines/cashout') {
-        const s = ud._minesSession;
-        if (!s) throw Object.assign(new Error('no_session'), { data: { error: 'no_session' } });
-        const safeRevealed = s.revealed.filter(i => !s.mines.includes(i)).length;
-        const coef = +(1 + safeRevealed * 0.15).toFixed(2);
-        const win = Math.floor(s.bet * coef);
-        bal[s.currency] += win;
-        ud._minesSession = null;
-        saveUserData(); updateBalance();
-        return { ok: true, status: 'settled', win, coefficient: coef, mines: s.mines };
-    }
-
-    // ── РАКЕТА ──
-    if (path === '/game/rocket/start') {
-        const { bet, currency } = payload;
-        const crashAt = +(Math.max(1.01, -Math.log(Math.random()) * 1.5 + 1.0)).toFixed(2);
-        bal[currency] -= bet;
-        ud._rocketSession = { bet, currency, crashAt, startTime: Date.now() };
-        saveUserData(); updateBalance();
-        return { ok: true, session_id: 'local', currency, bet, crash_at: crashAt, server_time: Date.now() };
-    }
-    if (path === '/game/rocket/status') {
-        const s = ud._rocketSession;
-        if (!s) return { ok: true, status: 'idle' };
-        const elapsed = (Date.now() - s.startTime) / 1000;
-        const coef = +(Math.pow(Math.E, 0.06 * elapsed)).toFixed(2);
-        if (coef >= s.crashAt) return { ok: true, status: 'crashed', crash_at: s.crashAt };
-        return { ok: true, status: 'active', coefficient: coef };
-    }
-    if (path === '/game/rocket/cashout' || path === '/game/rocket/resolve') {
-        const s = ud._rocketSession;
-        if (!s) throw Object.assign(new Error('no_session'), { data: { error: 'no_session' } });
-        const elapsed = (Date.now() - s.startTime) / 1000;
-        const coef = Math.min(+(Math.pow(Math.E, 0.06 * elapsed)).toFixed(2), s.crashAt - 0.01);
-        const win = Math.floor(s.bet * coef);
-        bal[s.currency] += win;
-        ud._rocketSession = null;
-        saveUserData(); updateBalance();
-        return { ok: true, status: 'settled', win, coefficient: coef };
-    }
-
-    // ── КЕЙСЫ ──
-    if (path === '/game/case/open') {
-        const { case_type, currency, cost } = payload;
-        const price = cost || 15;
-        if ((bal[currency] || 0) < price) throw Object.assign(new Error('insufficient_balance'), { data: { error: 'insufficient_balance' } });
-        bal[currency] -= price;
-        const gifts = ['heart','bear','gift','rose','cake','bouquet','rocket','cup','ring','diamond','champagne'];
-        const type = gifts[Math.floor(Math.random() * gifts.length)];
-        const value = Math.floor(Math.random() * 200) + 15;
-        saveUserData(); updateBalance();
-        return { ok: true, gift: { type, name: type, value, id: Date.now() } };
-    }
-
-    // ── ЕЖЕДНЕВНЫЙ БОНУС ──
-    if (path === '/daily/claim') {
-        bal.silver += 100;
-        saveUserData(); updateBalance();
-        return { ok: true, reward: 100, currency: 'silver' };
-    }
-
-    // ── ЗАДАНИЯ ──
-    if (path === '/task/claim') {
-        const reward = payload.reward || 50;
-        bal.silver += reward;
-        saveUserData(); updateBalance();
-        return { ok: true, reward, currency: 'silver' };
-    }
-
-    // Всё остальное — успех без действий
-    return { ok: true };
-}
-async function __fleepGameApi_orig(path, payload) {
     const requestBody = Object.assign({}, payload || {});
     // Некоторые версии Telegram WebView на iPhone нестабильно передают
     // нестандартный X-Telegram-Init-Data. Дублируем подписанное initData
