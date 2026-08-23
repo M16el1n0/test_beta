@@ -5951,56 +5951,120 @@ function rouletteStartSpin(room) {
     const total = room.hostBet + room.guestBet;
     const p1pct = room.hostBet / total;
     const p1Wins = Math.random() < p1pct;
+
+    // Обновляем банк в UI
+    const potEl = document.getElementById('r-spin-pot');
+    const centEl = document.getElementById('r-center-pot');
+    if (potEl) potEl.textContent = total + ' F';
+    if (centEl) centEl.textContent = total;
+
     rouletteShowPanel('spin');
-    rouletteBuildWheel(p1pct, p1Wins, room);
+    setTimeout(() => rouletteDrawWheel(p1pct, p1Wins, room), 100);
 }
 
-function rouletteBuildWheel(p1pct, p1Wins, room) {
-    const track = document.getElementById('r-wheel-track');
-    if (!track) return;
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0)';
-    track.innerHTML = '';
+function rouletteDrawWheel(p1pct, p1Wins, room) {
+    const canvas = document.getElementById('r-wheel-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const size = 280;
+    const cx = size / 2, cy = size / 2, r = size / 2 - 2;
 
-    const totalSegs = 60;
-    const p1count = Math.round(totalSegs * p1pct);
+    // Цвета секторов — несколько оттенков для красивости
+    const p1colors = ['#ef4444','#f87171','#dc2626','#fb7185'];
+    const p2colors = ['#7b5cff','#a855f7','#6d28d9','#8b5cf6'];
+
+    // Генерируем мини-сегменты (~40 штук) для красивого колеса
+    const totalSegs = 40;
+    const p1count = Math.max(1, Math.round(totalSegs * p1pct));
+    const p2count = Math.max(1, totalSegs - p1count);
     let segs = [];
-    for (let i = 0; i < p1count; i++) segs.push({ type: 'p1', label: room.host.slice(0,5) });
-    for (let i = 0; i < totalSegs - p1count; i++) segs.push({ type: 'p2', label: room.guest.slice(0,5) });
-    for (let i = segs.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [segs[i],segs[j]]=[segs[j],segs[i]]; }
-
-    const allSegs = [...segs,...segs,...segs,...segs];
-    const segW = 58;
-    allSegs.forEach(seg => {
-        const div = document.createElement('div');
-        div.style.cssText = `height:52px;min-width:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;margin:0 3px;flex-shrink:0;padding:0 6px;`;
-        if (seg.type === 'p1') {
-            div.style.background = 'rgba(239,68,68,0.5)';
-            div.style.border = '1px solid rgba(239,68,68,0.6)';
-            div.style.color = '#fca5a5';
-        } else {
-            div.style.background = 'rgba(123,92,255,0.5)';
-            div.style.border = '1px solid rgba(123,92,255,0.6)';
-            div.style.color = '#c4b5fd';
-        }
-        div.textContent = seg.label;
-        track.appendChild(div);
-    });
-
-    const wrapW = document.querySelector('#roulette-spin > div')?.offsetWidth || 340;
-    const centerPx = wrapW / 2;
-    const winnerType = p1Wins ? 'p1' : 'p2';
-    let targetIdx = totalSegs * 2;
-    for (let i = totalSegs*2; i < totalSegs*3; i++) {
-        if (allSegs[i].type === winnerType) { targetIdx = i; break; }
+    for (let i = 0; i < p1count; i++) segs.push(1);
+    for (let i = 0; i < p2count; i++) segs.push(2);
+    // Перемешиваем
+    for (let i = segs.length-1; i > 0; i--) {
+        const j = Math.floor(Math.random()*(i+1)); [segs[i],segs[j]]=[segs[j],segs[i]];
     }
-    const finalOffset = targetIdx * segW + segW/2 - centerPx + (Math.random()-0.5)*30;
 
-    requestAnimationFrame(() => setTimeout(() => {
-        track.style.transition = 'transform 4s cubic-bezier(0.15,0.85,0.35,1.0)';
-        track.style.transform = `translateX(-${finalOffset}px)`;
-        setTimeout(() => rouletteShowResult(p1Wins, room), 4300);
-    }, 100));
+    const segAngle = (2 * Math.PI) / segs.length;
+
+    // Рисуем статичное колесо (до вращения)
+    function drawWheel(rotation) {
+        ctx.clearRect(0, 0, size, size);
+        segs.forEach((player, i) => {
+            const startA = rotation + i * segAngle - Math.PI/2;
+            const endA = startA + segAngle;
+            const colors = player === 1 ? p1colors : p2colors;
+            const color = colors[i % colors.length];
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, startA, endA);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // Тонкая граница между сегментами
+            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Инициал игрока в центре сегмента
+            const midA = startA + segAngle / 2;
+            const textR = r * 0.72;
+            const tx = cx + textR * Math.cos(midA);
+            const ty = cy + textR * Math.sin(midA);
+            ctx.save();
+            ctx.translate(tx, ty);
+            ctx.rotate(midA + Math.PI/2);
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(player === 1 ? room.host[0].toUpperCase() : room.guest[0].toUpperCase(), 0, 0);
+            ctx.restore();
+        });
+
+        // Внутренний круг (маска)
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.32, 0, 2*Math.PI);
+        ctx.fillStyle = '#13131f';
+        ctx.fill();
+    }
+
+    // Определяем финальный угол — указатель (сверху = -π/2) должен попасть на нужный сектор
+    const winnerPlayer = p1Wins ? 1 : 2;
+    // Находим случайный сегмент победителя
+    const winSegs = segs.map((s,i)=>({s,i})).filter(x=>x.s===winnerPlayer);
+    const winSeg = winSegs[Math.floor(Math.random()*winSegs.length)];
+    const winMidAngle = winSeg.i * segAngle + segAngle/2; // угол середины сегмента (от 0)
+    // Нужно повернуть так чтобы winMidAngle оказался на -π/2 (верхушка)
+    const targetRotation = -Math.PI/2 - winMidAngle;
+    // Добавляем 5+ полных оборотов
+    const fullSpins = (5 + Math.floor(Math.random()*3)) * 2 * Math.PI;
+    const finalRotation = targetRotation - fullSpins;
+
+    // Анимация
+    const duration = 4500;
+    const startTime = performance.now();
+    const startRotation = 0;
+
+    function ease(t) { return 1 - Math.pow(1-t, 4); } // ease-out quart
+
+    function animate(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const rot = startRotation + (finalRotation - startRotation) * ease(t);
+        drawWheel(rot);
+        if (t < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            drawWheel(finalRotation);
+            setTimeout(() => rouletteShowResult(p1Wins, room), 600);
+        }
+    }
+
+    drawWheel(0);
+    requestAnimationFrame(animate);
 }
 
 function rouletteShowResult(p1Wins, room) {

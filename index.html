@@ -368,13 +368,37 @@
             </div>
 
             <!-- КОЛЕСО -->
-            <div id="roulette-spin" style="display:none;padding:0 14px 14px;">
-                <div style="font-size:0.68rem;font-weight:800;color:#ef4444;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:12px;">КРУТИМ КОЛЕСО</div>
-                <div style="position:relative;width:100%;height:72px;border-radius:16px;overflow:hidden;background:#0d0d1c;border:1.5px solid rgba(239,68,68,0.25);">
-                    <div id="r-wheel-track" style="display:flex;height:100%;align-items:center;will-change:transform;transition:transform 4s cubic-bezier(0.15,0.85,0.35,1.0);"></div>
-                    <div style="position:absolute;top:0;bottom:0;left:50%;width:3px;transform:translateX(-50%);background:#fff;box-shadow:0 0 10px rgba(255,255,255,0.8);z-index:10;border-radius:2px;"></div>
+            <div id="roulette-spin" style="display:none;padding:14px;">
+                <!-- Банк сверху -->
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="font-size:0.62rem;font-weight:700;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">БАНК</div>
+                    <div style="font-size:1.6rem;font-weight:900;color:#fcd34d;" id="r-spin-pot">0 F</div>
                 </div>
-                <div style="text-align:center;margin-top:14px;font-size:0.9rem;font-weight:700;color:#aaa;" id="r-spin-status">Определяем победителя…</div>
+
+                <!-- Круглое колесо -->
+                <div style="position:relative;width:100%;display:flex;justify-content:center;margin-bottom:16px;">
+                    <!-- Указатель сверху -->
+                    <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:20;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:20px solid #fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.8));"></div>
+
+                    <!-- Обёртка колеса -->
+                    <div style="position:relative;width:280px;height:280px;">
+                        <!-- Внешнее кольцо -->
+                        <div style="position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,#7b5cff,#ef4444,#a855f7,#7b5cff);padding:4px;box-shadow:0 0 30px rgba(123,92,255,0.5),0 0 60px rgba(239,68,68,0.3);">
+                            <div style="width:100%;height:100%;border-radius:50%;background:#0d0d1c;"></div>
+                        </div>
+
+                        <!-- Canvas колеса -->
+                        <canvas id="r-wheel-canvas" width="280" height="280" style="position:absolute;inset:0;border-radius:50%;"></canvas>
+
+                        <!-- Центральный круг -->
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#2a1a3e,#13131f);border:2px solid rgba(123,92,255,0.4);box-shadow:0 0 20px rgba(0,0,0,0.8),inset 0 0 15px rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;">
+                            <div style="font-size:1.1rem;font-weight:900;color:#fff;" id="r-center-pot">0</div>
+                            <div style="font-size:0.6rem;color:#7b5cff;font-weight:700;letter-spacing:1px;">F</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align:center;font-size:0.85rem;font-weight:700;color:#aaa;" id="r-spin-status">Определяем победителя…</div>
             </div>
 
             <!-- РЕЗУЛЬТАТ -->
