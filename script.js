@@ -5973,73 +5973,82 @@ function rouletteDrawWheel(p1pct, p1Wins, room) {
     const p1colors = ['#ef4444','#f87171','#dc2626','#fb7185'];
     const p2colors = ['#7b5cff','#a855f7','#6d28d9','#8b5cf6'];
 
-    // Генерируем мини-сегменты (~40 штук) для красивого колеса
-    const totalSegs = 40;
-    const p1count = Math.max(1, Math.round(totalSegs * p1pct));
-    const p2count = Math.max(1, totalSegs - p1count);
-    let segs = [];
-    for (let i = 0; i < p1count; i++) segs.push(1);
-    for (let i = 0; i < p2count; i++) segs.push(2);
-    // Перемешиваем
-    for (let i = segs.length-1; i > 0; i--) {
-        const j = Math.floor(Math.random()*(i+1)); [segs[i],segs[j]]=[segs[j],segs[i]];
-    }
+    // Каждый игрок = один сектор, угол пропорционален ставке
+    const total = room.hostBet + room.guestBet;
+    const players = [
+        { id: 1, name: room.host,  bet: room.hostBet,  angle: (room.hostBet  / total) * 2 * Math.PI, colors: p1colors },
+        { id: 2, name: room.guest, bet: room.guestBet, angle: (room.guestBet / total) * 2 * Math.PI, colors: p2colors },
+    ];
 
-    const segAngle = (2 * Math.PI) / segs.length;
+    // Вычисляем startAngle каждого сектора
+    let cumAngle = 0;
+    players.forEach(p => { p.startAngle = cumAngle; cumAngle += p.angle; });
 
-    // Рисуем статичное колесо (до вращения)
+    // Рисуем колесо
     function drawWheel(rotation) {
         ctx.clearRect(0, 0, size, size);
-        segs.forEach((player, i) => {
-            const startA = rotation + i * segAngle - Math.PI/2;
-            const endA = startA + segAngle;
-            const colors = player === 1 ? p1colors : p2colors;
-            const color = colors[i % colors.length];
+        players.forEach((p, i) => {
+            const startA = rotation + p.startAngle - Math.PI/2;
+            const endA   = startA + p.angle;
 
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, r, startA, endA);
             ctx.closePath();
-            ctx.fillStyle = color;
+            ctx.fillStyle = p.colors[0];
             ctx.fill();
 
-            // Тонкая граница между сегментами
-            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-            ctx.lineWidth = 1;
+            // Граница
+            ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Инициал игрока в центре сегмента
-            const midA = startA + segAngle / 2;
-            const textR = r * 0.72;
+            // Имя игрока в секторе
+            const midA = startA + p.angle / 2;
+            const textR = r * 0.65;
             const tx = cx + textR * Math.cos(midA);
             const ty = cy + textR * Math.sin(midA);
             ctx.save();
             ctx.translate(tx, ty);
             ctx.rotate(midA + Math.PI/2);
-            ctx.fillStyle = 'rgba(255,255,255,0.55)';
-            ctx.font = 'bold 8px sans-serif';
+
+            // Подложка для текста
+            const label = p.name.slice(0, 8);
+            const pctLabel = Math.round(p.bet / total * 100) + '%';
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.beginPath();
+            ctx.roundRect(-28, -18, 56, 36, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 9px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(player === 1 ? room.host[0].toUpperCase() : room.guest[0].toUpperCase(), 0, 0);
+            ctx.fillText(label, 0, -5);
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.fillText(pctLabel, 0, 8);
             ctx.restore();
         });
 
-        // Внутренний круг (маска)
+        // Внутренний круг
         ctx.beginPath();
         ctx.arc(cx, cy, r * 0.32, 0, 2*Math.PI);
         ctx.fillStyle = '#13131f';
         ctx.fill();
+
+        // Тонкое кольцо внутри
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.32, 0, 2*Math.PI);
+        ctx.strokeStyle = 'rgba(123,92,255,0.4)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
 
-    // Определяем финальный угол — указатель (сверху = -π/2) должен попасть на нужный сектор
-    const winnerPlayer = p1Wins ? 1 : 2;
-    // Находим случайный сегмент победителя
-    const winSegs = segs.map((s,i)=>({s,i})).filter(x=>x.s===winnerPlayer);
-    const winSeg = winSegs[Math.floor(Math.random()*winSegs.length)];
-    const winMidAngle = winSeg.i * segAngle + segAngle/2; // угол середины сегмента (от 0)
-    // Нужно повернуть так чтобы winMidAngle оказался на -π/2 (верхушка)
+    // Финальный угол — указатель должен попасть на середину сектора победителя
+    const winner = p1Wins ? players[0] : players[1];
+    const winMidAngle = winner.startAngle + winner.angle / 2;
     const targetRotation = -Math.PI/2 - winMidAngle;
-    // Добавляем 5+ полных оборотов
     const fullSpins = (5 + Math.floor(Math.random()*3)) * 2 * Math.PI;
     const finalRotation = targetRotation - fullSpins;
 
